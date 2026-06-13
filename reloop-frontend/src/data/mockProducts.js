@@ -16,6 +16,11 @@ export const mockProducts = [
       "not as described",
     ],
     image_url: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop"
+    ],
     description: "6000mAh battery, 120Hz Super AMOLED display, 50MP camera",
     rating: 4.2,
     reviews_count: 1240,
@@ -35,6 +40,11 @@ export const mockProducts = [
       "dead pixels",
     ],
     image_url: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=600&auto=format&fit=crop"
+    ],
     description: "Intel Core i7, 16GB RAM, OLED Touch display, RTX 4060",
     rating: 4.5,
     reviews_count: 854,
@@ -53,6 +63,11 @@ export const mockProducts = [
       "damaged cover",
     ],
     image_url: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1614849963640-9cc74b2a826f?q=80&w=600&auto=format&fit=crop"
+    ],
     description: "International bestseller on building good habits and breaking bad ones",
     rating: 4.8,
     reviews_count: 45290,
@@ -72,6 +87,11 @@ export const mockProducts = [
       "defective on arrival",
     ],
     image_url: "https://images.unsplash.com/photo-1578643463396-0997cb5328c1?q=80&w=600&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1578643463396-0997cb5328c1?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?q=80&w=600&auto=format&fit=crop"
+    ],
     description: "600W motor, 1.5L jar, 3 speed settings with pulse",
     rating: 4.1,
     reviews_count: 3120,
@@ -90,11 +110,11 @@ export const mockProducts = [
       "stitching issue",
       "fabric quality",
     ],
-    image_url: "/reloop-jacket-1.jpg",
+    image_url: "/reloop-jacket-1.png",
     images: [
-      "/reloop-jacket-1.jpg",
-      "/reloop-jacket-2.jpg",
-      "/reloop-jacket-3.jpg"
+      "/reloop-jacket-1.png",
+      "/reloop-jacket-2.png",
+      "/reloop-jacket-3.png"
     ],
     description: "Classic blue denim trucker jacket, slim fit, button front",
     rating: 4.3,
