@@ -47,7 +47,7 @@ export default function Home() {
       items: [
         { name: "Cleaning supplies", img: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=300&auto=format&fit=crop" },
         { name: "Bathroom accessories", img: "https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=300&auto=format&fit=crop" },
-        { name: "Home tools", img: "https://images.unsplash.com/photo-1530124560072-aab8cf2fbb30?q=80&w=300&auto=format&fit=crop" },
+        { name: "Home tools", img: "/reloop-tools.png" },
         { name: "Wallpapers", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" }
       ]
     },
