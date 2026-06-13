@@ -18,6 +18,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 
 # CORS
 ALLOWED_ORIGINS: list[str] = [
     "http://localhost:3000",
+    "http://localhost:3001",
     "http://localhost:5173",
-    "https://*.vercel.app",
 ]
