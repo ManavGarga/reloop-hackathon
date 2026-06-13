@@ -39,12 +39,15 @@ async def get_user_dashboard(user_id: str):
     # Build cleaned recent returns list
     formatted_returns = [
         {
-            "return_id":     r.get("return_id"),
-            "product_name":  r.get("product_name"),
-            "status":        r.get("status"),
-            "route":         r.get("disposal_route"),
+            "return_id":      r.get("return_id"),
+            "product_id":     r.get("product_id"),
+            "product_name":   r.get("product_name"),
+            "status":         r.get("status"),
+            "route":          r.get("disposal_route"),
+            "grade":          r.get("grade"),
+            "co2_saved":      r.get("co2_saved_kg"),
             "credits_earned": r.get("green_credits_awarded", 0),
-            "date":          (r.get("created_at") or "")[:10],
+            "date":           (r.get("created_at") or "")[:10],
         }
         for r in recent_returns
     ]

@@ -5,16 +5,18 @@ const BASE = "http://localhost:8000/api"
 
 async function request(method, path, body = null) {
   try {
-    const res = await fetch(`${BASE}${path}`, {
+    const separator = path.includes("?") ? "&" : "?";
+    const url = `${BASE}${path}${method === "GET" ? `${separator}t=${Date.now()}` : ""}`;
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: body ? JSON.stringify(body) : undefined,
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return await res.json()
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
   } catch (e) {
-    console.warn(`[ReLoop API] ${method} ${path} failed:`, e.message)
-    return {}
+    console.warn(`[ReLoop API] ${method} ${path} failed:`, e.message);
+    return {};
   }
 }
 
