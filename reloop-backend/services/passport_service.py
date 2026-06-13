@@ -127,6 +127,20 @@ async def append_event(
     if co2_delta_kg is not None:
         update["$inc"] = {"total_co2_kg": co2_delta_kg}
 
+    # Ensure passport exists before appending
+    passport = await db.passports.find_one({"product_id": product_id})
+    if not passport:
+        prod = await db.products.find_one({"product_id": product_id})
+        prod_name = prod.get("name", "Product") if prod else "Product"
+        category = prod.get("category", "general") if prod else "general"
+        initial_co2 = prod.get("carbon_footprint_kg", 0.0) if prod else 0.0
+        await create_passport(
+            product_id=product_id,
+            product_name=prod_name,
+            category=category,
+            initial_co2_kg=initial_co2
+        )
+
     await db.passports.update_one({"product_id": product_id}, update)
     return event
 

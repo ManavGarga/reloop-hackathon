@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ShieldCheck, ArrowLeft, ArrowRight, User, MapPin, BadgeAlert, Award, Compass, Eye, ShieldAlert } from "lucide-react";
+import { ShieldCheck, ArrowLeft, ArrowRight, User, MapPin, BadgeAlert, Award, Compass, Eye, ShieldAlert, Leaf } from "lucide-react";
 import { getPassport } from "../api/reloop";
 import GradeTag from "../components/shared/GradeTag";
 import CarbonBadge from "../components/passport/CarbonBadge";

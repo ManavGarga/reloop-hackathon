@@ -34,10 +34,11 @@ export const createProduct = (data) => request("POST", "/products", data)
 export const updateProduct = (id, data) => request("PUT", `/products/${id}`, data)
 
 // ─── Returns ──────────────────────────────────────────────
-export const initiateReturn   = (data) => request("POST", "/returns", data)
-export const getReturn        = (id)   => request("GET",  `/returns/${id}`)
-export const updateReturnDecision = (id, data) => request("PUT", `/returns/${id}/decision`, data)
-export const getUserReturns   = (uid)  => request("GET",  `/returns/user/${uid}`)
+export const initiateReturn      = (data) => request("POST", "/returns/initiate", data)
+export const gradeReturn         = (data) => request("POST", "/returns/grade", data)
+export const disposeReturn       = (data) => request("POST", "/returns/dispose", data)
+export const completeReturn      = (id, data) => request("POST", `/returns/${id}/complete`, data)
+export const getReturn           = (id)   => request("GET",  `/returns/${id}`)
 
 // ─── Recommendations ──────────────────────────────────────
 export const getSimilar          = (productId) => request("GET", `/recommendations/similar/${productId}`)

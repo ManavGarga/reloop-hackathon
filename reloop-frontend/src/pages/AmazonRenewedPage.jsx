@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Star, ShieldCheck, Leaf, Info, HelpCircle, ArrowLeft, Heart, ShoppingBag, Search, ChevronRight, ShieldAlert, Sparkles } from "lucide-react";
+import { Star, ShieldCheck, Leaf, Info, HelpCircle, ArrowLeft, Heart, ShoppingBag, Search, ChevronRight, ShieldAlert, Sparkles, X } from "lucide-react";
 import IntegrationTierBanner from "../components/amazon/IntegrationTierBanner";
 import ReLoopVerifiedBadge from "../components/amazon/ReLoopVerifiedBadge";
 import RenewedPassportDrawer from "../components/amazon/RenewedPassportDrawer";
