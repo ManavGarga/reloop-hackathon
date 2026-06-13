@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 motor
 python-dotenv
-anthropic
+google-genai
 pydantic[email]
 python-jose[cryptography]
 passlib[bcrypt]
