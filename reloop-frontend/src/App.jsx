@@ -2,12 +2,16 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { Package, RotateCcw, BarChart2, Sparkles, ShoppingBag, User } from 'lucide-react'
 import './index.css'
 
-// ─── Page Placeholders (Person 2 will flesh these out) ───
+// Import actual page components
+import ProductPage from './pages/ProductPage'
+import ReturnFlow from './pages/ReturnFlow'
+import Dashboard from './pages/Dashboard'
+import PassportPage from './pages/PassportPage'
+import AmazonRenewedPage from './pages/AmazonRenewedPage'
+
+// ─── Remaining Page Placeholders ───
 const pages = {
   Home:            () => <PlaceholderPage title="Home" subtitle="Sustainable Returns & Recommerce" />,
-  Products:        () => <PlaceholderPage title="Marketplace" subtitle="Browse refurbished & returned items" />,
-  Returns:         () => <PlaceholderPage title="Initiate Return" subtitle="Smart return decision engine" />,
-  Dashboard:       () => <PlaceholderPage title="Analytics Dashboard" subtitle="Sustainability impact & trends" />,
   Recommendations: () => <PlaceholderPage title="For You" subtitle="AI-powered personalized picks" />,
   Profile:         () => <PlaceholderPage title="My Profile" subtitle="Account & return history" />,
 }
@@ -78,9 +82,12 @@ export default function App() {
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
         <Routes>
           <Route path="/"                element={<pages.Home />}            />
-          <Route path="/products"        element={<pages.Products />}        />
-          <Route path="/returns"         element={<pages.Returns />}         />
-          <Route path="/dashboard"       element={<pages.Dashboard />}       />
+          <Route path="/products"        element={<ProductPage />}          />
+          <Route path="/returns"         element={<ReturnFlow />}           />
+          <Route path="/return/:productId" element={<ReturnFlow />}         />
+          <Route path="/dashboard"       element={<Dashboard />}            />
+          <Route path="/passport/:productId" element={<PassportPage />}     />
+          <Route path="/amazon-renewed"  element={<AmazonRenewedPage />}    />
           <Route path="/recommendations" element={<pages.Recommendations />} />
           <Route path="/profile"         element={<pages.Profile />}         />
         </Routes>
