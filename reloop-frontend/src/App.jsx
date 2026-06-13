@@ -28,14 +28,21 @@ const navItems = [
 ]
 
 function Navbar() {
-  const { totalItems, cartItems, removeFromCart } = useCart();
-  const { user } = useUser();
+  const { totalItems, cartItems, removeFromCart, clearCart } = useCart();
+  const { user, updateUser } = useUser();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [liveCredits, setLiveCredits] = useState(null);
   const navigate = useNavigate();
 
+  const [searchCategory, setSearchCategory] = useState('All Departments');
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [newCity, setNewCity] = useState(user?.city || 'Bengaluru');
+  const [newPincode, setNewPincode] = useState('560001');
+
+  const [checkoutReceiptOpen, setCheckoutReceiptOpen] = useState(false);
+  const [receiptDetails, setReceiptDetails] = useState(null);
 
   // Fetch live credits balance
   useEffect(() => {
@@ -46,12 +53,69 @@ function Navbar() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    let queryParams = [];
     if (searchQuery.trim()) {
-      navigate(`/products?q=${encodeURIComponent(searchQuery)}`);
-    } else {
-      navigate('/products');
+      queryParams.push(`q=${encodeURIComponent(searchQuery)}`);
     }
+    if (searchCategory !== "All Departments") {
+      const catVal = searchCategory === "Amazon Fashion" ? "clothing" : searchCategory.toLowerCase();
+      queryParams.push(`category=${catVal}`);
+    }
+    const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+    navigate(`/products${queryString}`);
   };
+
+  const handleProceedToBuy = () => {
+    let carbonSaved = 0;
+    let creditsEarned = 0;
+
+    cartItems.forEach(item => {
+      const isRenewed = item.name.toLowerCase().includes('refurbished') || item.grade;
+      const baseCarbon = item.carbon_footprint_kg || item.total_co2_kg || 70.0;
+      
+      if (isRenewed) {
+        carbonSaved += baseCarbon * 0.85 * item.quantity;
+        creditsEarned += 50 * item.quantity;
+      } else {
+        carbonSaved += baseCarbon * 0.1 * item.quantity;
+      }
+    });
+
+    const receipt = {
+      items: [...cartItems],
+      carbonSaved,
+      creditsEarned,
+      totalAmount: cartItems.reduce((acc, item) => acc + ((item.price_renewed || item.price_new) * item.quantity), 0)
+    };
+
+    try {
+      const existingStr = sessionStorage.getItem("reloop_orders");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      
+      const newOrders = cartItems.map(item => ({
+        id: `404-${Math.floor(1000000 + Math.random() * 9000000)}-${Math.floor(1000000 + Math.random() * 9000000)}`,
+        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
+        total: `₹${(item.price_renewed || item.price_new).toLocaleString()}`,
+        shipTo: user?.name || "Priya Sharma",
+        status: "Eligible for Return",
+        statusDesc: `Delivered. Return window open until ${new Date(Date.now() + 90 * 24 * 3600 * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}.`,
+        productName: item.name,
+        price: `₹${(item.price_renewed || item.price_new).toLocaleString()}`,
+        productId: item.product_id || item.original_id || "prod_samsung_m34_001",
+        img: item.image_url
+      }));
+
+      sessionStorage.setItem("reloop_orders", JSON.stringify([...newOrders, ...existing]));
+    } catch (e) {
+      console.error("Failed to save purchases:", e);
+    }
+
+    setReceiptDetails(receipt);
+    setCartOpen(false);
+    clearCart();
+    setCheckoutReceiptOpen(true);
+  };
+
 
   return (
     <>
@@ -76,7 +140,13 @@ function Navbar() {
               <div style={{ height: '3px', width: '100%', background: 'linear-gradient(90deg, #febd69, #4ade80)', borderRadius: '2px', marginTop: '-2px' }} />
             </NavLink>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+            <div 
+              onClick={() => {
+                setNewCity(user?.city || 'Bengaluru');
+                setAddressModalOpen(true);
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+            >
               <MapPin size={16} style={{ color: '#cccccc', marginTop: '6px' }} />
               <div style={{ display: 'flex', flexDirection: 'column', fontSize: '11px', lineHeight: '1.2' }}>
                 <span style={{ color: '#cccccc' }}>Deliver to {user?.name?.split(' ')[0] || 'Priya'}</span>
@@ -89,6 +159,8 @@ function Navbar() {
           <div style={{ display: 'flex', flex: 1, flexDirection: 'column', position: 'relative' }}>
             <form onSubmit={handleSearchSubmit} style={{ display: 'flex', height: '40px', borderRadius: '4px', overflow: 'hidden', background: 'white' }}>
               <select 
+                value={searchCategory}
+                onChange={e => setSearchCategory(e.target.value)}
                 style={{
                   background: '#f3f3f3',
                   color: '#555555',
@@ -474,10 +546,7 @@ function Navbar() {
                   </span>
                 </div>
                 <button 
-                  onClick={() => {
-                    setCartOpen(false);
-                    alert("Checkout processed successfully (Demo mock)!");
-                  }}
+                  onClick={handleProceedToBuy}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -498,6 +567,108 @@ function Navbar() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Address Picker Modal */}
+      {addressModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', color: '#111' }}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '8px', width: '400px', boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: 'bold' }}>Choose your location</h3>
+            <p style={{ fontSize: '11px', color: '#565959', marginBottom: '16px', lineHeight: '1.4' }}>Select a delivery city to see local ReLoop listings, NGO donation center routing, and peer-to-peer delivery options.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>City</label>
+                <select 
+                  value={newCity} 
+                  onChange={e => setNewCity(e.target.value)} 
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', outline: 'none', background: 'white' }}
+                >
+                  <option value="Bengaluru">Bengaluru</option>
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Noida">Noida</option>
+                  <option value="Pune">Pune</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Pin Code</label>
+                <input 
+                  type="text" 
+                  value={newPincode} 
+                  onChange={e => setNewPincode(e.target.value)} 
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', outline: 'none' }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setAddressModalOpen(false)} 
+                style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  updateUser({ city: newCity });
+                  setAddressModalOpen(false);
+                }} 
+                style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Receipt Modal */}
+      {checkoutReceiptOpen && receiptDetails && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', color: '#111' }}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '500px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', border: '2px solid #22c55e', textIndent: 0 }}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <span style={{ fontSize: '48px' }}>♻️</span>
+              <h3 style={{ margin: '8px 0 4px 0', fontSize: '20px', fontWeight: 'bold', color: '#15803d' }}>Order Placed Successfully!</h3>
+              <p style={{ fontSize: '12px', color: '#16a34a', fontWeight: 'bold' }}>ReLoop Green Checkout Verified</p>
+            </div>
+
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '16px', fontSize: '13px' }}>
+              <span style={{ fontWeight: 'bold', color: '#166534', display: 'block', marginBottom: '8px' }}>🌱 YOUR CIRCULAR IMPACT REPORT</span>
+              <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span>Carbon Emissions Saved:</span>
+                <strong style={{ color: '#15803d' }}>{receiptDetails.carbonSaved.toFixed(1)} kg CO₂e</strong>
+              </div>
+              <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span>Green Credits Earned:</span>
+                <strong style={{ color: '#ca8a04' }}>+{receiptDetails.creditsEarned} Credits</strong>
+              </div>
+              <div style={{ fontSize: '10px', color: '#166534', marginTop: '8px', borderTop: '1px solid #dcfce7', paddingTop: '8px', lineHeight: '1.4' }}>
+                🌍 By choosing Amazon Renewed pre-owned alternatives, you saved up to 85% of standard manufacturing carbon outputs.
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #eee', paddingTop: '12px', marginBottom: '20px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#565959', display: 'block', textTransform: 'uppercase' }}>Items purchased:</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px', maxHeight: '120px', overflowY: 'auto' }}>
+                {receiptDetails.items.map((it, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '12px', gap: '10px' }}>
+                    <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '350px' }}>• {it.name} (x{it.quantity})</span>
+                    <strong>₹{(it.price_renewed || it.price_new).toLocaleString()}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                setCheckoutReceiptOpen(false);
+                navigate('/returns');
+              }} 
+              style={{ width: '100%', padding: '12px', background: 'linear-gradient(to bottom, #f7dfa5, #f0c14b)', border: '1px solid #a88734', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
+            >
+              Go to Your Orders to track circular items
+            </button>
           </div>
         </div>
       )}

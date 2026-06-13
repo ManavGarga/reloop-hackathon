@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, Key, MapPin, CreditCard, ChevronRight, Check } from 'lucide-react';
+import { User, Shield, Key, MapPin, CreditCard, ChevronRight, Award, Zap, Coins, Heart, MessageSquare, Headphones } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, updateUser, loading } = useUser();
-  const [profileView, setProfileView] = useState("menu"); // "menu" or "login-security"
+  const { user, updateUser } = useUser();
+  const [profileView, setProfileView] = useState("menu"); // "menu" | "login-security" | "prime" | "payment" | "contact"
 
   // Edit states
   const [isEditingName, setIsEditingName] = useState(false);
@@ -64,7 +64,6 @@ export default function Profile() {
       <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '24px' }}>
           
-          {/* Breadcrumbs */}
           <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
             <span style={{ cursor: 'pointer', color: '#007185' }} onClick={() => setProfileView("menu")}>Your Account</span> 
             <ChevronRight size={10} style={{ display: 'inline', margin: '0 4px' }} /> 
@@ -73,10 +72,8 @@ export default function Profile() {
 
           <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Login & Security</h1>
 
-          {/* Details Table Card */}
           <div style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
             
-            {/* Field: Name */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
               <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Name:</span>
@@ -100,7 +97,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Field: Phone */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
               <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Primary mobile number:</span>
@@ -127,7 +123,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Field: Email */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
               <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>E-mail:</span>
@@ -154,7 +149,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Field: City */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
               <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Primary delivery city:</span>
@@ -181,7 +175,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Field: Passkey */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
               <div>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Passkey:</span>
@@ -190,13 +183,153 @@ export default function Profile() {
               <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Set up</button>
             </div>
 
-            {/* Field: Password */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
               <div>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Password:</span>
                 <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>••••••••</p>
               </div>
               <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  if (profileView === "prime") {
+    return (
+      <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '24px' }}>
+          
+          <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
+            <span style={{ cursor: 'pointer', color: '#007185' }} onClick={() => setProfileView("menu")}>Your Account</span> 
+            <ChevronRight size={10} style={{ display: 'inline', margin: '0 4px' }} /> 
+            <span style={{ color: '#c7511f' }}>Your Prime Membership</span>
+          </div>
+
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '30px', borderRadius: '12px', color: 'white', marginBottom: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
+            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ fontSize: '11px', background: '#38bdf8', color: '#0f172a', padding: '3px 8px', borderRadius: '12px', fontWeight: '800' }}>ACTIVE MEMBER</span>
+                <h2 style={{ fontSize: '26px', fontWeight: '800', marginTop: '8px' }}>amazon<span style={{ color: '#4ade80' }}>reloop</span> prime</h2>
+              </div>
+              <span style={{ fontSize: '48px' }}>👑</span>
+            </div>
+            <p style={{ fontSize: '13px', color: '#cbd5e1', marginTop: '12px', lineHeight: '1.5' }}>
+              Your Prime membership includes exclusive ReLoop circular logistics, priority returns processing, and green cashback incentives.
+            </p>
+          </div>
+
+          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>Your Circular Prime Benefits</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[
+              { icon: <Zap className="text-amber-500" />, title: "Free AI-Doorstep Pickups", desc: "Skip drop-offs entirely. A ReLoop logistics courier will collect returns right at your doorstep, verify AI grade status on the spot, and credit you immediately." },
+              { icon: <Coins className="text-emerald-500" />, title: "1.5x Credits Multiplier", desc: "Earn 50% more Green Credits for every P2P recommerce exchange or local NGO donation verified." },
+              { icon: <Heart className="text-rose-500" />, title: "Refurbished Priority Access", desc: "Gain 24-hour early booking privileges on high-demand Certified Renewed product listings (beating standard marketplace drops)." }
+            ].map((benefit, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: '16px', border: '1px solid #eee', borderRadius: '8px', padding: '16px' }}>
+                <div style={{ padding: '8px', background: '#f8fafc', borderRadius: '8px' }}>{benefit.icon}</div>
+                <div>
+                  <h4 style={{ fontSize: '14px', fontWeight: 'bold' }}>{benefit.title}</h4>
+                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px', lineHeight: '1.4' }}>{benefit.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  if (profileView === "payment") {
+    return (
+      <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '24px' }}>
+          
+          <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
+            <span style={{ cursor: 'pointer', color: '#007185' }} onClick={() => setProfileView("menu")}>Your Account</span> 
+            <ChevronRight size={10} style={{ display: 'inline', margin: '0 4px' }} /> 
+            <span style={{ color: '#c7511f' }}>Payment Options</span>
+          </div>
+
+          <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Your Saved Cards & Balances</h1>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
+            
+            {/* Amazon Pay Balance with Credits */}
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', color: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+              <span style={{ fontSize: '11px', uppercase: 'true', fontWeight: '800', opacity: 0.8 }}>AMAZON PAY WALLET</span>
+              <h3 style={{ fontSize: '24px', fontWeight: '800', marginTop: '8px' }}>₹240.00</h3>
+              <p style={{ fontSize: '11px', marginTop: '8px', opacity: 0.9 }}>
+                Green Credits Converted: 240 Credits
+              </p>
+              <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', fontSize: '11px' }}>
+                <span>Verified ReLoop Wallet</span>
+                <span>Active ✓</span>
+              </div>
+            </div>
+
+            {/* ReLoop Green Card */}
+            <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #10b981 100%)', color: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+              <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '11px', uppercase: 'true', fontWeight: '800', opacity: 0.8 }}>RELOOP CO-BRANDED CARD</span>
+                <span style={{ fontSize: '18px' }}>🌱</span>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '14px' }}>•••• •••• •••• 8921</h3>
+              <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.9 }}>{user.name}</p>
+              <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', fontSize: '11px' }}>
+                <span>Exp: 08/29</span>
+                <span>2% ReLoop Cashback</span>
+              </div>
+            </div>
+
+          </div>
+
+          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>Circular Exchange Rate</h3>
+          <div style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', lineHeight: '1.5' }}>
+            ♻️ <strong>Green Credits Redemption</strong>: 1 Green Credit = ₹1 Amazon Pay Balance. Credits awarded during circular return approvals are credited to your Amazon Pay wallet automatically upon processing.
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  if (profileView === "contact") {
+    return (
+      <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '24px' }}>
+          
+          <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
+            <span style={{ cursor: 'pointer', color: '#007185' }} onClick={() => setProfileView("menu")}>Your Account</span> 
+            <ChevronRight size={10} style={{ display: 'inline', margin: '0 4px' }} /> 
+            <span style={{ color: '#c7511f' }}>Contact Customer Support</span>
+          </div>
+
+          <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Support Assistant</h1>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '12px' }}>
+            
+            <div 
+              onClick={() => navigate('/recommendations')}
+              style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
+              onMouseOver={e => e.currentTarget.style.background = '#f8fafc'}
+              onMouseOut={e => e.currentTarget.style.background = 'white'}
+            >
+              <MessageSquare size={36} className="text-indigo-600" style={{ margin: '0 auto 12px auto' }} />
+              <h3 style={{ fontSize: '15px', fontWeight: 'bold' }}>Chat with ReLoop AI</h3>
+              <p style={{ fontSize: '12px', color: '#565959', marginTop: '6px', lineHeight: '1.4' }}>Talk instantly to our sustainability advisor chatbot to ask about credits, returns, or checkups.</p>
+            </div>
+
+            <div 
+              style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'center' }}
+            >
+              <Headphones size={36} className="text-amber-500" style={{ margin: '0 auto 12px auto' }} />
+              <h3 style={{ fontSize: '15px', fontWeight: 'bold' }}>Standard Call Support</h3>
+              <p style={{ fontSize: '12px', color: '#565959', marginTop: '6px', lineHeight: '1.4' }}>Call our 24/7 support line at <strong style={{ color: '#111' }}>1800-103-8921</strong> for questions regarding refunds or pick-up issues.</p>
             </div>
 
           </div>
@@ -246,11 +379,12 @@ export default function Profile() {
 
           {/* Prime */}
           <div 
+            onClick={() => setProfileView("prime")}
             style={{ display: 'flex', gap: '16px', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '16px', cursor: 'pointer' }}
             onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'}
             onMouseOut={e => e.currentTarget.style.background = 'white'}
           >
-            <span style={{ fontSize: '32px' }}>🔵</span>
+            <span style={{ fontSize: '32px' }}>👑</span>
             <div>
               <h4 style={{ fontSize: '15px', fontWeight: '700' }}>Prime</h4>
               <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>View benefits and payment settings</p>
@@ -259,6 +393,7 @@ export default function Profile() {
 
           {/* Addresses */}
           <div 
+            onClick={() => setProfileView("login-security")}
             style={{ display: 'flex', gap: '16px', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '16px', cursor: 'pointer' }}
             onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'}
             onMouseOut={e => e.currentTarget.style.background = 'white'}
@@ -272,6 +407,7 @@ export default function Profile() {
 
           {/* Payment */}
           <div 
+            onClick={() => setProfileView("payment")}
             style={{ display: 'flex', gap: '16px', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '16px', cursor: 'pointer' }}
             onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'}
             onMouseOut={e => e.currentTarget.style.background = 'white'}
@@ -285,6 +421,7 @@ export default function Profile() {
 
           {/* Contact */}
           <div 
+            onClick={() => setProfileView("contact")}
             style={{ display: 'flex', gap: '16px', background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '16px', cursor: 'pointer' }}
             onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'}
             onMouseOut={e => e.currentTarget.style.background = 'white'}

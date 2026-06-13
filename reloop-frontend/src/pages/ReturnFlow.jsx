@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ReturnProvider, useReturn } from "../context/ReturnContext";
 import { useUser } from "../context/UserContext";
+import { useCart } from "../context/CartContext";
 import ProgressBar from "../components/shared/ProgressBar";
-import { CheckCircle2, ChevronRight, ArrowLeft, Package, Sparkles } from "lucide-react";
+import { CheckCircle2, ChevronRight, ArrowLeft, Package, Sparkles, Printer, Star, X, Check } from "lucide-react";
 
 // Import step components
 import Step1ProductSelect from "../components/return/Step1ProductSelect";
@@ -93,10 +94,19 @@ function ReturnFlowContainer() {
 
 function OrdersList({ user }) {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [activeTab, setActiveTab] = useState("orders"); // "orders" or "refund-status"
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const mockOrders = [
+  // Modal States
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [reviewingOrder, setReviewingOrder] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const initialOrders = [
     {
       id: "404-3596249-8456512",
       date: "15 March 2026",
@@ -107,7 +117,8 @@ function OrdersList({ user }) {
       productName: "Samsung Galaxy M34 5G (Silver, 128GB)",
       price: "₹18,999.00",
       productId: "prod_samsung_m34_001",
-      img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=200&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=200&auto=format&fit=crop",
+      carbon_footprint_kg: 70
     },
     {
       id: "404-1188199-4825114",
@@ -119,13 +130,63 @@ function OrdersList({ user }) {
       productName: "Levi's Trucker Denim Jacket (Classic Blue, Size M)",
       price: "₹4,999.00",
       productId: "prod_levis_jacket_001",
-      img: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=200&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=200&auto=format&fit=crop",
+      carbon_footprint_kg: 22
     }
   ];
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("reloop_orders");
+      return stored ? JSON.parse(stored) : initialOrders;
+    } catch {
+      return initialOrders;
+    }
+  });
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 3500);
+  };
+
+  const handleBuyAgain = (order) => {
+    // Map order item back to a cart item structure
+    const cartProduct = {
+      product_id: order.productId,
+      name: order.productName,
+      price_new: parseFloat(order.price.replace(/[₹,]/g, "")),
+      image_url: order.img,
+      carbon_footprint_kg: order.carbon_footprint_kg || 40
+    };
+    addToCart(cartProduct);
+    showToast(`"${order.productName}" added back to shopping cart!`);
+  };
 
   const handleViewStatus = (order) => {
     setSelectedOrder(order);
     setActiveTab("refund-status");
+  };
+
+  const suggestAIReview = () => {
+    if (!reviewingOrder) return;
+    const isClothing = reviewingOrder.productName.toLowerCase().includes("jacket") || reviewingOrder.productName.toLowerCase().includes("denim");
+    if (isClothing) {
+      setReviewComment("Excellent classic fit! The fabric weight is premium and choice of recycled cotton fibers shows Amazon's commitment to circular recommerce. Highly recommended!");
+    } else {
+      setReviewComment("Amazing screen clarity and processing speed! Choosing this certified Amazon Renewed device saved about 59.5 kg of manufacturing CO2. Professional grading works perfectly.");
+    }
+    setReviewRating(5);
+  };
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    setReviewSubmitted(true);
+    setTimeout(() => {
+      setReviewingOrder(null);
+      setReviewSubmitted(false);
+      setReviewComment("");
+      showToast("Thank you! Your verified customer review was submitted successfully.");
+    }, 1500);
   };
 
   if (activeTab === "refund-status" && selectedOrder) {
@@ -146,7 +207,7 @@ function OrdersList({ user }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
             <div style={{ background: '#fcfcfc', border: '1px solid #e7e7e7', borderRadius: '8px', padding: '20px' }}>
               <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
-                <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '4px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '4px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center' }}>
                   <img src={selectedOrder.img} alt={selectedOrder.productName} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
                 </div>
                 <div>
@@ -171,7 +232,7 @@ function OrdersList({ user }) {
                   { label: "Item received at sorting hub", date: "Pending" },
                   { label: "Refund credited & Green Credits awarded", date: "Processed ✓" }
                 ].map((step, idx) => (
-                  <div key={idx} style={{ position: 'relative', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <div key={idx} style={{ position: 'relative', marginBottom: '24px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{
                       position: 'absolute',
                       left: '-26px',
@@ -193,11 +254,11 @@ function OrdersList({ user }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '20px' }}>
                 <h4 style={{ fontWeight: '750', fontSize: '16px', marginBottom: '14px' }}>Refund summary</h4>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', paddingBottom: '8px' }}>
+                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '13px', paddingBottom: '8px' }}>
                   <span>Refund subtotal</span>
                   <span>{selectedOrder.price}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold', borderTop: '1px dashed #eee', paddingTop: '8px' }}>
+                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold', borderTop: '1px dashed #eee', paddingTop: '8px' }}>
                   <span>Total expected refund</span>
                   <span>{selectedOrder.price}</span>
                 </div>
@@ -208,8 +269,8 @@ function OrdersList({ user }) {
                   Manage your return
                 </div>
                 <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#007185' }}>
-                  <span style={{ cursor: 'pointer' }}>View order details</span>
-                  <span style={{ cursor: 'pointer' }}>Write a product review</span>
+                  <span style={{ cursor: 'pointer' }} onClick={() => setSelectedInvoice(selectedOrder)}>View invoice receipt</span>
+                  <span style={{ cursor: 'pointer' }} onClick={() => setReviewingOrder(selectedOrder)}>Write a product review</span>
                 </div>
               </div>
 
@@ -236,6 +297,14 @@ function OrdersList({ user }) {
 
   return (
     <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+      
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div style={{ position: "fixed", top: "80px", right: "24px", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: "4px", fontWeight: "bold", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 2000 }}>
+          {toastMessage}
+        </div>
+      )}
+
       <div style={{ maxWidth: '1000px', margin: '0 auto', spaceY: '16px' }}>
         
         <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
@@ -251,9 +320,11 @@ function OrdersList({ user }) {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {mockOrders.map((order) => (
+          {orders.map((order) => (
             <div key={order.id} style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-              <div style={{ background: '#f0f2f2', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#565959' }}>
+              
+              {/* Card Metadata Top belt */}
+              <div style={{ background: '#f0f2f2', padding: '12px 20px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '12px', color: '#565959' }}>
                 <div style={{ display: 'flex', gap: '32px' }}>
                   <div>
                     <span>ORDER PLACED</span>
@@ -270,14 +341,17 @@ function OrdersList({ user }) {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span>ORDER # {order.id}</span>
-                  <p style={{ color: '#007185', marginTop: '2px', cursor: 'pointer' }}>View order details | Invoice</p>
+                  <p style={{ color: '#007185', marginTop: '2px', cursor: 'pointer' }}>
+                    <span onClick={() => setSelectedInvoice(order)}>Invoice</span>
+                  </p>
                 </div>
               </div>
 
+              {/* Card Item body */}
               <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 240px', gap: '20px' }}>
                 <div style={{ display: 'flex', gap: '20px' }}>
-                  <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src={order.img} alt={order.productName} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+                  <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', border: '1px solid #eee', borderRadius: '6px' }}>
+                    <img src={order.img} alt={order.productName} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>{order.status}</h4>
@@ -308,18 +382,182 @@ function OrdersList({ user }) {
                     ♻️ Return via ReLoop
                   </button>
                   <button 
+                    onClick={() => handleBuyAgain(order)}
+                    style={{ padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '100px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}
+                  >
+                    Buy it again
+                  </button>
+                  <button 
                     onClick={() => handleViewStatus(order)}
                     style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}
                   >
                     View Refund Status
+                  </button>
+                  <button 
+                    onClick={() => setReviewingOrder(order)}
+                    style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    Write product review
                   </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
       </div>
+
+      {/* Invoice Receipt Modal */}
+      {selectedInvoice && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', color: '#111' }}>
+          <div style={{ background: 'white', padding: '30px', borderRadius: '8px', width: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', border: '1px solid #ccc' }}>
+            
+            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: '2px solid #ddd', paddingBottom: '10px', marginBottom: '20px' }}>
+              <div>
+                <h2 style={{ fontSize: '22px', fontWeight: 'bold' }}>amazon<span style={{ color: '#16a34a' }}>reloop</span></h2>
+                <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Verified Circular Order Invoice</p>
+              </div>
+              <button onClick={() => setSelectedInvoice(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={20} /></button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '12px', marginBottom: '20px' }}>
+              <div>
+                <strong>Sold By:</strong>
+                <p style={{ color: '#565959', marginTop: '4px', lineHeight: '1.4' }}>Amazon Retail India Private Limited<br />Plot 14, ReLoop Hub Sector 5<br />Bengaluru, KA 560001</p>
+              </div>
+              <div>
+                <strong>Shipping Address:</strong>
+                <p style={{ color: '#565959', marginTop: '4px', lineHeight: '1.4' }}>{selectedInvoice.shipTo}<br />M.G. Road Residency<br />{user?.city || "Bengaluru"}, India</p>
+              </div>
+            </div>
+
+            <div style={{ border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px', fontSize: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', background: '#f0f2f2', padding: '10px', fontWeight: 'bold', borderBottom: '1px solid #ddd' }}>
+                <span>Item</span>
+                <span>Qty</span>
+                <span style={{ textAlign: 'right' }}>Price</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', padding: '10px', borderBottom: '1px solid #eee' }}>
+                <span style={{ fontWeight: '500' }}>{selectedInvoice.productName}</span>
+                <span>1</span>
+                <span style={{ textAlign: 'right' }}>{selectedInvoice.price}</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', padding: '10px', fontWeight: 'bold' }}>
+                <span>Total Amount</span>
+                <span></span>
+                <span style={{ textAlign: 'right' }}>{selectedInvoice.price}</span>
+              </div>
+            </div>
+
+            {/* ReLoop Eco Certification Section */}
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '24px', fontSize: '12px' }}>
+              <span style={{ fontWeight: 'bold', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>🌱 CIRCULAR ECO-CERTIFICATE</span>
+              <p style={{ color: '#166534', marginTop: '6px', lineHeight: '1.4' }}>
+                This purchase was fulfilled utilizing verified circular logistics. E-waste/Garment manufacturing offset is estimated at approximately <strong>{selectedInvoice.carbon_footprint_kg || 40} kg of CO₂e emissions</strong> compared to virgin material processing loops.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => {
+                  window.print();
+                }} 
+                style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+              >
+                <Printer size={16} /> Print Receipt
+              </button>
+              <button 
+                onClick={() => setSelectedInvoice(null)} 
+                style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+              >
+                Close Invoice
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Review Dialog Modal */}
+      {reviewingOrder && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', color: '#111' }}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '8px', width: '450px', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
+            
+            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Create verified review</h3>
+              <button onClick={() => setReviewingOrder(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={18} /></button>
+            </div>
+
+            {reviewSubmitted ? (
+              <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+                <span style={{ fontSize: '48px', color: '#16a34a' }}>✓</span>
+                <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '12px', color: '#15803d' }}>Review Submitted!</h4>
+                <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>Earning +15 green credits for verified review activity.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <img src={reviewingOrder.img} alt="" style={{ width: '50px', height: '50px', objectFit: 'contain', border: '1px solid #eee', borderRadius: '4px' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{reviewingOrder.productName}</span>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>Overall rating</label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        size={22} 
+                        onClick={() => setReviewRating(star)} 
+                        fill={star <= reviewRating ? "#ff9900" : "none"} 
+                        stroke={star <= reviewRating ? "#ff9900" : "#ccc"} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 'bold' }}>Add a written review</label>
+                    <button 
+                      type="button" 
+                      onClick={suggestAIReview} 
+                      style={{ background: 'none', border: 'none', color: '#007185', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}
+                    >
+                      ✨ Auto-Draft Eco Review
+                    </button>
+                  </div>
+                  <textarea 
+                    value={reviewComment}
+                    onChange={e => setReviewComment(e.target.value)}
+                    placeholder="What did you like or dislike? How does ReLoop carbon saving verification feel?"
+                    style={{ width: '100%', height: '100px', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', outline: 'none' }}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                  <button 
+                    type="button"
+                    onClick={() => setReviewingOrder(null)} 
+                    style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
+                  >
+                    Submit Review
+                  </button>
+                </div>
+              </form>
+            )}
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

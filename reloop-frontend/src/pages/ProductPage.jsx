@@ -12,6 +12,7 @@ export default function ProductPage() {
   const { addToCart } = useCart();
 
   const query = searchParams.get("q") || "";
+  const categoryParam = searchParams.get("category") || "";
 
   // Products from backend API
   const [products, setProducts] = useState([]);
@@ -26,12 +27,17 @@ export default function ProductPage() {
     }).finally(() => setLoading(false));
   }, []);
 
-  const filteredProducts = products.filter((p) =>
-    !query ||
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    (p.brand || "").toLowerCase().includes(query.toLowerCase()) ||
-    (p.category || "").toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchesQuery = !query ||
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      (p.brand || "").toLowerCase().includes(query.toLowerCase()) ||
+      (p.category || "").toLowerCase().includes(query.toLowerCase());
+      
+    const matchesCategory = !categoryParam ||
+      (p.category || "").toLowerCase() === categoryParam.toLowerCase();
+      
+    return matchesQuery && matchesCategory;
+  });
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
