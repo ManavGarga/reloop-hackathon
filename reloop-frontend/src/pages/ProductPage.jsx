@@ -4,14 +4,19 @@ import { Star, ShieldCheck, AlertTriangle, X, ShoppingCart, ArrowRight, ArrowLef
 import { mockProducts } from "../data/mockProducts";
 import RenewedPassportDrawer from "../components/passport/RenewedPassportDrawer";
 import GradeTag from "../components/shared/GradeTag";
+import { useCart } from "../context/CartContext";
 
 export default function ProductPage() {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   
   // Default to Samsung Galaxy M34 5G if no ID or if ID matches
   const [selectedProductId, setSelectedProductId] = useState("prod_samsung_m34_001");
   const [isPassportOpen, setIsPassportOpen] = useState(false);
-  const [dismissedNudges, setDismissedNudges] = useState({});
+  
+  // Modal for checkout/cart warning verification
+  const [warningModalOpen, setWarningModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'cart' or 'buy'
 
   // Mock Active User with Return History
   const currentUser = {
@@ -28,17 +33,32 @@ export default function ProductPage() {
 
   // Nudge logic
   // 1. Size nudge: product.return_rate_percent > 28
-  const showSizeNudge = product.return_rate_percent > 28 && !dismissedNudges[`size-${product.product_id}`];
+  const showSizeNudge = product.return_rate_percent > 28;
   
   // 2. History nudge: user has 2+ returns in category
   const categoryReturns = currentUser.past_returns.filter((r) => r.category === product.category);
-  const showHistoryNudge = categoryReturns.length >= 2 && !dismissedNudges[`history-${product.product_id}`];
+  const showHistoryNudge = categoryReturns.length >= 2;
 
-  const handleDismissNudge = (type) => {
-    setDismissedNudges((prev) => ({
-      ...prev,
-      [`${type}-${product.product_id}`]: true,
-    }));
+  const handleActionClick = (actionType) => {
+    if (showSizeNudge || showHistoryNudge) {
+      setPendingAction(actionType);
+      setWarningModalOpen(true);
+    } else {
+      executeAction(actionType);
+    }
+  };
+
+  const executeAction = (actionType) => {
+    if (actionType === "cart") {
+      addToCart(product);
+      alert(`"${product.name}" added to your cart!`);
+    } else if (actionType === "buy") {
+      addToCart(product);
+      // Automatically trigger buying/checkout behavior
+      alert("Redirecting to Checkout with this product!");
+    }
+    setWarningModalOpen(false);
+    setPendingAction(null);
   };
 
   return (
@@ -53,7 +73,10 @@ export default function ProductPage() {
           {mockProducts.map((p) => (
             <button
               key={p.product_id}
-              onClick={() => setSelectedProductId(p.product_id)}
+              onClick={() => {
+                setSelectedProductId(p.product_id);
+                setWarningModalOpen(false);
+              }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                 selectedProductId === p.product_id
                   ? "bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-950"
@@ -65,51 +88,6 @@ export default function ProductPage() {
           ))}
         </div>
       </div>
-
-      {/* Return Prevention Nudges Section */}
-      {(showSizeNudge || showHistoryNudge) && (
-        <div className="space-y-3">
-          {showSizeNudge && (
-            <div className="relative flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 text-amber-200 p-4 rounded-xl animate-fade-in">
-              <span className="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
-                <AlertTriangle size={18} />
-              </span>
-              <div className="flex-1 pr-6">
-                <span className="font-bold text-amber-400 text-sm tracking-wide">⚠️ ReLoop Insight</span>
-                <p className="text-xs mt-1 leading-relaxed text-amber-200/90">
-                  This item has a high return rate of <strong>{product.return_rate_percent}%</strong> (exceeding our 28% quality threshold), primary due to size mismatches. We highly recommend consulting the detailed brand sizing chart and customer reviews below before finalized purchase.
-                </p>
-              </div>
-              <button
-                onClick={() => handleDismissNudge("size")}
-                className="absolute top-4 right-4 text-amber-400/60 hover:text-amber-200 transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          )}
-
-          {showHistoryNudge && (
-            <div className="relative flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 text-amber-200 p-4 rounded-xl animate-fade-in">
-              <span className="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
-                <AlertTriangle size={18} />
-              </span>
-              <div className="flex-1 pr-6">
-                <span className="font-bold text-amber-400 text-sm tracking-wide">⚠️ ReLoop Insight</span>
-                <p className="text-xs mt-1 leading-relaxed text-amber-200/90">
-                  You have returned <strong>{categoryReturns.length}</strong> items in the <strong>{product.category}</strong> category recently (e.g. <em>{categoryReturns.map(r => r.product).join(", ")}</em>). To support our zero-waste initiative, please double check fit guidelines and descriptions.
-                </p>
-              </div>
-              <button
-                onClick={() => handleDismissNudge("history")}
-                className="absolute top-4 right-4 text-amber-400/60 hover:text-amber-200 transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Main Amazon PDP Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -232,10 +210,16 @@ export default function ProductPage() {
             </div>
 
             <div className="space-y-2 pt-2">
-              <button className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all shadow cursor-pointer active:scale-98">
+              <button 
+                onClick={() => handleActionClick("cart")}
+                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all shadow cursor-pointer active:scale-98"
+              >
                 Add to Cart
               </button>
-              <button className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition-all shadow cursor-pointer active:scale-98">
+              <button 
+                onClick={() => handleActionClick("buy")}
+                className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition-all shadow cursor-pointer active:scale-98"
+              >
                 Buy Now
               </button>
             </div>
@@ -260,7 +244,7 @@ export default function ProductPage() {
                 <p>ReLoop handles your returns sustainably. Earn green credits and reduce CO₂.</p>
               </div>
               <button
-                onClick={() => navigate(`/return/B09X7KQMGN`)}
+                onClick={() => navigate(`/return/${product.product_id}`)}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition-all border border-slate-700/80 flex items-center justify-center gap-1.5 cursor-pointer hover:text-white"
               >
                 <ArrowLeftRight size={14} />
@@ -270,6 +254,64 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+
+      {/* Return Nudge Alert Warning Modal */}
+      {warningModalOpen && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-850 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-5 relative animate-scale-in">
+            {/* Modal Header */}
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
+              <span className="p-2 bg-amber-500/20 text-amber-400 rounded-lg">
+                <AlertTriangle size={24} />
+              </span>
+              <div>
+                <h3 className="text-lg font-bold text-slate-100">⚠️ ReLoop Insight & Warnings</h3>
+                <p className="text-xs text-slate-400">Please review sustainability recommendations before buying.</p>
+              </div>
+            </div>
+
+            {/* Warnings Container */}
+            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+              {showSizeNudge && (
+                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-200 p-4 rounded-xl space-y-2">
+                  <div className="font-bold text-amber-400 text-xs uppercase tracking-wide">High Category Return Alert</div>
+                  <p className="text-xs leading-relaxed text-slate-300">
+                    This item has a high return rate of <strong>{product.return_rate_percent}%</strong> (exceeding our 28% quality threshold), primarily due to size mismatches. We highly recommend consulting the detailed brand sizing chart and customer reviews before adding it.
+                  </p>
+                </div>
+              )}
+
+              {showHistoryNudge && (
+                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-200 p-4 rounded-xl space-y-2">
+                  <div className="font-bold text-amber-400 text-xs uppercase tracking-wide">Category History Alert</div>
+                  <p className="text-xs leading-relaxed text-slate-300">
+                    You have returned <strong>{categoryReturns.length}</strong> items in the <strong>{product.category}</strong> category recently (e.g. <em>{categoryReturns.map(r => r.product).join(", ")}</em>). To support our zero-waste initiative, please double check fit guidelines and descriptions.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => {
+                  setWarningModalOpen(false);
+                  setPendingAction(null);
+                }}
+                className="flex-1 py-3 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+              >
+                Go Back / Review Details
+              </button>
+              <button
+                onClick={() => executeAction(pendingAction)}
+                className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+              >
+                Proceed & Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* RenewedPassportDrawer */}
       <RenewedPassportDrawer
