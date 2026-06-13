@@ -1,18 +1,19 @@
 """
-routes/passport.py
-Lifecycle passport endpoints — product provenance & CO₂ tracking.
+routes/passport.py — wired to passport_service.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+
+from services.passport_service import append_event, get_passport_display, create_passport
 
 router = APIRouter()
 
 
 class AddEventBody(BaseModel):
-    event_type: str          # manufactured | sold | returned | refurbished | p2p_sold | donated | recycled
-    actor: str               # user_id, ngo_id, or "system"
+    event_type: str
+    actor: str
     notes: Optional[str] = None
     location: Optional[str] = None
     co2_delta_kg: Optional[float] = None
@@ -22,43 +23,27 @@ class AddEventBody(BaseModel):
 @router.get("/{product_id}")
 async def get_passport(product_id: str):
     """Get the full lifecycle passport for a product."""
-    return {
-        "status": "ok",
-        "mock": True,
-        "product_id": product_id,
-        "product_name": "Samsung Galaxy M34 5G",
-        "category": "electronics",
-        "total_co2_kg": 70.0,
-        "current_owner": "user_priya_001",
-        "current_condition": "good",
-        "events": [
-            {
-                "event_type": "manufactured",
-                "timestamp": "2024-01-01T00:00:00",
-                "actor": "system",
-                "notes": "Manufactured at Samsung Noida plant",
-                "location": "Noida, UP",
-                "co2_delta_kg": 70.0,
-            },
-            {
-                "event_type": "sold",
-                "timestamp": "2024-03-15T00:00:00",
-                "actor": "user_priya_001",
-                "notes": "Original purchase via Amazon",
-                "location": "Bengaluru, KA",
-                "co2_delta_kg": 0.0,
-            },
-        ],
-    }
+    passport = await get_passport_display(product_id)
+    if not passport:
+        raise HTTPException(status_code=404, detail=f"Passport not found for product: {product_id}")
+    return {"status": "ok", **passport}
 
 
 @router.post("/{product_id}/event")
 async def add_passport_event(product_id: str, body: AddEventBody):
-    """Append a new lifecycle event to a product's passport."""
+    """Append an immutable lifecycle event to a product's passport."""
+    event = await append_event(
+        product_id=product_id,
+        event_type=body.event_type,
+        actor=body.actor,
+        notes=body.notes,
+        location=body.location,
+        co2_delta_kg=body.co2_delta_kg,
+        condition_at_event=body.condition_at_event,
+    )
     return {
-        "status": "ok",
-        "mock": True,
-        "product_id": product_id,
-        "event_added": body.model_dump(),
-        "message": "Lifecycle event appended to passport",
+        "status":      "ok",
+        "product_id":  product_id,
+        "event_added": event,
+        "message":     "Lifecycle event appended to passport",
     }
