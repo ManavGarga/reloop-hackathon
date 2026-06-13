@@ -15,7 +15,24 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   --border: rgba(255,255,255,0.08);
+  
+  --green-primary: #16a34a;
+  --green-dark: #14532d;
+  --green-light-bg: #f0fdf4;
+  --amber: #d97706;
+  --red: #dc2626;
+  --teal: #0d9488;
 }
+
+@theme {
+  --color-green-primary: var(--green-primary);
+  --color-green-dark: var(--green-dark);
+  --color-green-light-bg: var(--green-light-bg);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+  --color-teal: var(--teal);
+}
+
 
 * {
   box-sizing: border-box;
