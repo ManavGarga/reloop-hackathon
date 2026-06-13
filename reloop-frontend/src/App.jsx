@@ -461,7 +461,10 @@ function Navbar() {
                   </span>
                 </div>
                 <button 
-                  onClick={() => alert("Checkout processed successfully (Demo mock)!")}
+                  onClick={() => {
+                    setCartOpen(false);
+                    alert("Checkout processed successfully (Demo mock)!");
+                  }}
                   style={{
                     width: '100%',
                     padding: '14px',

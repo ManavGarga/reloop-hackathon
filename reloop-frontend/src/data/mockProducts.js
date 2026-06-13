@@ -90,7 +90,12 @@ export const mockProducts = [
       "stitching issue",
       "fabric quality",
     ],
-    image_url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=600&auto=format&fit=crop",
+    image_url: "/reloop-jacket-1.jpg",
+    images: [
+      "/reloop-jacket-1.jpg",
+      "/reloop-jacket-2.jpg",
+      "/reloop-jacket-3.jpg"
+    ],
     description: "Classic blue denim trucker jacket, slim fit, button front",
     rating: 4.3,
     reviews_count: 1450,

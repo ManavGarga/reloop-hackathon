@@ -28,7 +28,7 @@ export default function Home() {
       title: "Appliances for your home | Up to 55% off",
       items: [
         { name: "Air conditioners", img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=300&auto=format&fit=crop" },
-        { name: "Refrigerators", img: "https://images.unsplash.com/photo-1571175432287-e2462612b758?q=80&w=300&auto=format&fit=crop" },
+        { name: "Refrigerators", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=300&auto=format&fit=crop" },
         { name: "Microwaves", img: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?q=80&w=300&auto=format&fit=crop" },
         { name: "Washing machines", img: "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=300&auto=format&fit=crop" }
       ]
@@ -47,8 +47,8 @@ export default function Home() {
       items: [
         { name: "Cleaning supplies", img: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=300&auto=format&fit=crop" },
         { name: "Bathroom accessories", img: "https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=300&auto=format&fit=crop" },
-        { name: "Home tools", img: "https://images.unsplash.com/photo-1581147036324-c17da41dfa6c?q=80&w=300&auto=format&fit=crop" },
-        { name: "Wallpapers", img: "https://images.unsplash.com/photo-1527067829737-402941667bd0?q=80&w=300&auto=format&fit=crop" }
+        { name: "Home tools", img: "https://images.unsplash.com/photo-1530124560072-aab8cf2fbb30?q=80&w=300&auto=format&fit=crop" },
+        { name: "Wallpapers", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" }
       ]
     },
     {

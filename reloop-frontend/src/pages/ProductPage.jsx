@@ -239,10 +239,39 @@ export default function ProductPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginTop: '12px' }}>
               {/* Left Column: Image */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                 <div style={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', width: '100%', borderRadius: '6px', border: '1px solid #eee' }}>
-                  <img src={selectedProduct.image_url} alt={selectedProduct.name} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
+                  <img src={selectedProduct.activeImage || selectedProduct.image_url} alt={selectedProduct.name} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
                 </div>
+                {selectedProduct.images && selectedProduct.images.length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px' }}>
+                    {selectedProduct.images.map((img, idx) => (
+                      <div 
+                        key={idx}
+                        onClick={() => {
+                          setSelectedProduct({
+                            ...selectedProduct,
+                            activeImage: img
+                          });
+                        }}
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          border: (selectedProduct.activeImage || selectedProduct.image_url) === img ? '2px solid #e77600' : '1px solid #ddd',
+                          borderRadius: '4px',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'white'
+                        }}
+                      >
+                        <img src={img} alt="angle view" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Right Column: Spec details */}
