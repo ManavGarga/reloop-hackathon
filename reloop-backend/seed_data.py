@@ -26,7 +26,7 @@ PRODUCTS = [
             "screen flickering",
             "not as described",
         ],
-        "image_url": "https://images.samsung.com/in/smartphones/galaxy-m34-5g/images/galaxy-m34-5g-silver.jpg",
+        "image_url": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
         "description": "6000mAh battery, 120Hz Super AMOLED display, 50MP camera",
     },
     {
@@ -43,7 +43,7 @@ PRODUCTS = [
             "overheating",
             "dead pixels",
         ],
-        "image_url": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/xps-15-9530/general/ng/xps-9530-nt-blue-gallery-5.psd",
+        "image_url": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop",
         "description": "Intel Core i7, 16GB RAM, OLED Touch display, RTX 4060",
     },
     {
@@ -59,7 +59,7 @@ PRODUCTS = [
             "wrong edition",
             "damaged cover",
         ],
-        "image_url": "https://m.media-amazon.com/images/I/81wgcld4wxL._SL1500_.jpg",
+        "image_url": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop",
         "description": "International bestseller on building good habits and breaking bad ones",
     },
     {
@@ -76,7 +76,7 @@ PRODUCTS = [
             "blade not spinning",
             "defective on arrival",
         ],
-        "image_url": "https://www.philips.co.in/c-dam/b2c/category-pages/kitchen/blenders/hl7756.jpg",
+        "image_url": "https://images.unsplash.com/photo-1578643463396-0997cb5328c1?q=80&w=600&auto=format&fit=crop",
         "description": "600W motor, 1.5L jar, 3 speed settings with pulse",
     },
     {
@@ -93,7 +93,7 @@ PRODUCTS = [
             "stitching issue",
             "fabric quality",
         ],
-        "image_url": "https://lsco.scene7.com/is/image/lsco/723340001-front-pdp",
+        "image_url": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=600&auto=format&fit=crop",
         "description": "Classic blue denim trucker jacket, slim fit, button front",
     },
 ]
@@ -248,6 +248,33 @@ PASSPORTS = [
 ]
 
 
+RETURNS = [
+    {
+        "return_id": "RET-20260613-0001",
+        "user_id": "user_priya_001",
+        "product_id": "prod_samsung_m34_001",
+        "product_name": "Samsung Galaxy M34 5G",
+        "status": "completed",
+        "disposal_route": "refurbish",
+        "grade": "good",
+        "green_credits_awarded": 120.0,
+        "co2_saved_kg": 59.5,
+        "created_at": (datetime.utcnow() - timedelta(days=10)).isoformat(),
+    },
+    {
+        "return_id": "RET-20260530-0005",
+        "user_id": "user_priya_001",
+        "product_id": "prod_levis_jacket_001",
+        "product_name": "Levi's Trucker Denim Jacket",
+        "status": "completed",
+        "disposal_route": "ngo_donate",
+        "grade": "good",
+        "green_credits_awarded": 80.0,
+        "co2_saved_kg": 8.5,
+        "created_at": (datetime.utcnow() - timedelta(days=25)).isoformat(),
+    }
+]
+
 # ─────────────────────────────────────────────
 #  SEEDER FUNCTION
 # ─────────────────────────────────────────────
@@ -279,6 +306,11 @@ async def seed_if_empty():
     if await db.passports.count_documents({}) == 0:
         await db.passports.insert_many(PASSPORTS)
         seeded.append(f"{len(PASSPORTS)} passports")
+
+    # Returns
+    if await db.returns.count_documents({}) == 0:
+        await db.returns.insert_many(RETURNS)
+        seeded.append(f"{len(RETURNS)} returns")
 
     # Green credit ledgers (one per user)
     if await db.green_credits.count_documents({}) == 0:

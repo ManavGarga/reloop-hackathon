@@ -333,7 +333,7 @@ export default function Dashboard() {
         </div>
         
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={240}>
             <LineChart data={co2TrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
               <XAxis dataKey="month" stroke="#64748b" fontSize={11} />

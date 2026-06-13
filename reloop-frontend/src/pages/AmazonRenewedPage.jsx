@@ -38,7 +38,7 @@ export default function AmazonRenewedPage() {
       { location: "Outer Bezel", type: "Hairline Scratch", length: "0.8 mm", severity: "Minor" },
       { location: "Rear Cover", type: "Faint Scuff", length: "1.2 mm", severity: "Minor" },
     ],
-    image_url: "https://images.samsung.com/in/smartphones/galaxy-m34-5g/images/galaxy-m34-5g-silver.jpg",
+    image_url: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
   };
 
   const handlePassportLink = (e) => {
