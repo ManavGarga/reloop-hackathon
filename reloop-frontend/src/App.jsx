@@ -88,6 +88,7 @@ export default function App() {
           <Route path="/dashboard"       element={<Dashboard />}            />
           <Route path="/passport/:productId" element={<PassportPage />}     />
           <Route path="/amazon-renewed"  element={<AmazonRenewedPage />}    />
+          <Route path="/renewed/:productId" element={<AmazonRenewedPage />} />
           <Route path="/recommendations" element={<pages.Recommendations />} />
           <Route path="/profile"         element={<pages.Profile />}         />
         </Routes>
