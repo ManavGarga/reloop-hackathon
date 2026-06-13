@@ -16,6 +16,10 @@ export function ReturnProvider({ children }) {
     dropoffLocation: null,
     status: "initiated",
     currentStep: 1,
+    returnId: "", // from backend initiate API
+    gradeResult: null, // from backend grade API
+    disposeResult: null, // from backend dispose API
+    completeResult: null, // from backend complete API
   });
 
   const updateReturn = (fields) => {
@@ -36,6 +40,10 @@ export function ReturnProvider({ children }) {
       dropoffLocation: null,
       status: "initiated",
       currentStep: 1,
+      returnId: "",
+      gradeResult: null,
+      disposeResult: null,
+      completeResult: null,
     });
   };
 
