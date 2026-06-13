@@ -54,3 +54,9 @@ export const getSustainabilityMetrics = () => request("GET", "/analytics/sustain
 export const sendChat        = (data) => request("POST", "/ai/chat", data)
 export const analyzeReturn   = (data) => request("POST", "/ai/analyze-return", data)
 export const gradeItemAI     = (data) => request("POST", "/ai/grade-item", data)
+
+// ─── Circular Passport & Dashboard ─────────────────────────
+export const getPassport = (productId) => request("GET", `/passport/${productId}`)
+export const getUserDashboard = (userId) => request("GET", `/user/${userId}/dashboard`)
+export const getCredits = (userId) => request("GET", `/credits/${userId}`)
+
