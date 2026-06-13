@@ -7,8 +7,8 @@ load_dotenv()
 MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017/reloop")
 DB_NAME: str = os.getenv("DB_NAME", "reloop")
 
-# Anthropic
-ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+# Google Gemini
+GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 
 # App
 APP_ENV: str = os.getenv("APP_ENV", "development")
