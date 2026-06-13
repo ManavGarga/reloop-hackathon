@@ -31,6 +31,14 @@ export default function ProductPage() {
     ]
   };
 
+  // Toast alert banner state
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
   const handleActionClick = (actionType, prod) => {
     const showSizeNudge = prod.return_rate_percent > 28;
     const categoryReturns = currentUser.past_returns.filter(r => r.category === prod.category);
@@ -47,18 +55,36 @@ export default function ProductPage() {
   const executeAction = (actionType, prod) => {
     if (actionType === "cart") {
       addToCart(prod);
-      alert(`"${prod.name}" added to cart!`);
+      showToast(`"${prod.name}" added to cart!`);
     } else if (actionType === "buy") {
       addToCart(prod);
-      alert(`Proceeding to checkout with "${prod.name}"!`);
+      showToast(`Proceeding to checkout with "${prod.name}"!`);
     }
     setWarningModalOpen(false);
     setPendingAction(null);
   };
 
   return (
-    <div style={{ background: '#eaeded', minHeight: '100vh', padding: '16px 24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ background: '#eaeded', minHeight: '100vh', padding: '16px 24px', color: '#111111', fontFamily: 'Arial, sans-serif', position: 'relative' }}>
       
+      {/* Toast alert banner */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          right: '24px',
+          background: '#06b6d4',
+          color: 'white',
+          padding: '12px 24px',
+          borderRadius: '4px',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 2000
+        }}>
+          {toastMessage}
+        </div>
+      )}
+
       {/* Search results banner info */}
       <div style={{ background: 'white', padding: '10px 16px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>
         <span>1-16 of {filteredProducts.length} results {query && <span>for "<strong style={{ color: '#c7511f' }}>{query}</strong>"</span>}</span>
@@ -243,6 +269,34 @@ export default function ProductPage() {
                       Choosing this item avoids recycling loop delays and helps optimize parcel carbon routing offsets.
                     </p>
                   </div>
+
+                  {/* Integrated Amazon Renewed buying flow for electronics products */}
+                  {selectedProduct.category === "electronics" && (
+                    <div 
+                      onClick={() => {
+                        setSelectedProduct(null);
+                        navigate(`/renewed/${selectedProduct.product_id}`);
+                      }}
+                      style={{
+                        marginTop: '16px',
+                        background: '#fff8f2',
+                        border: '1px solid #ff9900',
+                        borderRadius: '6px',
+                        padding: '12px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <span style={{ fontSize: '11px', background: '#ff9900', color: 'white', padding: '2px 6px', borderRadius: '3px', fontWeight: 'bold' }}>Amazon Renewed</span>
+                        <p style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '6px' }}>Certified pre-owned alternative available: ₹14,500</p>
+                        <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Saves 59.5 kg CO₂ overall • 1-year brand warranty included</p>
+                      </div>
+                      <span style={{ fontSize: '18px', color: '#ff9900', fontWeight: 'bold' }}>➔</span>
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>

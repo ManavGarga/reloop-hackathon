@@ -22,13 +22,13 @@ const navItems = [
   { to: '/dashboard',      label: 'Eco Dashboard'   },
   { to: '/recommendations',label: 'For You'         },
   { to: '/profile',        label: 'Profile'         },
-  { to: '/amazon-renewed',  label: 'Amazon Renewed'  },
 ]
 
 function Navbar() {
   const { totalItems, cartItems, removeFromCart } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchSubmit = (e) => {
@@ -206,7 +206,7 @@ function Navbar() {
                 onMouseLeave={() => document.getElementById('account-dropdown').style.display = 'none'}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
-                  <span style={{ color: '#cccccc' }}>Hello, Priya</span>
+                  <span style={{ color: '#cccccc' }}>{isLoggedIn ? "Hello, Nikita" : "Hello, Priya"}</span>
                   <span style={{ fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '2px' }}>
                     Account & Lists <span style={{ fontSize: '10px' }}>▼</span>
                   </span>
@@ -232,7 +232,7 @@ function Navbar() {
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
                     <button 
-                      onClick={() => alert("Sign In processed successfully (Demo mock)!")}
+                      onClick={() => setIsLoggedIn(!isLoggedIn)}
                       style={{
                         width: '100%',
                         padding: '8px',
@@ -244,7 +244,7 @@ function Navbar() {
                         cursor: 'pointer'
                       }}
                     >
-                      Sign In
+                      {isLoggedIn ? "Sign Out" : "Sign In"}
                     </button>
                     <span style={{ fontSize: '11px', marginTop: '6px', color: '#565959' }}>New customer? <strong style={{ color: '#007185', cursor: 'pointer' }}>Start here.</strong></span>
                   </div>
@@ -343,12 +343,25 @@ function Navbar() {
                 key={to} to={to} end={to === '/'}
                 style={({ isActive }) => ({
                   textDecoration: 'none',
-                  color: isActive ? '#febd69' : '#ffffff',
-                  fontWeight: isActive ? '700' : '500',
-                  transition: 'color 0.2s',
-                  padding: '4px 8px',
-                  borderRadius: '4px'
+                  color: '#ffffff',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  padding: '6px 10px',
+                  border: isActive ? '1px solid #ffffff' : '1px solid transparent',
+                  borderRadius: '2px',
+                  display: 'inline-flex',
+                  alignItems: 'center'
                 })}
+                onMouseOver={e => {
+                  if (e.currentTarget.style.borderColor !== 'rgb(255, 255, 255)') {
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (e.currentTarget.style.borderColor !== 'rgb(255, 255, 255)') {
+                    e.currentTarget.style.borderColor = 'transparent';
+                  }
+                }}
               >
                 {label}
               </NavLink>
