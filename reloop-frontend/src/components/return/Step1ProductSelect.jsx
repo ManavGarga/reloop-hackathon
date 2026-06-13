@@ -16,6 +16,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
         updateReturn({
           productId: product.product_id,
           productName: product.name,
+          category: product.category,
         });
       }
     }
@@ -27,6 +28,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
     updateReturn({
       productId: product.product_id,
       productName: product.name,
+      category: product.category,
     });
   };
 

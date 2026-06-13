@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Star, ShieldCheck, Leaf, ArrowLeft, Heart, ChevronRight, X } from "lucide-react";
+import { Star, ShieldCheck, Leaf, ArrowLeft, Heart, ChevronRight, X, Loader2 } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { getPassport } from "../api/reloop";
 
 export default function AmazonRenewedPage() {
   const { productId } = useParams();
@@ -10,17 +11,12 @@ export default function AmazonRenewedPage() {
   
   const activeProductId = productId || "prod_samsung_m34_001";
   
-  // State variables
-  const [activeTab, setActiveTab] = useState("condition"); // condition or passport
+  const [activeTab, setActiveTab] = useState("condition");
   const [toastMessage, setToastMessage] = useState(null);
+  const [passportLoading, setPassportLoading] = useState(true);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  // Mock product specific details for renewed listing
-  const renewedItem = {
+  // Static fallback (used if passport not found)
+  const FALLBACK = {
     original_id: "prod_samsung_m34_001",
     passport_id: "RLP-2026-X128A",
     name: "Samsung Galaxy M34 5G (Refurbished) - 6GB RAM, 128GB Storage, Silver",
@@ -39,6 +35,59 @@ export default function AmazonRenewedPage() {
       { location: "Rear Cover", type: "Faint Scuff", length: "1.2 mm", severity: "Minor" },
     ],
     image_url: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
+    lives_count: 2,
+    trust_score: 94,
+    events: [],
+  };
+
+  const [renewedItem, setRenewedItem] = useState(FALLBACK);
+
+  useEffect(() => {
+    setPassportLoading(true);
+    getPassport(activeProductId)
+      .then((res) => {
+        if (res && res.status === "ok" && res.product_name) {
+          const latestEvent = res.events?.[0] || {};
+          const grade = latestEvent.condition_at_event || "Good";
+          const priceNew = 18999; // pulled from product — for now static
+          const priceRenewed = Math.round(priceNew * 0.55);
+          const co2Saved = Math.abs(
+            res.events?.reduce((acc, e) => acc + (e.co2_delta_kg < 0 ? e.co2_delta_kg : 0), 0) || 59.5
+          );
+
+          // Map passport flaw_breakdown from grade events if present
+          const flawEvent = res.events?.find((e) => e.flaw_breakdown);
+          const flaws = flawEvent?.flaw_breakdown || FALLBACK.flaws;
+
+          setRenewedItem({
+            original_id: res.product_id,
+            passport_id: res.passport_id || "RLP-LIVE",
+            name: `${res.product_name} (Refurbished)`,
+            brand: res.brand || "ReLoop Certified",
+            price_renewed: priceRenewed,
+            price_new: priceNew,
+            discount_percent: Math.round((1 - priceRenewed / priceNew) * 100),
+            rating: 4.2,
+            reviews_count: 124,
+            grade,
+            confidence: 89,
+            flaws_count: flaws.length,
+            carbon_saved: co2Saved,
+            flaws,
+            image_url: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop",
+            lives_count: res.lives_count || 2,
+            trust_score: res.trust_score || 90,
+            events: res.events || [],
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setPassportLoading(false));
+  }, [activeProductId]);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   return (

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom'
 import { Package, RotateCcw, BarChart2, Sparkles, ShoppingBag, User, ShoppingCart, MapPin, Search, Coins, Award, X, Trash2 } from 'lucide-react'
 import './index.css'
+import { getCredits } from './api/reloop'
 
 // Import actual page components
 import ProductPage from './pages/ProductPage'
@@ -29,7 +30,15 @@ function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [liveCredits, setLiveCredits] = useState(null);
   const navigate = useNavigate();
+
+  // Fetch live credits balance
+  useEffect(() => {
+    getCredits('user_priya_001').then((res) => {
+      if (res && res.status === 'ok') setLiveCredits(Math.round(res.balance));
+    });
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -275,8 +284,8 @@ function Navbar() {
                 <span style={{ fontWeight: '700' }}>& Smart ReLoop</span>
               </NavLink>
 
-            {/* Green Credits Coin */}
-            <NavLink to="/profile" style={{
+            {/* Green Credits Coin - live balance */}
+            <NavLink to="/dashboard" style={{
               textDecoration: 'none',
               color: '#131921',
               background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
@@ -290,7 +299,7 @@ function Navbar() {
               boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)'
             }}>
               <Coins size={15} />
-              <span>240 Credits</span>
+              <span>{liveCredits !== null ? `${liveCredits} Credits` : 'Credits'}</span>
             </NavLink>
 
             {/* Cart Button */}
@@ -368,10 +377,10 @@ function Navbar() {
             ))}
           </div>
 
-          {/* Right side Highlight */}
+          {/* Right side Highlight - pulls tier from credits */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80', fontWeight: '600', fontSize: '12px' }}>
             <Award size={14} />
-            <span>Sustainability Score: Eco Advocate (Level 4)</span>
+            <span>Sustainability Score: {liveCredits >= 1000 ? 'Planet Saver 🌍' : liveCredits >= 500 ? 'Eco Hero 🏆' : liveCredits >= 200 ? 'Green 🍃' : 'Seedling 🌱'}</span>
           </div>
         </div>
       </header>

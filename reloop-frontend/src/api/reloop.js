@@ -1,5 +1,4 @@
 // ReLoop API client
-// All functions return mock data for now — Person 2 will wire real calls
 
 const BASE = "http://localhost:8000/api"
 
@@ -47,6 +46,10 @@ export const getSimilar          = (productId) => request("GET", `/recommendatio
 export const getPersonalizedFeed = (userId)    => request("GET", `/recommendations/for/${userId}`)
 export const gradeItem           = (data)      => request("POST", "/recommendations/grade", data)
 
+// ─── Prevention Nudges ────────────────────────────────────
+export const getPreventionNudge = (userId, productId, reason = "") =>
+  request("GET", `/prevention/${userId}/${productId}?return_reason=${encodeURIComponent(reason)}`)
+
 // ─── Analytics ────────────────────────────────────────────
 export const getAnalyticsOverview     = () => request("GET", "/analytics/overview")
 export const getReturnsTrend          = () => request("GET", "/analytics/returns-trend")
@@ -69,4 +72,3 @@ export const getRewardCatalogue = () => request("GET", `/credits/catalogue/rewar
 export const getBuyerDemand = (productId) => request("GET", `/recommendations/buyer-demand/${productId}`)
 export const getSimilarRefurbished = (productId) => request("GET", `/recommendations/similar/${productId}`)
 export const getPersonalisedFeed = (userId) => request("GET", `/recommendations/for/${userId}`)
-
