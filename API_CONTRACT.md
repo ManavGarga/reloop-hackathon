@@ -270,7 +270,7 @@
 | `refund_amount` | float | INR |
 | `green_credits_awarded` | float | Credits to award on complete |
 | `carbon` | object | See below |
-| `reasoning` | string | Claude-generated or fallback explanation |
+| `reasoning` | string | Gemini-generated or fallback explanation |
 
 **`carbon` object**
 | Field | Type | Notes |

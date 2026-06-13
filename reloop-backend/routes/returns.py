@@ -14,7 +14,7 @@ from database import get_db
 from services.grading_service import grade_item
 from services.disposition_service import get_disposition
 from services.carbon_service import calculate_savings
-from services.claude_service import get_disposition_reasoning
+from services.gemini_service import get_disposition_reasoning
 from services.passport_service import append_event, get_passport_display
 from services.spapi_mock import push_renewed_listing, notify_buyer
 
@@ -186,7 +186,7 @@ async def dispose_return(body: DisposeBody):
         carbon_footprint_override=carbon_kg,
     )
 
-    # Claude reasoning (async, never throws)
+    # Gemini reasoning (async, never throws)
     reasoning = await get_disposition_reasoning(
         product_name=ret.get("product_name", prod.get("name", "item")),
         category=category,

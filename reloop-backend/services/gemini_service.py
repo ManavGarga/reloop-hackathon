@@ -1,6 +1,6 @@
 """
-services/claude_service.py
-Live Claude API integration for disposition reasoning.
+services/gemini_service.py
+Live Gemini API integration for disposition reasoning using the modern google-genai SDK.
 2 retries with exponential backoff; fallback template if API unavailable.
 Never raises — always returns a string.
 """
@@ -9,8 +9,9 @@ import asyncio
 import logging
 from typing import Optional
 
-import anthropic
-from config import ANTHROPIC_API_KEY
+from google import genai
+from google.genai import types
+from config import GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -120,15 +121,14 @@ async def get_disposition_reasoning(
     green_credits: float = 0.0,
 ) -> str:
     """
-    Call Claude for a 2–3 sentence disposition explanation.
+    Call Gemini for a 2–3 sentence disposition explanation.
     Falls back to a template if API key missing or call fails after 2 retries.
     Never raises.
     """
-    if not ANTHROPIC_API_KEY:
-        logger.warning("ANTHROPIC_API_KEY not set — using fallback template")
+    if not GEMINI_API_KEY:
+        logger.warning("GEMINI_API_KEY not set — using fallback template")
         return _fallback_message(product_name, disposition, co2_saved_kg, green_credits)
 
-    client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
     user_prompt = _build_user_prompt(
         product_name, category, return_reason, condition,
         grade_score, disposition, co2_saved_kg, green_credits,
@@ -136,24 +136,26 @@ async def get_disposition_reasoning(
 
     for attempt in range(1, 3):        # 2 retries
         try:
-            message = await client.messages.create(
-                model="claude-opus-4-5",
-                max_tokens=200,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_prompt}],
+            # Initialize modern google-genai client
+            client = genai.Client(api_key=GEMINI_API_KEY)
+            
+            # Call Gemini async API
+            response = await client.aio.models.generate_content(
+                model="gemini-1.5-flash",
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT
+                )
             )
-            return message.content[0].text.strip()
-
-        except anthropic.RateLimitError:
-            wait = 2 ** attempt
-            logger.warning(f"Claude rate limited — waiting {wait}s (attempt {attempt})")
-            await asyncio.sleep(wait)
+            if response.text:
+                return response.text.strip()
+            raise ValueError("Empty response received from Gemini API")
 
         except Exception as e:
-            logger.error(f"Claude API error (attempt {attempt}): {e}")
+            logger.error(f"Gemini API error (attempt {attempt}): {e}")
             if attempt == 2:
                 break
-            await asyncio.sleep(1)
+            await asyncio.sleep(2 ** attempt)
 
-    logger.warning("Claude API failed after retries — using fallback template")
+    logger.warning("Gemini API failed after retries — using fallback template")
     return _fallback_message(product_name, disposition, co2_saved_kg, green_credits)
