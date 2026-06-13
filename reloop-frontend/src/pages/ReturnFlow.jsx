@@ -1,8 +1,97 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ReturnProvider, useReturn } from "../context/ReturnContext";
+import { useUser } from "../context/UserContext";
+import ProgressBar from "../components/shared/ProgressBar";
+import { CheckCircle2, ChevronRight, ArrowLeft, Package, Sparkles } from "lucide-react";
 
-export default function ReturnFlow() {
+// Import step components
+import Step1ProductSelect from "../components/return/Step1ProductSelect";
+import Step2ConditionCheck from "../components/return/Step2ConditionCheck";
+import Step3ValueAssessment from "../components/return/Step3ValueAssessment";
+import Step4DropoffSelect from "../components/return/Step4DropoffSelect";
+import Step5ReLoopOptions from "../components/return/Step5ReLoopOptions";
+import Step6Confirmation from "../components/return/Step6Confirmation";
+
+function ReturnFlowContainer() {
+  const { productId } = useParams();
+  const { returnDetails, updateReturn } = useReturn();
+  const currentStep = returnDetails.currentStep;
+  const navigate = useNavigate();
+
+  const handleNextStep = () => {
+    updateReturn({ currentStep: currentStep + 1 });
+  };
+
+  const handleBackStep = () => {
+    updateReturn({ currentStep: Math.max(1, currentStep - 1) });
+  };
+
+  const renderActiveStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1ProductSelect preselectedId={productId} onNext={handleNextStep} />;
+      case 2:
+        return <Step2ConditionCheck onNext={handleNextStep} onBack={handleBackStep} />;
+      case 3:
+        return <Step3ValueAssessment onNext={handleNextStep} />;
+      case 4:
+        return <Step4DropoffSelect onNext={handleNextStep} onBack={handleBackStep} />;
+      case 5:
+        return <Step5ReLoopOptions onNext={handleNextStep} onBack={handleBackStep} />;
+      case 6:
+        return <Step6Confirmation />;
+      default:
+        return <Step1ProductSelect preselectedId={productId} onNext={handleNextStep} />;
+    }
+  };
+
+  return (
+    <div style={{ background: '#090d16', minHeight: '100vh', padding: '32px 24px', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', borderRadius: '12px' }}>
+      <div className="min-h-screen flex flex-col items-center max-w-5xl mx-auto space-y-6">
+        
+        {/* Return to Orders */}
+        <button 
+          onClick={() => navigate('/returns')}
+          style={{
+            alignSelf: 'flex-start',
+            background: 'none',
+            border: 'none',
+            color: '#38bdf8',
+            cursor: 'pointer',
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontWeight: '600',
+            marginBottom: '10px'
+          }}
+        >
+          <ArrowLeft size={16} /> Back to Your Orders
+        </button>
+
+        {/* Wizard Header Title */}
+        <div className="text-center space-y-1">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight flex items-center justify-center gap-2">
+            <Sparkles size={24} style={{ color: '#4ade80' }} />
+            amazon<span style={{ color: '#4ade80' }}>reloop</span> AI Return Hub
+          </h1>
+          <p className="text-xs text-slate-400">Reduce carbon waste, earn green credits, and circularize returns via computer vision grading.</p>
+        </div>
+
+        {/* Progress Bar */}
+        <ProgressBar currentStep={currentStep} />
+
+        {/* Step Container Card */}
+        <div className="w-full bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-sm">
+          {renderActiveStep()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrdersList({ user }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("orders"); // "orders" or "refund-status"
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -10,25 +99,27 @@ export default function ReturnFlow() {
   const mockOrders = [
     {
       id: "404-3596249-8456512",
-      date: "5 November 2025",
-      total: "₹279.06",
-      shipTo: "Nikita Gupta",
-      status: "Refunded",
-      statusDesc: "Your return is in transit. Your refund has been issued.",
-      productName: "VL53L0X V2 Laser Ranging Sensor for Accurate Distance Measurement",
-      price: "₹275.00",
+      date: "15 March 2026",
+      total: "₹18,999.00",
+      shipTo: user?.name || "Priya Sharma",
+      status: "Eligible for Return",
+      statusDesc: "Delivered on March 18. Return window open until June 18, 2026.",
+      productName: "Samsung Galaxy M34 5G (Silver, 128GB)",
+      price: "₹18,999.00",
+      productId: "prod_samsung_m34_001",
       img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=200&auto=format&fit=crop"
     },
     {
       id: "404-1188199-4825114",
-      date: "5 November 2025",
-      total: "₹202.94",
-      shipTo: "Nikita Gupta",
-      status: "Refunded",
-      statusDesc: "Your return is in transit. Your refund has been issued.",
-      productName: "SRP Cable for Arduino Nano (USB 2.0 A to USB 2.0 Mini B) - Blue, 30cm",
-      price: "₹199.00",
-      img: "https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=200&auto=format&fit=crop"
+      date: "10 April 2026",
+      total: "₹4,999.00",
+      shipTo: user?.name || "Priya Sharma",
+      status: "Eligible for Return",
+      statusDesc: "Delivered on April 13. Return window open until July 13, 2026.",
+      productName: "Levi's Trucker Denim Jacket (Classic Blue, Size M)",
+      price: "₹4,999.00",
+      productId: "prod_levis_jacket_001",
+      img: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=200&auto=format&fit=crop"
     }
   ];
 
@@ -42,7 +133,6 @@ export default function ReturnFlow() {
       <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto', background: 'white', borderRadius: '8px', border: '1px solid #ddd', padding: '24px' }}>
           
-          {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '22px', fontWeight: '500' }}>Return/Refund Status</h2>
             <button 
@@ -54,8 +144,6 @@ export default function ReturnFlow() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
-            
-            {/* Left: Product & Status Timeline */}
             <div style={{ background: '#fcfcfc', border: '1px solid #e7e7e7', borderRadius: '8px', padding: '20px' }}>
               <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
                 <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '4px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -67,29 +155,23 @@ export default function ReturnFlow() {
                 </div>
               </div>
 
-              {/* Refund confirmation block */}
               <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '24px' }}>
                 <span style={{ color: '#137333' }}><CheckCircle2 size={20} /></span>
                 <div>
-                  <h5 style={{ fontSize: '14px', fontWeight: '700', color: '#137333' }}>Refund issued</h5>
-                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '2px' }}>{selectedOrder.price} was refunded to your original payment method</p>
+                  <h5 style={{ fontSize: '14px', fontWeight: '700', color: '#137333' }}>Refund status: Processed</h5>
+                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '2px' }}>Your circular return was processed and credits/cash refund has been issued.</p>
                 </div>
               </div>
 
-              {/* Vertical Progress Tracker */}
               <div style={{ position: 'relative', paddingLeft: '32px' }}>
-                {/* Vertical Bar */}
                 <div style={{ position: 'absolute', left: '11px', top: '12px', bottom: '12px', width: '4px', background: '#ff9900' }} />
-                
                 {[
-                  { label: "Return pickup scheduled", date: "Nov 16" },
-                  { label: "Picked up", date: "Nov 17" },
-                  { label: "Item received", date: "Nov 17" },
-                  { label: "Refund initiated", date: "Nov 17" },
-                  { label: "Refund credited to your bank account", date: "Nov 20-22" }
+                  { label: "Return initiated (ReLoop AI scan verified)", date: "Today" },
+                  { label: "Package dropped off / collected", date: "Pending" },
+                  { label: "Item received at sorting hub", date: "Pending" },
+                  { label: "Refund credited & Green Credits awarded", date: "Processed ✓" }
                 ].map((step, idx) => (
                   <div key={idx} style={{ position: 'relative', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                    {/* Circle Bullet */}
                     <span style={{
                       position: 'absolute',
                       left: '-26px',
@@ -108,9 +190,7 @@ export default function ReturnFlow() {
               </div>
             </div>
 
-            {/* Right: Summary Options */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Summary box */}
               <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '20px' }}>
                 <h4 style={{ fontWeight: '750', fontSize: '16px', marginBottom: '14px' }}>Refund summary</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', paddingBottom: '8px' }}>
@@ -123,7 +203,6 @@ export default function ReturnFlow() {
                 </div>
               </div>
 
-              {/* Manage return links */}
               <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
                 <div style={{ background: '#f0f2f2', padding: '10px 16px', fontSize: '13px', fontWeight: '700', borderBottom: '1px solid #ddd' }}>
                   Manage your return
@@ -149,37 +228,31 @@ export default function ReturnFlow() {
                 Continue shopping
               </button>
             </div>
-
           </div>
         </div>
       </div>
     );
   }
 
-  // Active Tab is Orders list
   return (
     <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto', spaceY: '16px' }}>
         
-        {/* Breadcrumb */}
         <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
           <span>Your Account</span> <ChevronRight size={10} style={{ display: 'inline' }} /> <span style={{ color: '#c7511f' }}>Your Orders</span>
         </div>
 
         <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Your Orders</h1>
 
-        {/* Tab Buttons */}
         <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px', marginBottom: '20px', fontSize: '14px' }}>
           <span style={{ fontWeight: 'bold', borderBottom: '2px solid #e77600', paddingBottom: '10px', cursor: 'pointer' }}>Orders</span>
           <span style={{ color: '#565959', cursor: 'pointer' }}>Buy Again</span>
           <span style={{ color: '#565959', cursor: 'pointer' }}>Not Yet Shipped</span>
         </div>
 
-        {/* Orders List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {mockOrders.map((order) => (
             <div key={order.id} style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-              {/* Order Metadata Belt */}
               <div style={{ background: '#f0f2f2', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#565959' }}>
                 <div style={{ display: 'flex', gap: '32px' }}>
                   <div>
@@ -201,40 +274,44 @@ export default function ReturnFlow() {
                 </div>
               </div>
 
-              {/* Order Item Details */}
               <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 240px', gap: '20px' }}>
                 <div style={{ display: 'flex', gap: '20px' }}>
                   <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={order.img} alt={order.productName} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>Refunded</h4>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>{order.status}</h4>
                     <p style={{ fontSize: '13px', color: '#565959', marginBottom: '12px' }}>{order.statusDesc}</p>
-                    <span style={{ fontSize: '13px', color: '#007185', cursor: 'pointer', lineHeight: '1.4' }}>{order.productName}</span>
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-                      <button style={{ padding: '6px 12px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}>Buy it again</button>
-                      <button style={{ padding: '6px 12px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}>View your item</button>
-                    </div>
+                    <span style={{ fontSize: '13px', color: '#007185', cursor: 'pointer', lineHeight: '1.4', fontWeight: '600' }}>{order.productName}</span>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <button 
-                    onClick={() => handleViewStatus(order)}
+                    onClick={() => navigate(`/return/${order.productId}`)}
                     style={{
                       padding: '10px',
-                      background: '#ffd814',
-                      border: '1px solid #fcd200',
+                      background: 'linear-gradient(135deg, #4ade80, #22c55e)',
+                      border: 'none',
                       borderRadius: '100px',
                       fontSize: '12px',
-                      fontWeight: '700',
-                      cursor: 'pointer'
+                      fontWeight: '800',
+                      color: '#0f1111',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      boxShadow: '0 2px 6px rgba(34, 197, 94, 0.2)'
                     }}
                   >
-                    View Return/Refund Status
+                    ♻️ Return via ReLoop
                   </button>
-                  <button style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}>
-                    Write a product review
+                  <button 
+                    onClick={() => handleViewStatus(order)}
+                    style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    View Refund Status
                   </button>
                 </div>
               </div>
@@ -245,4 +322,19 @@ export default function ReturnFlow() {
       </div>
     </div>
   );
+}
+
+export default function ReturnFlow() {
+  const { productId } = useParams();
+  const { user } = useUser();
+
+  if (productId) {
+    return (
+      <ReturnProvider>
+        <ReturnFlowContainer />
+      </ReturnProvider>
+    );
+  }
+
+  return <OrdersList user={user} />;
 }

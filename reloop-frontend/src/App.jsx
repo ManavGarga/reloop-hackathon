@@ -15,6 +15,8 @@ import Recommendations from './pages/Recommendations'
 import Profile from './pages/Profile'
 
 import { CartProvider, useCart } from './context/CartContext'
+import { UserProvider, useUser } from './context/UserContext'
+
 
 const navItems = [
   { to: '/',               label: 'Home'            },
@@ -27,11 +29,13 @@ const navItems = [
 
 function Navbar() {
   const { totalItems, cartItems, removeFromCart } = useCart();
+  const { user } = useUser();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [liveCredits, setLiveCredits] = useState(null);
   const navigate = useNavigate();
+
 
   // Fetch live credits balance
   useEffect(() => {
@@ -75,8 +79,8 @@ function Navbar() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
               <MapPin size={16} style={{ color: '#cccccc', marginTop: '6px' }} />
               <div style={{ display: 'flex', flexDirection: 'column', fontSize: '11px', lineHeight: '1.2' }}>
-                <span style={{ color: '#cccccc' }}>Deliver to Priya</span>
-                <span style={{ fontWeight: '700', color: 'white' }}>Bengaluru 560001</span>
+                <span style={{ color: '#cccccc' }}>Deliver to {user?.name?.split(' ')[0] || 'Priya'}</span>
+                <span style={{ fontWeight: '700', color: 'white' }}>{user?.city || 'Bengaluru'} 560001</span>
               </div>
             </div>
           </div>
@@ -215,7 +219,7 @@ function Navbar() {
                 onMouseLeave={() => document.getElementById('account-dropdown').style.display = 'none'}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
-                  <span style={{ color: '#cccccc' }}>{isLoggedIn ? "Hello, Nikita" : "Hello, Priya"}</span>
+                  <span style={{ color: '#cccccc' }}>{isLoggedIn ? `Hello, ${user?.name?.split(' ')[0] || 'Priya'}` : "Hello, Guest"}</span>
                   <span style={{ fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '2px' }}>
                     Account & Lists <span style={{ fontSize: '10px' }}>▼</span>
                   </span>
@@ -503,10 +507,12 @@ function Navbar() {
 
 export default function App() {
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Navbar />
-        <main style={{ width: '100%', padding: '24px' }}>
+    <UserProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <Navbar />
+          <main style={{ width: '1050px', margin: '0 auto', padding: '24px' }}>
+
           <Routes>
             <Route path="/"                element={<Home />}            />
             <Route path="/products"        element={<ProductPage />}          />
@@ -519,8 +525,9 @@ export default function App() {
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/profile"         element={<Profile />}         />
           </Routes>
-        </main>
-      </BrowserRouter>
-    </CartProvider>
+          </main>
+        </BrowserRouter>
+      </CartProvider>
+    </UserProvider>
   )
 }

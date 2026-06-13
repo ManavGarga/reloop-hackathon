@@ -65,7 +65,7 @@ export default function Dashboard() {
         const totalRet  = dashRes?.impact?.total_returns    ?? 3;
 
         setDashboardData({
-          user:  { name: "Priya Sharma", member_since: "2024-04-14" },
+          user:  { name: dashRes?.user?.name || "Priya Sharma", member_since: dashRes?.user?.member_since || "2024-04-14" },
           impact: { co2_saved_kg: co2, trees_equivalent: trees, returns_avoided: dashRes?.impact?.returns_avoided ?? 1, items_refurbished: refurbished, items_donated: donated, items_p2p: p2p, total_returns: totalRet },
           green_credits: { balance, total_earned: earned, total_spent: spent },
           recent_returns: dashRes?.recent_returns?.length ? dashRes.recent_returns : [

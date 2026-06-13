@@ -2,38 +2,46 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Sparkles, Brain, Lightbulb, Send, CheckCircle2, Leaf, ChevronRight, Recycle } from 'lucide-react'
 import { getPersonalisedFeed, sendChat } from '../api/reloop'
-
-const USER_ID = 'user_priya_001'
+import { useUser } from '../context/UserContext'
 
 export default function Recommendations() {
   const navigate = useNavigate()
+  const { user } = useUser()
   const [feedProducts, setFeedProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const chatEndRef = useRef(null)
 
   // AI Chat State
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hello Priya! I'm your ReLoop AI assistant. I can help you find eco-friendly products, give tips to reduce your return rate, or explain how to earn more Green Credits. What's on your mind today?" }
-  ])
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
 
   useEffect(() => {
-    getPersonalisedFeed(USER_ID).then((res) => {
-      if (res && res.status === 'ok' && res.feed?.length) {
-        setFeedProducts(res.feed)
-      }
-    }).finally(() => setLoading(false))
-  }, [])
+    if (user) {
+      setMessages([
+        { role: 'assistant', content: `Hello ${user.name.split(' ')[0]}! I'm your ReLoop AI assistant. I can help you find eco-friendly products, give tips to reduce your return rate, or explain how to earn more Green Credits. What's on your mind today?` }
+      ]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.user_id) {
+      setLoading(true);
+      getPersonalisedFeed(user.user_id).then((res) => {
+        if (res && res.status === 'ok' && res.feed?.length) {
+          setFeedProducts(res.feed)
+        }
+      }).finally(() => setLoading(false))
+    }
+  }, [user])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-
   const handleSend = async (e) => {
     e.preventDefault()
-    if (!input.trim() || sending) return
+    if (!input.trim() || sending || !user) return
 
     const userMessage = { role: 'user', content: input }
     setMessages(prev => [...prev, userMessage])
@@ -41,7 +49,7 @@ export default function Recommendations() {
     setSending(true)
 
     try {
-      const res = await sendChat({ message: userMessage.content, history: messages.slice(-5) })
+      const res = await sendChat({ message: userMessage.content, history: messages.slice(-5), user_id: user.user_id })
       if (res && res.status === 'ok') {
         setMessages(prev => [...prev, { role: 'assistant', content: res.reply }])
       } else {

@@ -27,6 +27,9 @@ export const registerUser = (data) => request("POST", "/users/register", data)
 export const loginUser    = (data) => request("POST", "/users/login", data)
 export const getMe        = ()     => request("GET",  "/users/me")
 export const updateMe     = (data) => request("PUT",  "/users/me", data)
+export const getUserProfile   = (userId)       => request("GET", `/users/${userId}`)
+export const updateUserProfile = (userId, data) => request("PUT", `/users/${userId}`, data)
+
 
 // ─── Products ─────────────────────────────────────────────
 export const getProducts   = ()     => request("GET",  "/products")

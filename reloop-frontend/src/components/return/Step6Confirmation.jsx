@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useReturn } from "../../context/ReturnContext";
+import { useUser } from "../../context/UserContext";
 import { completeReturn } from "../../api/reloop";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle, Heart, Download, MapPin, Calendar } from "lucide-react";
@@ -15,6 +16,7 @@ const NGO_MAP = {
 
 export default function Step6Confirmation() {
   const { returnDetails, updateReturn, resetReturn } = useReturn();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -159,7 +161,7 @@ export default function Step6Confirmation() {
           {/* Certificate Body */}
           <div className="relative space-y-3 border border-emerald-800/40 bg-emerald-950/20 rounded-xl p-4">
             <p className="text-xs text-slate-300 leading-relaxed">
-              This certifies that <strong className="text-emerald-300">Priya Sharma</strong> donated a{" "}
+              This certifies that <strong className="text-emerald-300">{user?.name || "Priya Sharma"}</strong> donated a{" "}
               <strong className="text-emerald-300">{returnDetails.productName || "returned item"}</strong> (AI-graded condition) 
               through the ReLoop circular return platform.
             </p>

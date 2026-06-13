@@ -2,8 +2,10 @@ import React from "react";
 import { X, Leaf, ShieldCheck, Heart, User, Milestone } from "lucide-react";
 import GradeTag from "../shared/GradeTag";
 import CarbonBadge from "./CarbonBadge";
+import { useUser } from "../../context/UserContext";
 
 export default function RenewedPassportDrawer({ productId, isOpen, onClose }) {
+  const { user } = useUser();
   if (!isOpen) return null;
 
   // Mock passport data for prod_samsung_m34_001
@@ -11,7 +13,7 @@ export default function RenewedPassportDrawer({ productId, isOpen, onClose }) {
     product_name: "Samsung Galaxy M34 5G",
     category: "electronics",
     total_co2_kg: 70.0,
-    current_owner: "Priya Sharma (user_priya_001)",
+    current_owner: user ? `${user.name} (${user.user_id})` : "Priya Sharma (user_priya_001)",
     current_condition: "Good",
     events: [
       {
@@ -28,7 +30,7 @@ export default function RenewedPassportDrawer({ productId, isOpen, onClose }) {
         event_type: "sold",
         title: "Purchased (First Owner)",
         date: "Mar 15, 2026",
-        actor: "Priya Sharma",
+        actor: user ? user.name : "Priya Sharma",
         notes: "Original purchase via Amazon India",
         location: "Bengaluru, KA",
         co2_delta_kg: 0.0,

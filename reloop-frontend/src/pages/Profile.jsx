@@ -1,18 +1,62 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { User, Shield, Key, MapPin, CreditCard, ChevronRight } from 'lucide-react'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Shield, Key, MapPin, CreditCard, ChevronRight, Check } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { user, updateUser, loading } = useUser();
   const [profileView, setProfileView] = useState("menu"); // "menu" or "login-security"
 
-  // Nikita Gupta matching mock state
-  const mockUser = {
-    name: "Nikita Gupta",
-    email: "nikita.gupta@example.com",
-    phone: "+919818134486",
-    passkey: "Set up",
-    password: "••••••••"
+  // Edit states
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingCity, setIsEditingCity] = useState(false);
+
+  // Form inputs state
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editCity, setEditCity] = useState("");
+
+  const startEdit = (field) => {
+    if (field === "name") {
+      setEditName(user.name);
+      setIsEditingName(true);
+    } else if (field === "phone") {
+      setEditPhone(user.phone);
+      setIsEditingPhone(true);
+    } else if (field === "email") {
+      setEditEmail(user.email);
+      setIsEditingEmail(true);
+    } else if (field === "city") {
+      setEditCity(user.city || "Bengaluru");
+      setIsEditingCity(true);
+    }
+  };
+
+  const saveEdit = (field) => {
+    if (field === "name") {
+      updateUser({ name: editName });
+      setIsEditingName(false);
+    } else if (field === "phone") {
+      updateUser({ phone: editPhone });
+      setIsEditingPhone(false);
+    } else if (field === "email") {
+      updateUser({ email: editEmail });
+      setIsEditingEmail(false);
+    } else if (field === "city") {
+      updateUser({ city: editCity });
+      setIsEditingCity(false);
+    }
+  };
+
+  const cancelEdit = (field) => {
+    if (field === "name") setIsEditingName(false);
+    else if (field === "phone") setIsEditingPhone(false);
+    else if (field === "email") setIsEditingEmail(false);
+    else if (field === "city") setIsEditingCity(false);
   };
 
   if (profileView === "login-security") {
@@ -29,36 +73,112 @@ export default function Profile() {
 
           <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Login & Security</h1>
 
-          {/* Details Table Card matches Nikita reference image */}
+          {/* Details Table Card */}
           <div style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
             
             {/* Field: Name */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
-              <div>
+              <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Name:</span>
-                <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{mockUser.name}</p>
+                {isEditingName ? (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <input 
+                      type="text" 
+                      value={editName} 
+                      onChange={e => setEditName(e.target.value)} 
+                      style={{ padding: '6px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', width: '250px', outline: 'none' }}
+                    />
+                    <button onClick={() => saveEdit("name")} style={{ padding: '6px 14px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontWeight: '600' }}>Save</button>
+                    <button onClick={() => cancelEdit("name")} style={{ padding: '6px 14px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{user.name}</p>
+                )}
               </div>
-              <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              {!isEditingName && (
+                <button onClick={() => startEdit("name")} style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              )}
             </div>
 
             {/* Field: Phone */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
-              <div>
+              <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Primary mobile number:</span>
-                <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{mockUser.phone}</p>
-                <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Quickly sign in, easily recover passwords, and receive notifications.</p>
+                {isEditingPhone ? (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <input 
+                      type="text" 
+                      value={editPhone} 
+                      onChange={e => setEditPhone(e.target.value)} 
+                      style={{ padding: '6px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', width: '250px', outline: 'none' }}
+                    />
+                    <button onClick={() => saveEdit("phone")} style={{ padding: '6px 14px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontWeight: '600' }}>Save</button>
+                    <button onClick={() => cancelEdit("phone")} style={{ padding: '6px 14px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{user.phone}</p>
+                    <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Quickly sign in, easily recover passwords, and receive notifications.</p>
+                  </>
+                )}
               </div>
-              <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              {!isEditingPhone && (
+                <button onClick={() => startEdit("phone")} style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              )}
             </div>
 
             {/* Field: Email */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
-              <div>
+              <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>E-mail:</span>
-                <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{mockUser.email}</p>
-                <p style={{ fontSize: '11px', color: '#c7511f', marginTop: '2px' }}>⚠️ Add email verification to increase account protection.</p>
+                {isEditingEmail ? (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <input 
+                      type="email" 
+                      value={editEmail} 
+                      onChange={e => setEditEmail(e.target.value)} 
+                      style={{ padding: '6px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', width: '250px', outline: 'none' }}
+                    />
+                    <button onClick={() => saveEdit("email")} style={{ padding: '6px 14px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontWeight: '600' }}>Save</button>
+                    <button onClick={() => cancelEdit("email")} style={{ padding: '6px 14px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{user.email}</p>
+                    <p style={{ fontSize: '11px', color: '#c7511f', marginTop: '2px' }}>⚠️ Add email verification to increase account protection.</p>
+                  </>
+                )}
               </div>
-              <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Add</button>
+              {!isEditingEmail && (
+                <button onClick={() => startEdit("email")} style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              )}
+            </div>
+
+            {/* Field: City */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Primary delivery city:</span>
+                {isEditingCity ? (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <input 
+                      type="text" 
+                      value={editCity} 
+                      onChange={e => setEditCity(e.target.value)} 
+                      style={{ padding: '6px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', width: '250px', outline: 'none' }}
+                    />
+                    <button onClick={() => saveEdit("city")} style={{ padding: '6px 14px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontWeight: '600' }}>Save</button>
+                    <button onClick={() => cancelEdit("city")} style={{ padding: '6px 14px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{user.city || "Bengaluru"}</p>
+                    <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Used for local NGO donations and peer-to-peer recommendation sorting.</p>
+                  </>
+                )}
+              </div>
+              {!isEditingCity && (
+                <button onClick={() => startEdit("city")} style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+              )}
             </div>
 
             {/* Field: Passkey */}
@@ -71,10 +191,10 @@ export default function Profile() {
             </div>
 
             {/* Field: Password */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
               <div>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Password:</span>
-                <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>{mockUser.password}</p>
+                <p style={{ fontSize: '13px', color: '#333', marginTop: '2px' }}>••••••••</p>
               </div>
               <button style={{ padding: '6px 16px', background: 'white', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
             </div>
@@ -120,7 +240,7 @@ export default function Profile() {
             <span style={{ fontSize: '32px' }}>🔒</span>
             <div>
               <h4 style={{ fontSize: '15px', fontWeight: '700' }}>Login & security</h4>
-              <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>Edit login, name, and mobile number</p>
+              <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>Edit login, name, city, and mobile number</p>
             </div>
           </div>
 
@@ -180,5 +300,5 @@ export default function Profile() {
 
       </div>
     </div>
-  )
+  );
 }

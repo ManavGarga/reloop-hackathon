@@ -1,17 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useReturn } from "../../context/ReturnContext";
-import { mockProducts } from "../../data/mockProducts";
-import { initiateReturn } from "../../api/reloop";
+import { useUser } from "../../context/UserContext";
+import { initiateReturn, getProduct } from "../../api/reloop";
 import { ArrowRight, ArrowLeft, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function Step2ConditionCheck({ onNext, onBack }) {
   const { returnDetails, updateReturn } = useReturn();
-  const selectedProduct = mockProducts.find((p) => p.product_id === returnDetails.productId) || mockProducts[0];
+  const { user } = useUser();
+  const [product, setProduct] = useState(null);
+  const [fetchingProduct, setFetchingProduct] = useState(true);
 
-  const [reason, setReason] = useState(returnDetails.reason || selectedProduct.common_return_reasons[0]);
+  const [reason, setReason] = useState(returnDetails.reason || "size mismatch");
   const [comment, setComment] = useState(returnDetails.comment || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (returnDetails.productId) {
+      setFetchingProduct(true);
+      getProduct(returnDetails.productId).then((res) => {
+        if (res && res.status === "ok") {
+          setProduct(res);
+          // Set default reason if not already set
+          if (!returnDetails.reason && res.common_return_reasons?.length) {
+            setReason(res.common_return_reasons[0]);
+          }
+        }
+      }).finally(() => setFetchingProduct(false));
+    }
+  }, [returnDetails.productId]);
+
+  if (fetchingProduct || !product) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-3">
+        <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-400">Loading product details...</p>
+      </div>
+    );
+  }
+
 
   // Mock upload files state
   const [frontImage, setFrontImage] = useState(null);
@@ -32,19 +59,20 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
       setError("Please simulate uploading both front and back scan images for AI assessment.");
       return;
     }
+    if (!product || !user) return;
 
     setLoading(true);
     setError("");
 
     try {
       const payload = {
-        user_id: "user_priya_001",
-        product_id: selectedProduct.product_id,
-        product_name: selectedProduct.name,
+        user_id: user.user_id || "user_priya_001",
+        product_id: product.product_id,
+        product_name: product.name,
         return_reason: reason,
         reason_detail: comment,
         item_condition: "good",
-        image_url: selectedProduct.image_url,
+        image_url: product.image_url,
       };
 
       const res = await initiateReturn(payload);
@@ -86,7 +114,7 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
               onChange={(e) => setReason(e.target.value)}
               className="w-full bg-slate-950 text-slate-200 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >
-              {selectedProduct.common_return_reasons.map((r, idx) => (
+              {(product.common_return_reasons || []).map((r, idx) => (
                 <option key={idx} value={r}>{r}</option>
               ))}
               <option value="other">Other issues / defect</option>
