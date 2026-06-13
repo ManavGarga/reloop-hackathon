@@ -2,7 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useReturn } from "../../context/ReturnContext";
 import { completeReturn } from "../../api/reloop";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle, Heart, Download, MapPin, Calendar } from "lucide-react";
+
+// NGO lookup by category
+const NGO_MAP = {
+  electronics: { name: "Digital Bridge Foundation", city: "Bengaluru", mission: "Refurbishes returned electronics and donates to underprivileged students", emoji: "💻" },
+  clothing:    { name: "Clothes Forward",            city: "Mumbai",    mission: "Collects returned garments for rural communities across India",          emoji: "👕" },
+  books:       { name: "Shelf Life Books",            city: "Delhi",     mission: "Distributes returned books to government school libraries across India", emoji: "📚" },
+  appliances:  { name: "Digital Bridge Foundation",   city: "Bengaluru", mission: "Donates functional appliances to community centres and schools",        emoji: "⚡" },
+  general:     { name: "ReLoop Care Foundation",      city: "Bengaluru", mission: "Directs usable items to those in need across verified NGO partners",    emoji: "💚" },
+};
 
 export default function Step6Confirmation() {
   const { returnDetails, updateReturn, resetReturn } = useReturn();
@@ -86,6 +95,15 @@ export default function Step6Confirmation() {
   }
 
   const creditsAwarded = completeData?.credits_awarded || returnDetails.disposeResult?.green_credits_awarded || 30;
+  const disposition = completeData?.disposition || returnDetails.disposeResult?.disposition || "recycle";
+  const isNGODonation = disposition === "ngo_donate";
+  const isP2P = disposition === "p2p";
+
+  // Determine NGO for donation
+  const productCategory = returnDetails.disposeResult?.category || "general";
+  const ngo = NGO_MAP[productCategory] || NGO_MAP.general;
+  const donationDate = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  const certId = `RLP-CERT-${Date.now().toString(36).toUpperCase().slice(-8)}`;
 
   return (
     <div className="space-y-6">
@@ -121,6 +139,60 @@ export default function Step6Confirmation() {
         </div>
       </div>
 
+      {/* ── NGO DONATION CERTIFICATE ── */}
+      {isNGODonation && (
+        <div className="relative bg-gradient-to-br from-emerald-950/40 via-slate-900 to-teal-950/30 border border-emerald-800/60 rounded-2xl p-6 space-y-4 overflow-hidden animate-fade-in">
+          {/* Decorative background text */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+            <span className="text-[120px] font-black text-emerald-900/10 tracking-tighter">CERTIFICATE</span>
+          </div>
+
+          {/* Certificate Header */}
+          <div className="relative flex items-center gap-3">
+            <span className="p-2 bg-emerald-900/50 border border-emerald-700/50 rounded-xl text-2xl">{ngo.emoji}</span>
+            <div>
+              <span className="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest block">ReLoop Digital Certificate of Donation</span>
+              <span className="text-[10px] text-slate-400 font-mono">Cert ID: {certId}</span>
+            </div>
+          </div>
+
+          {/* Certificate Body */}
+          <div className="relative space-y-3 border border-emerald-800/40 bg-emerald-950/20 rounded-xl p-4">
+            <p className="text-xs text-slate-300 leading-relaxed">
+              This certifies that <strong className="text-emerald-300">Priya Sharma</strong> donated a{" "}
+              <strong className="text-emerald-300">{returnDetails.productName || "returned item"}</strong> (AI-graded condition) 
+              through the ReLoop circular return platform.
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-slate-500 uppercase font-bold flex items-center gap-1"><Heart size={9} className="text-rose-400" /> Beneficiary NGO</span>
+                <p className="text-xs font-bold text-slate-200">{ngo.name}</p>
+                <p className="text-[10px] text-slate-400 flex items-center gap-1"><MapPin size={9} /> {ngo.city}</p>
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-slate-500 uppercase font-bold flex items-center gap-1"><Calendar size={9} className="text-indigo-400" /> Donation Date</span>
+                <p className="text-xs font-bold text-slate-200">{donationDate}</p>
+                <p className="text-[10px] text-emerald-400 font-semibold">Verified ✓</p>
+              </div>
+            </div>
+
+            <p className="text-[10px] text-slate-400 italic leading-relaxed border-t border-emerald-800/30 pt-2">
+              "{ngo.mission}."
+            </p>
+          </div>
+
+          <div className="relative flex items-center justify-between">
+            <div className="text-[10px] text-emerald-400 font-semibold">
+              🌱 CO₂ Avoided: <strong>{returnDetails.disposeResult?.carbon?.co2_saved_kg || 0} kg</strong>
+            </div>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-900/40 border border-emerald-800/60 text-emerald-300 rounded-lg text-[10px] font-bold hover:bg-emerald-900/60 transition-all cursor-pointer">
+              <Download size={11} /> Download Certificate
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         {/* Left Column: Settlement Summary */}
         <div className="md:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
@@ -141,7 +213,7 @@ export default function Step6Confirmation() {
             </div>
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-400">Settlement Method</span>
-              <span className="font-semibold text-indigo-400 capitalize">{returnDetails.creditOption.replace("_", " ")}</span>
+              <span className="font-semibold text-indigo-400 capitalize">{(returnDetails.creditOption || "circular").replace("_", " ")}</span>
             </div>
           </div>
 
@@ -163,7 +235,7 @@ export default function Step6Confirmation() {
           </div>
         </div>
 
-        {/* Right Column: Renewed Listing Details if Refurbished */}
+        {/* Right Column: P2P / Refurbish Outcome OR NGO impact */}
         <div className="md:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Circular Routing Outcome</span>
           
@@ -187,6 +259,19 @@ export default function Step6Confirmation() {
                 <span>Preview Listing Page</span>
                 <ChevronRight size={12} />
               </button>
+            </div>
+          ) : isNGODonation ? (
+            /* NGO Impact Summary */
+            <div className="space-y-3 animate-fade-in">
+              <div className="bg-emerald-950/20 border border-emerald-900/40 p-4 rounded-xl space-y-2">
+                <p className="text-xs font-bold text-emerald-300">Your item is heading to {ngo.name} 💚</p>
+                <p className="text-[10px] text-slate-300 leading-relaxed">{ngo.mission}.</p>
+              </div>
+              <div className="space-y-2 text-xs text-slate-400">
+                <div className="flex justify-between"><span>NGO Location</span><span className="text-slate-200 font-semibold">{ngo.city}</span></div>
+                <div className="flex justify-between"><span>Expected Handoff</span><span className="text-slate-200 font-semibold">3–5 business days</span></div>
+                <div className="flex justify-between"><span>CO₂ Impact</span><span className="text-emerald-400 font-bold">-{returnDetails.disposeResult?.carbon?.co2_saved_kg || 0} kg</span></div>
+              </div>
             </div>
           ) : (
             <div className="text-xs text-slate-450 leading-relaxed space-y-2 py-4">

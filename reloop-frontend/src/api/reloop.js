@@ -62,4 +62,11 @@ export const gradeItemAI     = (data) => request("POST", "/ai/grade-item", data)
 export const getPassport = (productId) => request("GET", `/passport/${productId}`)
 export const getUserDashboard = (userId) => request("GET", `/user/${userId}/dashboard`)
 export const getCredits = (userId) => request("GET", `/credits/${userId}`)
+export const redeemCredits = (userId, rewardId) => request("POST", `/credits/${userId}/redeem`, { reward_id: rewardId })
+export const getRewardCatalogue = () => request("GET", `/credits/catalogue/rewards`)
+
+// ─── Recommendations & Buyer Targeting ──────────────────────
+export const getBuyerDemand = (productId) => request("GET", `/recommendations/buyer-demand/${productId}`)
+export const getSimilarRefurbished = (productId) => request("GET", `/recommendations/similar/${productId}`)
+export const getPersonalisedFeed = (userId) => request("GET", `/recommendations/for/${userId}`)
 
