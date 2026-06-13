@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, RotateCcw, ShieldCheck, Leaf, ArrowRight, Award, Zap, Heart } from 'lucide-react'
-import { getUserDashboard, getProducts } from '../api/reloop'
+import { getProducts } from '../api/reloop'
 
 export default function Home() {
   const navigate = useNavigate()
-  const [dashboard, setDashboard] = useState(null)
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
       try {
-        const dashData = await getUserDashboard('user_priya_001')
         const prodData = await getProducts()
-        if (dashData && dashData.status === 'ok') setDashboard(dashData)
         if (prodData && prodData.status === 'ok') {
-          setFeaturedProducts(prodData.products.slice(0, 3))
+          setFeaturedProducts(prodData.products)
         }
       } catch (e) {
-        console.error('Error loading home data:', e)
+        console.error('Error loading home products:', e)
       } finally {
         setLoading(false)
       }
@@ -27,340 +23,155 @@ export default function Home() {
     loadData()
   }, [])
 
+  const categories = [
+    {
+      title: "Appliances for your home | Up to 55% off",
+      items: [
+        { name: "Air conditioners", img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=300&auto=format&fit=crop" },
+        { name: "Refrigerators", img: "https://images.unsplash.com/photo-1571175432287-e2462612b758?q=80&w=300&auto=format&fit=crop" },
+        { name: "Microwaves", img: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?q=80&w=300&auto=format&fit=crop" },
+        { name: "Washing machines", img: "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=300&auto=format&fit=crop" }
+      ]
+    },
+    {
+      title: "Revamp your home in style",
+      items: [
+        { name: "Cushions & sheets", img: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=300&auto=format&fit=crop" },
+        { name: "Figurines, vases", img: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?q=80&w=300&auto=format&fit=crop" },
+        { name: "Home storage", img: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?q=80&w=300&auto=format&fit=crop" },
+        { name: "Lighting solutions", img: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=300&auto=format&fit=crop" }
+      ]
+    },
+    {
+      title: "Starting ₹49 | Deals on home essentials",
+      items: [
+        { name: "Cleaning supplies", img: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=300&auto=format&fit=crop" },
+        { name: "Bathroom accessories", img: "https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=300&auto=format&fit=crop" },
+        { name: "Home tools", img: "https://images.unsplash.com/photo-1581147036324-c17da41dfa6c?q=80&w=300&auto=format&fit=crop" },
+        { name: "Wallpapers", img: "https://images.unsplash.com/photo-1527067829737-402941667bd0?q=80&w=300&auto=format&fit=crop" }
+      ]
+    },
+    {
+      title: "Up to 75% off | Deals on headphones",
+      items: [
+        { name: "Wireless Earbuds", img: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=300&auto=format&fit=crop" },
+        { name: "Over-Ear ANC", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300&auto=format&fit=crop" },
+        { name: "Neckbands", img: "https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=300&auto=format&fit=crop" },
+        { name: "Gaming Headsets", img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=300&auto=format&fit=crop" }
+      ]
+    }
+  ]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      {/* Premium Amazon Eco Hero Banner */}
-      <div className="glass" style={{
-        padding: '40px',
-        background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
-        border: '1px solid rgba(34, 197, 94, 0.2)',
-        borderRadius: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Decorative background glow */}
+    <div style={{ background: '#eaeded', minHeight: '100vh', paddingBottom: '40px', color: '#111111' }}>
+      {/* Banner / Hero Slider Area */}
+      <div style={{ width: '100%', position: 'relative', overflow: 'hidden', height: '350px' }}>
+        <img 
+          src="https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=1500&auto=format&fit=crop" 
+          alt="Amazon Eco banner" 
+          style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
+        />
+        {/* Shadow Mask */}
         <div style={{
           position: 'absolute',
-          top: '-20%',
-          right: '-10%',
-          width: '300px',
-          height: '300px',
-          background: 'rgba(34, 197, 94, 0.15)',
-          filter: 'blur(80px)',
-          borderRadius: '50%',
-          pointerEvents: 'none'
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '150px',
+          background: 'linear-gradient(to top, #eaeded 0%, rgba(234,237,237,0) 100%)'
         }} />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{
-            background: 'rgba(34, 197, 94, 0.2)',
-            color: '#4ade80',
-            fontSize: '12px',
-            fontWeight: '700',
-            padding: '4px 12px',
-            borderRadius: '999px',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Amazon ReLoop
-          </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-            • Customer Obsessed Sustainability
-          </span>
-        </div>
-
-        <h1 style={{
-          fontSize: '38px',
-          fontWeight: '800',
-          lineHeight: '1.2',
-          background: 'linear-gradient(135deg, #ffffff 40%, #a7f3d0 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          Give Your Returns a Second Life.<br />
-          Earn Green Credits Instantly.
-        </h1>
-
-        <p style={{ color: 'var(--text-muted)', fontSize: '16px', maxWidth: '600px', lineHeight: '1.6' }}>
-          ReLoop turns returns into sustainable actions. Choose Peer-to-Peer Recommerce, Refurbishing, or Local NGO Donation instead of standard refunds. Track your carbon savings and redeem credits on Amazon.
-        </p>
-
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '10px' }}>
-          <button 
-            onClick={() => navigate('/returns')}
-            className="btn-primary" 
-            style={{ 
-              background: 'linear-gradient(135deg, #eab308, #ca8a04)',
-              color: '#0f172a',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              fontSize: '15px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 4px 12px rgba(234, 179, 8, 0.2)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(234, 179, 8, 0.3)'
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(234, 179, 8, 0.2)'
-            }}
-          >
-            <RotateCcw size={18} />
-            Start a Smart Return
-          </button>
-          <button 
-            onClick={() => navigate('/products')}
-            style={{ 
-              background: 'transparent',
-              color: '#ffffff',
-              border: '1px solid var(--border)',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              fontSize: '15px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.borderColor = 'var(--border)'
-            }}
-          >
-            Explore Recommerce Marketplace
-            <ArrowRight size={18} />
-          </button>
+        
+        {/* Banner text overlay */}
+        <div style={{ position: 'absolute', bottom: '120px', left: '40px', zIndex: 10 }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '800', color: 'white', textShadow: '2px 2px 8px rgba(0,0,0,0.6)' }}>
+            Remote control cars & more <br /> Under ₹999
+          </h1>
+          <p style={{ color: 'white', marginTop: '8px', fontWeight: '600', textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
+            Fast Delivery • Wide Selection • 5% Unlimited Cashback
+          </p>
         </div>
       </div>
 
-      {/* Sustainability Metrics Bar */}
+      {/* Grid of Card Widgets */}
       <div style={{
+        maxWidth: '1480px',
+        margin: '-80px auto 0 auto',
+        position: 'relative',
+        zIndex: 20,
+        padding: '0 20px',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
         gap: '20px'
       }}>
-        <div className="glass" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            background: 'rgba(34, 197, 94, 0.15)',
-            color: '#22c55e',
-            padding: '12px',
-            borderRadius: '12px'
-          }}>
-            <Leaf size={24} />
-          </div>
-          <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>Carbon Dioxide Saved</div>
-            <div style={{ fontSize: '24px', fontWeight: '800', marginTop: '2px' }}>
-              {dashboard ? `${dashboard.impact.co2_saved_kg} kg` : '28.4 kg'}
+        {categories.map((cat, i) => (
+          <div key={i} style={{ background: 'white', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', justifySelf: 'stretch' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '14px', color: '#0f1111' }}>{cat.title}</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flex: 1 }}>
+              {cat.items.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => navigate('/products')}
+                  style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '4px' }}
+                >
+                  <div style={{ height: '100px', background: '#f8f8f8', borderRadius: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center' }}>
+                    <img src={item.img} alt={item.name} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#0f1111', fontWeight: '500', height: '28px', overflow: 'hidden' }}>{item.name}</span>
+                </div>
+              ))}
             </div>
-          </div>
-        </div>
 
-        <div className="glass" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            background: 'rgba(99, 102, 241, 0.15)',
-            color: '#6366f1',
-            padding: '12px',
-            borderRadius: '12px'
-          }}>
-            <Award size={24} />
+            <span 
+              onClick={() => navigate('/products')}
+              style={{ color: '#007185', fontSize: '12px', fontWeight: '600', marginTop: '16px', display: 'inline-block', cursor: 'pointer' }}
+              onMouseOver={e => e.currentTarget.style.color = '#c7511f'}
+              onMouseOut={e => e.currentTarget.style.color = '#007185'}
+            >
+              See more deals
+            </span>
           </div>
-          <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>Green Credits Balance</div>
-            <div style={{ fontSize: '24px', fontWeight: '800', marginTop: '2px', color: '#fbbf24' }}>
-              {dashboard ? `${dashboard.green_credits.balance}` : '240'}
-            </div>
-          </div>
-        </div>
-
-        <div className="glass" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            background: 'rgba(6, 182, 212, 0.15)',
-            color: '#06b6d4',
-            padding: '12px',
-            borderRadius: '12px'
-          }}>
-            <Zap size={24} />
-          </div>
-          <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>Trees Saved Equivalent</div>
-            <div style={{ fontSize: '24px', fontWeight: '800', marginTop: '2px' }}>
-              {dashboard ? `${dashboard.impact.trees_equivalent}` : '1.4'}
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Main Grid: Features and Dashboard Summary */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-        gap: '24px'
-      }}>
-        {/* Amazon Renewed Spotlight */}
-        <div className="glass" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <ShieldCheck size={22} style={{ color: '#fbbf24' }} />
-            <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Amazon Renewed</h2>
-          </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5' }}>
-            Buy with confidence. Every refurbished or open-box product bought on ReLoop is fully certified, tested to work and look like new, and comes with a 1-year brand warranty.
-          </p>
-          <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
-            <button 
-              onClick={() => navigate('/amazon-renewed')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#4ade80',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '14px',
-                padding: '0'
-              }}
-            >
-              Learn more about Renewed Standard <ArrowRight size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Local Community NGO Donation */}
-        <div className="glass" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Heart size={22} style={{ color: '#ef4444' }} />
-            <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Donate to Local NGOs</h2>
-          </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.5' }}>
-            No longer need it? Donate electronics, formal clothing, or school books directly to our partner NGOs. We'll handle the logistics and reward you with sustainability badges and Green Credits.
-          </p>
-          <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
-            <button 
-              onClick={() => navigate('/returns')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#6366f1',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '14px',
-                padding: '0'
-              }}
-            >
-              Start Donation Return <ArrowRight size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Featured Recommerce Products */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Featured Sustainability Deals</h2>
-          <button 
-            onClick={() => navigate('/products')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#22d3ee',
-              fontWeight: '500',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            See all deals
-          </button>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '20px'
-        }}>
-          {featuredProducts.length > 0 ? (
-            featuredProducts.map((p) => (
-              <div 
-                key={p.product_id}
-                className="glass" 
-                style={{ 
-                  padding: '20px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '12px',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s ease'
-                }}
-                onClick={() => navigate(`/return/${p.product_id}`)}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-                <div style={{ 
-                  height: '160px', 
-                  borderRadius: '8px', 
-                  background: 'rgba(255,255,255,0.02)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden'
-                }}>
-                  <img 
-                    src={p.image_url} 
-                    alt={p.name} 
-                    style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', padding: '10px' }} 
-                  />
-                </div>
-                <div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600' }}>
-                    {p.brand} • {p.category}
+      {/* Recommended Products Showcase Belt */}
+      <div style={{ maxWidth: '1480px', margin: '30px auto 0 auto', padding: '0 20px' }}>
+        <div style={{ background: 'white', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px' }}>Explore ReLoop Certified Deals</h3>
+          <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '10px' }}>
+            {loading ? (
+              [1, 2, 3, 4, 5].map(i => (
+                <div key={i} style={{ minWidth: '180px', height: '220px', background: '#f8f8f8', borderRadius: '4px' }} />
+              ))
+            ) : (
+              featuredProducts.map((prod) => (
+                <div 
+                  key={prod.product_id}
+                  onClick={() => navigate(`/products`)}
+                  style={{
+                    minWidth: '180px',
+                    width: '180px',
+                    cursor: 'pointer',
+                    background: '#fcfcfc',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    border: '1px solid #e7e7e7',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div style={{ height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={prod.image_url} alt={prod.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                   </div>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600', marginTop: '4px', height: '40px', overflow: 'hidden' }}>
-                    {p.name}
-                  </h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                    <span style={{ fontSize: '18px', fontWeight: '700', color: '#4ade80' }}>
-                      ₹{p.price_new.toLocaleString()}
-                    </span>
-                    <span style={{ 
-                      fontSize: '12px', 
-                      background: 'rgba(34, 197, 94, 0.15)', 
-                      color: '#4ade80', 
-                      padding: '4px 8px', 
-                      borderRadius: '4px',
-                      fontWeight: '600'
-                    }}>
-                      -{p.carbon_footprint_kg} kg CO₂
-                    </span>
+                  <div style={{ marginTop: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#b12704' }}>₹{prod.price_new.toLocaleString()}</span>
+                    <p style={{ fontSize: '11px', color: '#565959', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>{prod.name}</p>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            [1, 2, 3].map((i) => (
-              <div key={i} className="glass shimmer" style={{ height: '300px', borderRadius: '16px' }} />
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
