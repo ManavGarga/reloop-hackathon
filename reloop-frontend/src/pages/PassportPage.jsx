@@ -121,9 +121,11 @@ export default function PassportPage() {
   // Set default view mode based on fetched product status
   useEffect(() => {
     if (passportData) {
-      setViewMode(passportData.current_status === "resold" ? "buyer" : "owner");
+      const isJacket = activeProductId.includes("jacket") || activeProductId === "prod_levis_jacket_001";
+      const currentStatus = passportData.current_status || (isJacket ? "resold" : "in_use");
+      setViewMode(currentStatus === "resold" ? "buyer" : "owner");
     }
-  }, [passportData]);
+  }, [passportData, activeProductId]);
 
   if (loading) {
     return (
@@ -145,279 +147,369 @@ export default function PassportPage() {
     );
   }
 
-  return (
-    <div className="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
+  const isJacket = activeProductId.includes("jacket") || activeProductId === "prod_levis_jacket_001";
+  
+  const enrichedPassport = {
+    ...passportData,
+    brand: passportData.brand || (isJacket ? "Levi's" : activeProductId.includes("samsung") ? "Samsung" : "ReLoop"),
+    product_name: passportData.product_name || (isJacket ? "Levi's Trucker Denim Jacket" : "Samsung Galaxy M34 5G"),
+    passport_id: passportData.passport_id || (isJacket ? "RLP-2026-C892X" : "RLP-2026-X128A"),
+    current_status: passportData.current_status || (isJacket ? "resold" : "in_use"),
+    lives_count: passportData.lives_count !== undefined ? passportData.lives_count : (isJacket ? 3 : 2),
+    trust_score: passportData.trust_score !== undefined ? passportData.trust_score : (isJacket ? 78 : 94),
+    total_co2_kg: passportData.total_co2_kg !== undefined ? passportData.total_co2_kg : (isJacket ? 22.0 : 70.0),
+    events: (passportData.events || []).map(event => {
+      const eventGrade = String(event.grade || event.condition_at_event || "Good");
       
-      {/* Header back button & sandbox switch */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 p-4 border border-slate-800/80 rounded-2xl">
-        <button
-          onClick={() => navigate("/products")}
-          className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <ArrowLeft size={14} /> Back to Products
-        </button>
+      let eventDate = event.date;
+      if (!eventDate && event.timestamp) {
+        try {
+          const d = new Date(event.timestamp);
+          if (!isNaN(d.getTime())) {
+            eventDate = d.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric"
+            });
+          } else {
+            eventDate = event.timestamp;
+          }
+        } catch (e) {
+          eventDate = event.timestamp;
+        }
+      }
+      if (!eventDate) eventDate = "Unknown Date";
 
-        {/* View Mode Switch for grading purposes */}
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Select View Context:</span>
-          <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-850">
-            <button
-              onClick={() => setViewMode("owner")}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                viewMode === "owner" 
-                  ? "bg-slate-800 text-slate-100 font-bold" 
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
-            >
-              Original Owner
-            </button>
-            <button
-              onClick={() => setViewMode("buyer")}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                viewMode === "buyer" 
-                  ? "bg-slate-800 text-slate-100 font-bold" 
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
-            >
-              Buyer View (Resold)
-            </button>
+      const eventTitle = event.title || (() => {
+        const type = event.event_type || "";
+        const titleMap = {
+          manufactured: "Manufactured",
+          sold: "Purchased (First Owner)",
+          returned: "Returned Item",
+          refurbished: "Inspected & Graded by ReLoop AI",
+          p2p_sold: "Resold (P2P)",
+          donated: "Donated to Charity",
+          recycled: "Recycled",
+          repaired: "Repaired & Restored"
+        };
+        if (titleMap[type]) return titleMap[type];
+        return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      })();
+
+      const eventLocation = event.location || "Bengaluru, KA";
+
+      return {
+        ...event,
+        grade: eventGrade,
+        date: eventDate,
+        title: eventTitle,
+        location: eventLocation,
+        co2_delta_kg: event.co2_delta_kg !== undefined ? event.co2_delta_kg : 0.0
+      };
+    })
+  };
+
+  const statusIsGreen = enrichedPassport.current_status === "in_use" || enrichedPassport.current_status === "refurbished" || enrichedPassport.current_status === "manufactured";
+
+  return (
+    <div className="bg-[#eaeded] min-h-screen text-[#0F1111] font-sans px-6 py-6 pb-12">
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* Amazon India Navigation Breadcrumbs */}
+        <div className="text-[11px] text-[#565959] flex items-center gap-1.5 font-normal">
+          <span 
+            onClick={() => navigate("/profile")} 
+            className="hover:text-[#C45500] hover:underline cursor-pointer"
+          >
+            Your Account
+          </span>
+          <span>&gt;</span>
+          <span 
+            onClick={() => navigate("/dashboard")} 
+            className="hover:text-[#C45500] hover:underline cursor-pointer"
+          >
+            Eco Dashboard
+          </span>
+          <span>&gt;</span>
+          <span className="text-[#C45500] font-semibold">Circular Passport</span>
+        </div>
+
+        {/* Header back button & sandbox switch */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 border border-[#DDD] rounded-xl shadow-sm">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 text-xs font-semibold text-[#007185] hover:text-[#C45500] hover:underline transition-colors"
+          >
+            <ArrowLeft size={14} /> Back to Eco Dashboard
+          </button>
+
+          {/* View Mode Switch for grading purposes */}
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-bold text-[#565959] uppercase tracking-wide">Select View Context:</span>
+            <div className="flex bg-[#F0F2F2] p-1 rounded-lg border border-[#D5D9D9]">
+              <button
+                onClick={() => setViewMode("owner")}
+                className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                  viewMode === "owner" 
+                    ? "bg-white text-[#0F1111] font-bold shadow-sm border border-[#D5D9D9]" 
+                    : "text-[#565959] hover:text-[#0F1111]"
+                }`}
+              >
+                Original Owner
+              </button>
+              <button
+                onClick={() => setViewMode("buyer")}
+                className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                  viewMode === "buyer" 
+                    ? "bg-white text-[#0F1111] font-bold shadow-sm border border-[#D5D9D9]" 
+                    : "text-[#565959] hover:text-[#0F1111]"
+                }`}
+              >
+                Buyer View (Resold)
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* SECTION A: HEADER */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-        
-        {/* Left Card: Basic Specs */}
-        <div className="md:col-span-7 bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-6 flex flex-col justify-between shadow-sm">
-          <div className="space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{passportData.brand}</span>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100 mt-1 tracking-tight">
-                  {passportData.product_name}
-                </h1>
-                <p className="text-xs font-mono text-slate-500 mt-1">Passport ID: {passportData.passport_id}</p>
-              </div>
-              <span className="bg-indigo-950/40 text-indigo-400 border border-indigo-900/60 px-3 py-1 rounded-full text-xs font-bold capitalize">
-                Status: {passportData.current_status.replace("_", " ")}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-3">
-              <div className="bg-slate-950/60 border border-slate-850/80 p-3 rounded-xl">
-                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Circular Cycles</span>
-                <span className="text-xl font-black text-slate-200 mt-1 block">
-                  {passportData.lives_count} Lives
+        {/* SECTION A: HEADER */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+          
+          {/* Left Card: Basic Specs */}
+          <div className="md:col-span-7 bg-white border border-[#DDD] p-6 rounded-xl space-y-6 flex flex-col justify-between shadow-sm hover:border-[#C45500] hover:shadow-md transition-all duration-150">
+            <div className="space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] text-[#565959] font-extrabold uppercase tracking-wider">{enrichedPassport.brand}</span>
+                  <h1 className="text-xl md:text-2xl font-bold text-[#0F1111] mt-1 tracking-tight">
+                    {enrichedPassport.product_name}
+                  </h1>
+                  <p className="text-xs font-mono text-[#565959] mt-1">Passport ID: {enrichedPassport.passport_id}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize border ${
+                  statusIsGreen 
+                    ? "bg-[#EDF8F2] text-[#007600] border-[#B1E5C6]" 
+                    : "bg-[#FFF8F2] text-[#C45500] border-[#FBD8B4]"
+                }`}>
+                  Status: {enrichedPassport.current_status.replace("_", " ")}
                 </span>
-                <span className="text-[9px] text-teal-400 font-medium">Kept out of landfills</span>
               </div>
 
-              <div className="bg-slate-950/60 border border-slate-850/80 p-3 rounded-xl">
-                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Circular Trust Score</span>
-                <span className="text-xl font-black text-slate-200 mt-1 block">
-                  {passportData.trust_score}/100
-                </span>
-                {/* Horizontal trust progress meter */}
-                <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div 
-                    className="h-full bg-emerald-500 transition-all duration-1000" 
-                    style={{ width: `${passportData.trust_score}%` }}
-                  />
+              <div className="grid grid-cols-2 gap-4 pt-3">
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-3 rounded-xl">
+                  <span className="text-[10px] text-[#565959] uppercase font-bold tracking-wider block">Circular Cycles</span>
+                  <span className="text-lg font-extrabold text-[#0F1111] mt-1 block">
+                    {enrichedPassport.lives_count} Lives
+                  </span>
+                  <span className="text-[9px] text-[#007600] font-medium">Kept out of landfills</span>
+                </div>
+
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-3 rounded-xl">
+                  <span className="text-[10px] text-[#565959] uppercase font-bold tracking-wider block">Circular Trust Score</span>
+                  <span className="text-lg font-extrabold text-[#0F1111] mt-1 block">
+                    {enrichedPassport.trust_score}/100
+                  </span>
+                  {/* Horizontal trust progress meter */}
+                  <div className="w-full bg-[#E5E7EB] h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div 
+                      className="h-full bg-[#007600] transition-all duration-1000" 
+                      style={{ width: `${enrichedPassport.trust_score}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+
+            <div className="text-xs text-[#565959] bg-[#F7F9FA] border border-[#E5E7EB] p-3 rounded-xl flex items-center gap-2">
+              <Award size={16} className="text-[#007600]" />
+              <span>This passport guarantees circular history, verified by ReLoop AI models.</span>
+            </div>
           </div>
 
-          <div className="text-xs text-slate-400 bg-slate-950/40 border border-slate-850/60 p-3 rounded-xl flex items-center gap-2">
-            <Award size={16} className="text-teal-400" />
-            <span>This passport guarantees circular history, verified by ReLoop AI models.</span>
+          {/* Right Card: CarbonBadge lg */}
+          <div className="md:col-span-5 flex flex-col">
+            <CarbonBadge
+              carbon_kg={enrichedPassport.total_co2_kg}
+              context_string={`Circular management prevents up to 85% of standard manufacturing footprint. Buy refurbished next time to help optimize emissions.`}
+              source="ReLoop Sustainability Tracker"
+              size="lg"
+              isLight={true}
+            />
           </div>
+
         </div>
 
-        {/* Right Card: CarbonBadge lg */}
-        <div className="md:col-span-5 flex flex-col">
-          <CarbonBadge
-            carbon_kg={passportData.total_co2_kg}
-            context_string={`Circular management prevents up to 85% of standard manufacturing footprint. Buy refurbished next time to help optimize emissions.`}
-            source="ReLoop Sustainability Tracker"
-            size="lg"
-          />
-        </div>
+        {/* SECTION B: TIMELINE */}
+        <div className="bg-white border border-[#DDD] rounded-xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="p-1.5 bg-[#EAF7ED] text-[#007600] rounded-lg border border-[#BEE7D1]">
+              <Compass size={16} />
+            </span>
+            <h2 className="text-base font-bold text-[#0F1111]">Verified Circular Timeline</h2>
+          </div>
 
-      </div>
-
-      {/* SECTION B: TIMELINE */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="p-1.5 bg-indigo-950 rounded-lg text-indigo-400 border border-indigo-900/40">
-            <Compass size={16} />
-          </span>
-          <h2 className="text-lg font-bold text-slate-200">Verified Circular Timeline</h2>
-        </div>
-
-        <div className="relative border-l-2 border-emerald-800/60 ml-4 pl-8 space-y-8 py-2">
-          
-          {passportData.events.map((event, index) => {
-            const isPoor = event.grade && (event.grade.toLowerCase() === "poor" || event.grade.toLowerCase() === "fair");
+          <div className="relative border-l-2 border-[#BEE7D1] ml-4 pl-8 space-y-8 py-2">
             
-            return (
-              <div key={index} className="relative animate-fade-in">
-                {/* Timeline Dot Indicator */}
-                <span className="absolute -left-[41px] top-1.5 bg-slate-900 border-2 border-emerald-500 w-4 h-4 rounded-full flex items-center justify-center shadow shadow-emerald-950">
-                  <span className="w-2 h-2 bg-emerald-400 rounded-full" />
-                </span>
+            {enrichedPassport.events.map((event, index) => {
+              const isPoor = event.grade && (event.grade.toLowerCase() === "poor" || event.grade.toLowerCase() === "fair");
+              
+              return (
+                <div key={index} className="relative animate-fade-in">
+                  {/* Timeline Dot Indicator */}
+                  <span className="absolute -left-[41px] top-1.5 bg-white border-2 border-[#007600] w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="w-2 h-2 bg-[#007600] rounded-full" />
+                  </span>
 
-                {/* Event Card */}
-                <div className={`bg-slate-950 border border-slate-850 p-5 rounded-2xl space-y-3 relative shadow-inner ${
-                  isPoor ? "border-l-4 border-l-amber-500 border-amber-900/40" : ""
-                }`}>
-                  {/* Event Topbar */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider bg-slate-900 border border-slate-850 px-2 py-0.5 rounded">
-                        {event.date}
-                      </span>
-                      {event.grade && <GradeTag grade={event.grade} />}
+                  {/* Event Card */}
+                  <div className={`bg-white border border-[#DDD] p-5 rounded-xl space-y-3 relative shadow-sm hover:shadow-md transition-shadow duration-150 ${
+                    isPoor ? "border-l-4 border-l-[#C45500]" : ""
+                  }`}>
+                    {/* Event Topbar */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#0F1111] font-bold uppercase tracking-wider bg-[#F0F2F2] border border-[#D5D9D9] px-2 py-0.5 rounded">
+                          {event.date}
+                        </span>
+                        {event.grade && <GradeTag grade={event.grade} />}
+                      </div>
+
+                      {event.co2_delta_kg !== 0 && (
+                        <span className={`text-[10px] px-2 py-0.5 font-bold rounded border ${
+                          event.co2_delta_kg < 0 
+                            ? "bg-[#EDF8F2] text-[#007600] border-[#B1E5C6]" 
+                            : "bg-[#FFF8F2] text-[#C45500] border-[#FBD8B4]"
+                        }`}>
+                          {event.co2_delta_kg < 0 
+                            ? `Saved: ${Math.abs(event.co2_delta_kg)} kg CO₂e` 
+                            : `Cost: ${event.co2_delta_kg} kg CO₂e`}
+                        </span>
+                      )}
                     </div>
 
-                    {event.co2_delta_kg !== 0 && (
-                      <span className={`text-[10px] px-2 py-0.5 font-bold rounded border ${
-                        event.co2_delta_kg < 0 
-                          ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40" 
-                          : "bg-slate-900/40 text-slate-400 border-slate-800"
-                      }`}>
-                        {event.co2_delta_kg < 0 
-                          ? `Saved: ${Math.abs(event.co2_delta_kg)} kg CO₂e` 
-                          : `Cost: ${event.co2_delta_kg} kg CO₂e`}
+                    {/* Title & Notes */}
+                    <div>
+                      <h3 className="text-sm font-bold text-[#0F1111]">{event.title}</h3>
+                      <p className="text-xs text-[#565959] mt-1 leading-relaxed">{event.notes}</p>
+                    </div>
+
+                    {/* Badges footer */}
+                    <div className="flex flex-wrap gap-2 text-[10px] text-[#565959] pt-1">
+                      <span className="bg-[#F7F9FA] px-2 py-1 rounded border border-[#E5E7EB] flex items-center gap-1">
+                        <User size={10} className="text-[#565959]" />
+                        Actor: <strong className="text-[#0F1111] font-semibold">{event.actor}</strong>
                       </span>
-                    )}
-                  </div>
-
-                  {/* Title & Notes */}
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-200">{event.title}</h3>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">{event.notes}</p>
-                  </div>
-
-                  {/* Badges footer */}
-                  <div className="flex flex-wrap gap-2 text-[10px] text-slate-500 pt-1">
-                    <span className="bg-slate-900 px-2 py-1 rounded border border-slate-850 flex items-center gap-1">
-                      <User size={10} className="text-slate-400" />
-                      Actor: <strong className="text-slate-300 font-semibold">{event.actor}</strong>
-                    </span>
-                    <span className="bg-slate-900 px-2 py-1 rounded border border-slate-850 flex items-center gap-1">
-                      <MapPin size={10} className="text-slate-400" />
-                      Location: <strong className="text-slate-300 font-semibold">{event.location}</strong>
-                    </span>
+                      <span className="bg-[#F7F9FA] px-2 py-1 rounded border border-[#E5E7EB] flex items-center gap-1">
+                        <MapPin size={10} className="text-[#565959]" />
+                        Location: <strong className="text-[#0F1111] font-semibold">{event.location}</strong>
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* SECTION C: WHAT THIS MEANS FOR YOU */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 className="text-base font-bold text-slate-200 mb-4">What This Means For You</h2>
+        {/* SECTION C: WHAT THIS MEANS FOR YOU */}
+        <div className="bg-white border border-[#DDD] rounded-xl p-6 shadow-sm">
+          <h2 className="text-base font-bold text-[#0F1111] mb-4">What This Means For You</h2>
 
-        {viewMode === "buyer" ? (
-          /* Buyer View Context (resold == true) */
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Trust Signal 1 */}
-              <div className="bg-slate-950/50 border border-slate-850 p-4 rounded-2xl flex items-start gap-3">
-                <span className="p-1.5 bg-teal-950/60 text-teal-400 rounded-lg border border-teal-900/40">
-                  <ShieldCheck size={16} />
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-200">AI-Verified Condition</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    This device was graded by ReLoop's ML computer-vision. We guarantee 89%+ scoring accuracy.
-                  </p>
-                </div>
-              </div>
-
-              {/* Trust Signal 2 */}
-              <div className="bg-slate-950/50 border border-slate-850 p-4 rounded-2xl flex items-start gap-3">
-                <span className="p-1.5 bg-indigo-950/60 text-indigo-400 rounded-lg border border-indigo-900/40">
-                  <Eye size={16} />
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-200">Full Chain History</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    You can view the full history: origin plant, previous owners, days used, and refurbished logs.
-                  </p>
-                </div>
-              </div>
-
-              {/* Trust Signal 3 */}
-              <div className="bg-slate-950/50 border border-slate-850 p-4 rounded-2xl flex items-start gap-3">
-                <span className="p-1.5 bg-emerald-950/60 text-emerald-400 rounded-lg border border-emerald-900/40">
-                  <Leaf size={16} />
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-200">Carbon Positive Impact</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    This circular purchase prevented 59.5 kg CO₂ from entering the atmosphere.
-                  </p>
-                </div>
-              </div>
-
-              {/* Trust Signal 4 */}
-              <div className="bg-slate-950/50 border border-slate-850 p-4 rounded-2xl flex items-start gap-3">
-                <span className="p-1.5 bg-orange-950/60 text-orange-400 rounded-lg border border-orange-900/40">
-                  🛒
-                </span>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-xs font-bold text-slate-200">Amazon Renewed Listed</h4>
-                    <span className="text-[9px] bg-orange-500/10 text-orange-400 border border-orange-500/30 px-1 rounded uppercase font-extrabold tracking-wide">
-                      amazon renewed
-                    </span>
+          {viewMode === "buyer" ? (
+            /* Buyer View Context (resold == true) */
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Trust Signal 1 */}
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-4 rounded-xl flex items-start gap-3 shadow-sm hover:shadow transition-shadow">
+                  <span className="p-1.5 bg-[#EAF7ED] text-[#007600] rounded-lg border border-[#BEE7D1]">
+                    <ShieldCheck size={16} />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#0F1111]">AI-Verified Condition</h4>
+                    <p className="text-[11px] text-[#565959] mt-0.5 leading-relaxed">
+                      This device was graded by ReLoop's ML computer-vision. We guarantee 89%+ scoring accuracy.
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    Backed by Amazon's 1-year Renewed Guarantee for extra peace of mind.
-                  </p>
+                </div>
+
+                {/* Trust Signal 2 */}
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-4 rounded-xl flex items-start gap-3 shadow-sm hover:shadow transition-shadow">
+                  <span className="p-1.5 bg-[#EBF3F9] text-[#007185] rounded-lg border border-[#BDE0E6]">
+                    <Eye size={16} />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#0F1111]">Full Chain History</h4>
+                    <p className="text-[11px] text-[#565959] mt-0.5 leading-relaxed">
+                      You can view the full history: origin plant, previous owners, days used, and refurbished logs.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Trust Signal 3 */}
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-4 rounded-xl flex items-start gap-3 shadow-sm hover:shadow transition-shadow">
+                  <span className="p-1.5 bg-[#EAF7ED] text-[#007600] rounded-lg border border-[#BEE7D1]">
+                    <Leaf size={16} />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#0F1111]">Carbon Positive Impact</h4>
+                    <p className="text-[11px] text-[#565959] mt-0.5 leading-relaxed">
+                      This circular purchase prevented 59.5 kg CO₂ from entering the atmosphere.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Trust Signal 4 */}
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-4 rounded-xl flex items-start gap-3 shadow-sm hover:shadow transition-shadow">
+                  <span className="p-1.5 bg-[#FFF8F2] text-[#C45500] rounded-lg border border-[#FBD8B4]">
+                    🛒
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold text-[#0F1111]">Amazon Renewed Listed</h4>
+                      <span className="text-[9px] bg-[#C45500] text-white px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide">
+                        amazon renewed
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#565959] mt-0.5 leading-relaxed">
+                      Backed by Amazon's 1-year Renewed Guarantee for extra peace of mind.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Grey Banner warning */}
-            <div className="bg-slate-950 text-slate-400 border border-slate-850 p-4 rounded-2xl text-xs flex items-center gap-3">
-              <ShieldAlert size={18} className="text-slate-500 flex-shrink-0" />
-              <span>This passport cannot be edited by any seller. Once generated, all events are permanently signed.</span>
-            </div>
-          </div>
-        ) : (
-          /* Owner View Context (resold == false) */
-          <div className="space-y-4">
-            <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl space-y-4">
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Your item's passport is live. When it sells on Amazon Renewed, the next buyer will see this full history. This transparency helps command higher resell value.
-              </p>
-              
-              {/* Badge Preview box */}
-              <div className="bg-slate-900 border border-slate-850/80 p-4 rounded-xl space-y-2">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Preview Badge:</span>
-                <div className="flex items-center gap-4">
-                  <ReLoopVerifiedBadge grade="Good" confidence={89} passport_id={passportData.passport_id} />
-                  <span className="text-slate-500 text-xs">Visible inline on the Amazon Renewed listing page.</span>
-                </div>
+              {/* Grey Banner warning */}
+              <div className="bg-[#FDF8E2] text-[#565959] border border-[#F5D8A0] p-4 rounded-xl text-xs flex items-center gap-3 shadow-sm">
+                <ShieldAlert size={18} className="text-[#a88734] flex-shrink-0" />
+                <span>This passport cannot be edited by any seller. Once generated, all events are permanently signed.</span>
               </div>
             </div>
+          ) : (
+            /* Owner View Context (resold == false) */
+            <div className="space-y-4">
+              <div className="bg-white border border-[#DDD] p-5 rounded-xl space-y-4">
+                <p className="text-xs text-[#0F1111] leading-relaxed">
+                  Your item's passport is live. When it sells on Amazon Renewed, the next buyer will see this full history. This transparency helps command higher resell value.
+                </p>
+                
+                {/* Badge Preview box */}
+                <div className="bg-[#F7F9FA] border border-[#E5E7EB] p-4 rounded-xl space-y-2">
+                  <span className="text-[10px] text-[#565959] font-bold uppercase tracking-wider block">Preview Badge:</span>
+                  <div className="flex items-center gap-4">
+                    <ReLoopVerifiedBadge grade="Good" confidence={89} passport_id={enrichedPassport.passport_id} />
+                    <span className="text-[#565959] text-xs">Visible inline on the Amazon Renewed listing page.</span>
+                  </div>
+                </div>
+              </div>
 
-            {/* CTA Button */}
-            <button
-              onClick={() => navigate(`/renewed/${activeProductId}`)}
-              className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow"
-            >
-              <span>See how it appears on Amazon Renewed</span>
-              <ArrowRight size={14} />
-            </button>
-          </div>
-        )}
+              {/* CTA Button */}
+              <button
+                onClick={() => navigate(`/renewed/${activeProductId}`)}
+                className="w-full py-3.5 bg-[#ffd814] border border-[#a88734] hover:bg-[#f7ca00] text-[#0F1111] font-bold rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm hover:shadow"
+              >
+                <span>See how it appears on Amazon Renewed</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
