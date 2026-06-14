@@ -69,6 +69,7 @@ export const getPassport = (productId) => request("GET", `/passport/${productId}
 export const getUserDashboard = (userId) => request("GET", `/user/${userId}/dashboard`)
 export const getCredits = (userId) => request("GET", `/credits/${userId}`)
 export const redeemCredits = (userId, rewardId) => request("POST", `/credits/${userId}/redeem`, { reward_id: rewardId })
+export const convertCredits = (userId, amount) => request("POST", `/credits/${userId}/convert`, { amount })
 export const getRewardCatalogue = () => request("GET", `/credits/catalogue/rewards`)
 
 // ─── Recommendations & Buyer Targeting ──────────────────────

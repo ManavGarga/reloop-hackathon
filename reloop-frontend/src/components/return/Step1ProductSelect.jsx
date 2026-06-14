@@ -16,11 +16,12 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
         if (res && res.status === "ok" && res.products) {
           setProducts(res.products);
 
-          // If a product is preselected in the URL and not yet set in context
-          if (preselectedId && !returnDetails.productId) {
-            const targetId = preselectedId === "B09X7KQMGN" ? "prod_samsung_m34_001" : preselectedId;
-            const product = res.products.find((p) => p.product_id === targetId) || res.products[0];
-            if (product) {
+          // If a product is preselected or set in context, ensure all metadata details are fully populated
+          const targetId = preselectedId === "B09X7KQMGN" ? "prod_samsung_m34_001" : preselectedId;
+          const currentId = returnDetails.productId || targetId;
+          if (currentId) {
+            const product = res.products.find((p) => p.product_id === currentId) || res.products[0];
+            if (product && (!returnDetails.productId || !returnDetails.productName || !returnDetails.category)) {
               updateReturn({
                 productId: product.product_id,
                 productName: product.name,
@@ -36,7 +37,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
       }
     }
     loadProducts();
-  }, [preselectedId, returnDetails.productId, updateReturn]);
+  }, [preselectedId, returnDetails.productId, returnDetails.productName, returnDetails.category, updateReturn]);
 
   const selectedProduct = products.find((p) => p.product_id === returnDetails.productId);
 

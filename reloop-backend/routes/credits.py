@@ -95,6 +95,60 @@ async def redeem_credits(user_id: str, body: RedeemBody):
     }
 
 
+class ConvertBody(BaseModel):
+    amount: float
+
+
+@router.post("/{user_id}/convert")
+async def convert_credits(user_id: str, body: ConvertBody):
+    """
+    Convert green credits to Amazon Pay wallet balance.
+    Deducts credits atomically from balance and pushes to ledger.
+    """
+    db = get_db()
+    
+    if body.amount <= 0:
+        raise HTTPException(status_code=400, detail="Conversion amount must be positive")
+
+    ledger = await db.green_credits.find_one({"user_id": user_id}, {"_id": 0})
+    if not ledger:
+        raise HTTPException(status_code=404, detail=f"No credit ledger found for user {user_id}")
+
+    balance = ledger.get("balance", 0.0)
+    if balance < body.amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient credits. You have {balance} but requested {body.amount}."
+        )
+
+    now = datetime.utcnow().isoformat()
+    transaction = {
+        "amount":           -body.amount,
+        "transaction_type": "converted_wallet",
+        "reference_id":     "wallet_conversion",
+        "notes":            f"Converted {body.amount} credits to Amazon Pay balance",
+        "balance_after":    balance - body.amount,
+        "timestamp":        now,
+    }
+
+    await db.green_credits.update_one(
+        {"user_id": user_id},
+        {
+            "$inc":  {"balance": -body.amount, "total_spent": body.amount},
+            "$push": {"transactions": transaction},
+            "$set":  {"updated_at": now},
+        }
+    )
+
+    return {
+        "status":       "ok",
+        "user_id":      user_id,
+        "converted":    body.amount,
+        "new_balance":  balance - body.amount,
+        "transaction":  transaction,
+    }
+
+
 @router.get("/catalogue/rewards")
 async def get_reward_catalogue():
     """Return the full reward catalogue."""

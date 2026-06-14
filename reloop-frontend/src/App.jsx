@@ -19,12 +19,12 @@ import { UserProvider, useUser } from './context/UserContext'
 
 
 const navItems = [
-  { to: '/',               label: 'Home'            },
-  { to: '/products',       label: 'Marketplace'     },
-  { to: '/returns',        label: 'Returns'         },
-  { to: '/dashboard',      label: 'Eco Dashboard'   },
-  { to: '/recommendations',label: 'For You'         },
-  { to: '/profile',        label: 'Profile'         },
+  { to: '/', label: 'Home' },
+  { to: '/products', label: 'Marketplace' },
+  { to: '/returns', label: 'Returns' },
+  { to: '/dashboard', label: 'Eco Dashboard' },
+  { to: '/recommendations', label: 'For You' },
+  { to: '/profile', label: 'Profile' },
 ]
 
 function Navbar() {
@@ -72,7 +72,7 @@ function Navbar() {
     cartItems.forEach(item => {
       const isRenewed = item.name.toLowerCase().includes('refurbished') || item.grade;
       const baseCarbon = item.carbon_footprint_kg || item.total_co2_kg || 70.0;
-      
+
       if (isRenewed) {
         carbonSaved += baseCarbon * 0.85 * item.quantity;
         creditsEarned += 50 * item.quantity;
@@ -91,7 +91,7 @@ function Navbar() {
     try {
       const existingStr = sessionStorage.getItem("reloop_orders");
       const existing = existingStr ? JSON.parse(existingStr) : [];
-      
+
       const newOrders = cartItems.map(item => ({
         id: `404-${Math.floor(1000000 + Math.random() * 9000000)}-${Math.floor(1000000 + Math.random() * 9000000)}`,
         date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -140,7 +140,7 @@ function Navbar() {
               <div style={{ height: '3px', width: '100%', background: 'linear-gradient(90deg, #febd69, #4ade80)', borderRadius: '2px', marginTop: '-2px' }} />
             </NavLink>
 
-            <div 
+            <div
               onClick={() => {
                 setNewCity(user?.city || 'Bengaluru');
                 setAddressModalOpen(true);
@@ -158,7 +158,7 @@ function Navbar() {
           {/* Middle: Custom Search bar */}
           <div style={{ display: 'flex', flex: 1, flexDirection: 'column', position: 'relative' }}>
             <form onSubmit={handleSearchSubmit} style={{ display: 'flex', height: '40px', borderRadius: '4px', overflow: 'hidden', background: 'white' }}>
-              <select 
+              <select
                 value={searchCategory}
                 onChange={e => setSearchCategory(e.target.value)}
                 style={{
@@ -179,8 +179,8 @@ function Navbar() {
                 <option>Books</option>
                 <option>Appliances</option>
               </select>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => document.getElementById('search-suggestions').style.display = 'block'}
@@ -188,7 +188,7 @@ function Navbar() {
                   const el = document.getElementById('search-suggestions');
                   if (el) el.style.display = 'none';
                 }, 200)}
-                placeholder="Search Amazon ReLoop for sustainable products..." 
+                placeholder="Search Amazon ReLoop for sustainable products..."
                 style={{
                   flex: 1,
                   border: 'none',
@@ -198,7 +198,7 @@ function Navbar() {
                   outline: 'none'
                 }}
               />
-              <button 
+              <button
                 type="submit"
                 style={{
                   background: '#febd69',
@@ -219,7 +219,7 @@ function Navbar() {
             </form>
 
             {/* Realtime Autocomplete Suggestions (Matches uploaded design) */}
-            <div 
+            <div
               id="search-suggestions"
               style={{
                 display: 'none',
@@ -253,7 +253,7 @@ function Navbar() {
                 const fullText = item.primary + item.secondary;
                 return fullText.toLowerCase().includes(searchQuery.toLowerCase());
               }).map((item, idx) => (
-                <div 
+                <div
                   key={idx}
                   onClick={() => {
                     setSearchQuery(item.primary + item.secondary);
@@ -281,84 +281,84 @@ function Navbar() {
             </div>
           </div>
 
-            {/* Right: User accounts, Returns, Eco Credits & Cart */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              
-              {/* Account Dropdown Container with Hover behavior */}
-              <div 
-                style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
-                onMouseEnter={() => document.getElementById('account-dropdown').style.display = 'block'}
-                onMouseLeave={() => document.getElementById('account-dropdown').style.display = 'none'}
+          {/* Right: User accounts, Returns, Eco Credits & Cart */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+
+            {/* Account Dropdown Container with Hover behavior */}
+            <div
+              style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
+              onMouseEnter={() => document.getElementById('account-dropdown').style.display = 'block'}
+              onMouseLeave={() => document.getElementById('account-dropdown').style.display = 'none'}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
+                <span style={{ color: '#cccccc' }}>{isLoggedIn ? `Hello, ${user?.name?.split(' ')[0] || 'Priya'}` : "Hello, Guest"}</span>
+                <span style={{ fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  Account & Lists <span style={{ fontSize: '10px' }}>▼</span>
+                </span>
+              </div>
+
+              {/* Account & Lists Hover Dropdown Menu */}
+              <div
+                id="account-dropdown"
+                style={{
+                  display: 'none',
+                  position: 'absolute',
+                  top: '40px',
+                  right: '-60px',
+                  width: '320px',
+                  background: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  padding: '16px',
+                  zIndex: 500,
+                  color: '#111'
+                }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
-                  <span style={{ color: '#cccccc' }}>{isLoggedIn ? `Hello, ${user?.name?.split(' ')[0] || 'Priya'}` : "Hello, Guest"}</span>
-                  <span style={{ fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    Account & Lists <span style={{ fontSize: '10px' }}>▼</span>
-                  </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
+                  <button
+                    onClick={() => setIsLoggedIn(!isLoggedIn)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      background: 'linear-gradient(to bottom, #f7dfa5, #f0c14b)',
+                      border: '1px solid #a88734',
+                      borderRadius: '3px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {isLoggedIn ? "Sign Out" : "Sign In"}
+                  </button>
+                  <span style={{ fontSize: '11px', marginTop: '6px', color: '#565959' }}>New customer? <strong style={{ color: '#007185', cursor: 'pointer' }}>Start here.</strong></span>
                 </div>
 
-                {/* Account & Lists Hover Dropdown Menu */}
-                <div 
-                  id="account-dropdown"
-                  style={{
-                    display: 'none',
-                    position: 'absolute',
-                    top: '40px',
-                    right: '-60px',
-                    width: '320px',
-                    background: 'white',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    padding: '16px',
-                    zIndex: 500,
-                    color: '#111'
-                  }}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
-                    <button 
-                      onClick={() => setIsLoggedIn(!isLoggedIn)}
-                      style={{
-                        width: '100%',
-                        padding: '8px',
-                        background: 'linear-gradient(to bottom, #f7dfa5, #f0c14b)',
-                        border: '1px solid #a88734',
-                        borderRadius: '3px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isLoggedIn ? "Sign Out" : "Sign In"}
-                    </button>
-                    <span style={{ fontSize: '11px', marginTop: '6px', color: '#565959' }}>New customer? <strong style={{ color: '#007185', cursor: 'pointer' }}>Start here.</strong></span>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '12px', textAlign: 'left' }}>
-                    <div>
-                      <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Lists</h4>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
-                        <span>Create a Wish List</span>
-                        <span>Wish From Any Website</span>
-                        <span>Baby Wishlist</span>
-                      </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '12px', textAlign: 'left' }}>
+                  <div>
+                    <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Lists</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
+                      <span>Create a Wish List</span>
+                      <span>Wish From Any Website</span>
+                      <span>Baby Wishlist</span>
                     </div>
-                    <div>
-                      <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Account</h4>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
-                        <NavLink to="/profile" style={{ textDecoration: 'none', color: '#565959' }}>Your Account</NavLink>
-                        <NavLink to="/returns" style={{ textDecoration: 'none', color: '#565959' }}>Your Orders</NavLink>
-                        <NavLink to="/dashboard" style={{ textDecoration: 'none', color: '#565959' }}>Eco Dashboard</NavLink>
-                      </div>
+                  </div>
+                  <div>
+                    <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Account</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
+                      <NavLink to="/profile" style={{ textDecoration: 'none', color: '#565959' }}>Your Account</NavLink>
+                      <NavLink to="/returns" style={{ textDecoration: 'none', color: '#565959' }}>Your Orders</NavLink>
+                      <NavLink to="/dashboard" style={{ textDecoration: 'none', color: '#565959' }}>Eco Dashboard</NavLink>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <NavLink to="/returns" style={{ textDecoration: 'none', color: 'white', display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
-                <span style={{ color: '#cccccc' }}>Returns</span>
-                <span style={{ fontWeight: '700' }}>& Smart ReLoop</span>
-              </NavLink>
+            <NavLink to="/returns" style={{ textDecoration: 'none', color: 'white', display: 'flex', flexDirection: 'column', fontSize: '12px' }}>
+              <span style={{ color: '#cccccc' }}>Returns</span>
+              <span style={{ fontWeight: '700' }}>& Smart ReLoop</span>
+            </NavLink>
 
             {/* Green Credits Coin - live balance */}
             <NavLink to="/dashboard" style={{
@@ -379,7 +379,7 @@ function Navbar() {
             </NavLink>
 
             {/* Cart Button */}
-            <div 
+            <div
               onClick={() => setCartOpen(true)}
               style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', position: 'relative' }}
             >
@@ -463,7 +463,7 @@ function Navbar() {
 
       {/* Cart Drawer */}
       {cartOpen && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             inset: 0,
@@ -475,7 +475,7 @@ function Navbar() {
           }}
           onClick={() => setCartOpen(false)}
         >
-          <div 
+          <div
             style={{
               width: '100%',
               maxWidth: '450px',
@@ -494,7 +494,7 @@ function Navbar() {
               <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ShoppingCart size={22} style={{ color: '#febd69' }} /> Shopping Cart
               </h2>
-              <button 
+              <button
                 onClick={() => setCartOpen(false)}
                 style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
               >
@@ -523,7 +523,7 @@ function Navbar() {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                         <span style={{ fontSize: '15px', fontWeight: '800', color: '#4ade80' }}>₹{item.price_new.toLocaleString()}</span>
-                        <button 
+                        <button
                           onClick={() => removeFromCart(item.product_id)}
                           style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600' }}
                         >
@@ -545,7 +545,7 @@ function Navbar() {
                     ₹{cartItems.reduce((acc, item) => acc + (item.price_new * item.quantity), 0).toLocaleString()}
                   </span>
                 </div>
-                <button 
+                <button
                   onClick={handleProceedToBuy}
                   style={{
                     width: '100%',
@@ -580,9 +580,9 @@ function Navbar() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
               <div>
                 <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>City</label>
-                <select 
-                  value={newCity} 
-                  onChange={e => setNewCity(e.target.value)} 
+                <select
+                  value={newCity}
+                  onChange={e => setNewCity(e.target.value)}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', outline: 'none', background: 'white' }}
                 >
                   <option value="Bengaluru">Bengaluru</option>
@@ -594,26 +594,26 @@ function Navbar() {
               </div>
               <div>
                 <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Pin Code</label>
-                <input 
-                  type="text" 
-                  value={newPincode} 
-                  onChange={e => setNewPincode(e.target.value)} 
+                <input
+                  type="text"
+                  value={newPincode}
+                  onChange={e => setNewPincode(e.target.value)}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', outline: 'none' }}
                 />
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => setAddressModalOpen(false)} 
+              <button
+                onClick={() => setAddressModalOpen(false)}
                 style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
                   updateUser({ city: newCity });
                   setAddressModalOpen(false);
-                }} 
+                }}
                 style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
               >
                 Apply
@@ -660,11 +660,11 @@ function Navbar() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => {
                 setCheckoutReceiptOpen(false);
                 navigate('/returns');
-              }} 
+              }}
               style={{ width: '100%', padding: '12px', background: 'linear-gradient(to bottom, #f7dfa5, #f0c14b)', border: '1px solid #a88734', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
             >
               Go to Your Orders to track circular items
@@ -682,20 +682,20 @@ export default function App() {
       <CartProvider>
         <BrowserRouter>
           <Navbar />
-          <main style={{ width: '1050px', margin: '0 auto', padding: '24px' }}>
+          <main style={{ width: '100%', minHeight: 'calc(100vh - 98px)' }}>
 
-          <Routes>
-            <Route path="/"                element={<Home />}            />
-            <Route path="/products"        element={<ProductPage />}          />
-            <Route path="/returns"         element={<ReturnFlow />}           />
-            <Route path="/return/:productId" element={<ReturnFlow />}         />
-            <Route path="/dashboard"       element={<Dashboard />}            />
-            <Route path="/passport/:productId" element={<PassportPage />}     />
-            <Route path="/amazon-renewed"  element={<AmazonRenewedPage />}    />
-            <Route path="/renewed/:productId" element={<AmazonRenewedPage />} />
-            <Route path="/recommendations" element={<Recommendations />} />
-            <Route path="/profile"         element={<Profile />}         />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<ProductPage />} />
+              <Route path="/returns" element={<ReturnFlow />} />
+              <Route path="/return/:productId" element={<ReturnFlow />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/passport/:productId" element={<PassportPage />} />
+              <Route path="/amazon-renewed" element={<AmazonRenewedPage />} />
+              <Route path="/renewed/:productId" element={<AmazonRenewedPage />} />
+              <Route path="/recommendations" element={<Recommendations />} />
+              <Route path="/profile" element={<Profile />} />
+            </Routes>
           </main>
         </BrowserRouter>
       </CartProvider>

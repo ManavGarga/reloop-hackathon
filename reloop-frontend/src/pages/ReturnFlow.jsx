@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ReturnProvider, useReturn } from "../context/ReturnContext";
 import { useUser } from "../context/UserContext";
@@ -16,9 +16,27 @@ import Step6Confirmation from "../components/return/Step6Confirmation";
 
 function ReturnFlowContainer() {
   const { productId } = useParams();
-  const { returnDetails, updateReturn } = useReturn();
+  const { returnDetails, updateReturn, resetReturn } = useReturn();
   const currentStep = returnDetails.currentStep;
   const navigate = useNavigate();
+  const [initialized, setInitialized] = useState(false);
+
+  const targetId = productId === "B09X7KQMGN" ? "prod_samsung_m34_001" : productId;
+  const isMismatched = returnDetails.productId !== targetId || returnDetails.currentStep === 6;
+
+  useEffect(() => {
+    if (productId) {
+      if (isMismatched) {
+        resetReturn();
+        updateReturn({
+          productId: targetId,
+          currentStep: 1
+        });
+      }
+      setInitialized(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleNextStep = () => {
     updateReturn({ currentStep: currentStep + 1 });
@@ -47,6 +65,17 @@ function ReturnFlowContainer() {
     }
   };
 
+  if (isMismatched && !initialized) {
+    return (
+      <div style={{ background: '#090d16', minHeight: '100vh', padding: '32px 24px', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', borderRadius: '12px' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center max-w-5xl mx-auto space-y-6">
+          <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-slate-400">Initializing return wizard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ background: '#090d16', minHeight: '100vh', padding: '32px 24px', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', borderRadius: '12px' }}>
       <div className="min-h-screen flex flex-col items-center max-w-5xl mx-auto space-y-6">
@@ -72,19 +101,21 @@ function ReturnFlowContainer() {
         </button>
 
         {/* Wizard Header Title */}
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight flex items-center justify-center gap-2">
-            <Sparkles size={24} style={{ color: '#4ade80' }} />
-            amazon<span style={{ color: '#4ade80' }}>reloop</span> AI Return Hub
+        <div className="text-center space-y-2 py-2">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight flex items-center justify-center gap-2">
+            <Sparkles size={24} className="text-emerald-450 animate-glow" />
+            amazon<span className="text-emerald-400">reloop</span> <span className="font-light text-slate-300">AI Return Hub</span>
           </h1>
-          <p className="text-xs text-slate-400">Reduce carbon waste, earn green credits, and circularize returns via computer vision grading.</p>
+          <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
+            Reduce carbon waste, earn green credits, and circularize returns via automated computer vision grading.
+          </p>
         </div>
 
         {/* Progress Bar */}
         <ProgressBar currentStep={currentStep} />
 
         {/* Step Container Card */}
-        <div className="w-full bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-sm">
+        <div className="w-full bg-slate-900/60 backdrop-blur-xl border border-slate-850 rounded-3xl p-6 md:p-8 shadow-2xl animate-slide-up">
           {renderActiveStep()}
         </div>
       </div>

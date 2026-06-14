@@ -14,16 +14,21 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
   const [comment, setComment] = useState(returnDetails.comment || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // Mock upload files state
+  const [frontImage, setFrontImage] = useState(null);
+  const [backImage, setBackImage] = useState(null);
 
   useEffect(() => {
     if (returnDetails.productId) {
       setFetchingProduct(true);
       getProduct(returnDetails.productId).then((res) => {
         if (res && res.status === "ok") {
-          setProduct(res);
+          const prodObj = res.product || res;
+          setProduct(prodObj);
           // Set default reason if not already set
-          if (!returnDetails.reason && res.common_return_reasons?.length) {
-            setReason(res.common_return_reasons[0]);
+          if (!returnDetails.reason && prodObj.common_return_reasons?.length) {
+            setReason(prodObj.common_return_reasons[0]);
           }
         }
       }).finally(() => setFetchingProduct(false));
@@ -38,11 +43,6 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
       </div>
     );
   }
-
-
-  // Mock upload files state
-  const [frontImage, setFrontImage] = useState(null);
-  const [backImage, setBackImage] = useState(null);
 
   const handleFakeUpload = (side) => {
     // Generate a mock filename and state when clicked

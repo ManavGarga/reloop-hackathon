@@ -31,6 +31,8 @@
   --color-amber: var(--amber);
   --color-red: var(--red);
   --color-teal: var(--teal);
+  --color-slate-850: #162031;
+  --color-slate-450: #7c8ba1;
 }
 
 
@@ -96,4 +98,31 @@ html, body, #root {
   background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4)); }
+  50% { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8)); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-glow {
+  animation: glowPulse 2s infinite ease-in-out;
 }

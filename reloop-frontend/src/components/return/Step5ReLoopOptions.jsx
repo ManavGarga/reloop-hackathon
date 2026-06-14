@@ -156,6 +156,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
                       onChange={(e) => setAskingPrice(Number(e.target.value))}
                       className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-xs"
                       min={0}
+                      step="any"
                     />
                   </div>
                   <div className="text-xs text-slate-400">
