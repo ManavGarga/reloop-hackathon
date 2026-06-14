@@ -47,9 +47,16 @@ test('ReLoop returns flow end-to-end and state reset test', async ({ page }) => 
 
   console.log('7. Step 5: Choosing circular recommendation options...');
   const p2pAcceptBtn = page.locator('button:has-text("Accept P2P Offer")');
+  const ngoAcceptBtn = page.locator('button:has-text("Confirm NGO Donation")');
+  const recycleAcceptBtn = page.locator('button:has-text("Confirm Material Recycling")');
   const continueToConfirmationBtn = page.locator('button:has-text("Continue to Confirmation")');
+
   if (await p2pAcceptBtn.count() > 0) {
     await p2pAcceptBtn.click();
+  } else if (await ngoAcceptBtn.count() > 0) {
+    await ngoAcceptBtn.click();
+  } else if (await recycleAcceptBtn.count() > 0) {
+    await recycleAcceptBtn.click();
   } else {
     await expect(continueToConfirmationBtn).toBeVisible({ timeout: 15000 });
     await continueToConfirmationBtn.click();
