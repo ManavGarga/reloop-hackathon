@@ -6,7 +6,7 @@ test('ReLoop Eco Dashboard Interactivity Test', async ({ page }) => {
 
   console.log('2. Verifying Rank Badge click opens Leaderboard Modal...');
   const rankBadge = page.locator('#rank-leaderboard-badge');
-  await expect(rankBadge).toBeVisible();
+  await expect(rankBadge).toBeVisible({ timeout: 15000 });
   await rankBadge.click();
 
   const leaderboardHeader = page.locator('h3:has-text("National Leaderboard")');

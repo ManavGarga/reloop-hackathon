@@ -7,7 +7,7 @@ import {
 import {
   Leaf, Award, Recycle, Gift, ChevronRight,
   CheckCircle, Sparkles, X, CreditCard, Zap,
-  ShieldCheck, Star, Trophy, Users, TrendingUp, TreePine, Shield, Package
+  ShieldCheck, Star, Trophy, Users, TrendingUp, TreePine, Shield, Package, AlertCircle
 } from "lucide-react";
 import { getUserDashboard, getCredits, redeemCredits } from "../api/reloop";
 
@@ -18,6 +18,7 @@ const REWARDS = [
   { reward_id: "amazon_250", title: "₹250 Amazon Discount", credits: 500, value: "₹250 off", icon: "💎", type: "discount" },
   { reward_id: "ngo_plant", title: "Plant a Tree via NGO", credits: 50, value: "1 tree 🌱", icon: "🌳", type: "ngo" },
   { reward_id: "priority_access", title: "Priority Renewed Access", credits: 150, value: "VIP 🔓", icon: "⭐", type: "tier" },
+  { reward_id: "amazon_500", title: "₹500 Amazon Discount", credits: 1000, value: "₹500 off", icon: "🔥", type: "discount" },
 ];
 
 // ── Tier definitions ──────────────────────────────────────────────────────────
@@ -39,16 +40,21 @@ const LEADERBOARD_DATA = [
 ];
 
 function getTier(credits) {
-  return TIERS.find(t => credits >= t.min && credits < t.max) || TIERS[0];
+  return TIERS.find(t => credits >= t.min && credits < t.max) || TIERS[TIERS.length - 1];
 }
 
 // Custom tooltip for chart
 function CustomTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
+    const co2 = payload[0].value;
+    const km = Math.round(co2 * 4.05);
     return (
-      <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3">
-        <p className="text-xs font-semibold text-gray-800">{label}</p>
-        <p className="text-sm font-bold text-emerald-600">{payload[0].value} kg CO₂</p>
+      <div className="bg-white border border-slate-200/80 rounded-xl shadow-lg px-4 py-3 text-left space-y-1">
+        <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wide">{label} 2026</p>
+        <p className="text-sm font-black text-[#16A34A]">{co2} kg CO₂ Saved</p>
+        <p className="text-[11px] text-slate-500 font-semibold border-t border-slate-100 pt-1 flex items-center gap-1">
+          <span>🚗</span> Equivalent to {km} km not driven
+        </p>
       </div>
     );
   }
@@ -67,10 +73,9 @@ export default function Dashboard() {
   const [redeemError, setRedeemError] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [hoveredSlice, setHoveredSlice] = useState(null);
 
-  const chartRef = useRef(null);
   const ledgerRef = useRef(null);
-
   const userId = "user_priya_001";
 
   useEffect(() => {
@@ -92,7 +97,7 @@ export default function Dashboard() {
         const totalRet = dashRes?.impact?.total_returns ?? 10;
 
         setDashboardData({
-          user: { name: dashRes?.user?.name || "Priya S. Sharma", member_since: dashRes?.user?.member_since || "2026-04-14" },
+          user: { name: dashRes?.user?.name || "Priya Sharma", member_since: dashRes?.user?.member_since || "2026-04-14" },
           impact: { co2_saved_kg: co2, trees_equivalent: trees, returns_avoided: dashRes?.impact?.returns_avoided ?? 0, items_refurbished: refurbished, items_donated: donated, items_p2p: p2p, total_returns: totalRet },
           green_credits: { balance, total_earned: earned, total_spent: spent },
           recent_returns: dashRes?.recent_returns?.length ? dashRes.recent_returns : [
@@ -107,7 +112,7 @@ export default function Dashboard() {
         setCreditsData({
           balance,
           transactions: credsRes?.transactions?.length ? credsRes.transactions : [
-            { amount: 100.0, transaction_type: "earned_return", notes: "P2P Resale — Samsung Galaxy M34 5G", timestamp: "2026-06-14T11:30:00" },
+            { amount: 100.0, transaction_type: "earned_return", notes: "Return completed: Refurbished Samsung Galaxy M34 5G", timestamp: "2026-06-14T11:30:00" },
             { amount: 100.0, transaction_type: "earned_return", notes: "P2P Resale — Samsung Galaxy M34 5G", timestamp: "2026-06-14T10:00:00" },
             { amount: -100.0, transaction_type: "spent_discount", notes: "₹100 discount on next order", timestamp: "2026-06-10T09:00:00" },
             { amount: 80.0, transaction_type: "earned_return", notes: "Donated Levi's Jacket to Clothes Forward", timestamp: "2026-05-30T14:00:00" },
@@ -169,17 +174,13 @@ export default function Dashboard() {
     }, 100);
   };
 
-  const handleImpactClick = () => {
-    chartRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-
   if (loading || !dashboardData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#f0fdf4] via-[#ecfdf5] to-[#f0f9ff] flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-4 text-gray-500">
           <div className="relative">
-            <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-500 rounded-full animate-spin"></div>
-            <Leaf className="absolute inset-0 m-auto text-emerald-500" size={20} />
+            <div className="w-12 h-12 border-4 border-teal-200 border-t-[#16A34A] rounded-full animate-spin"></div>
+            <Leaf className="absolute inset-0 m-auto text-[#16A34A]" size={20} />
           </div>
           <span className="text-sm font-medium text-gray-600">Loading your Eco Dashboard...</span>
         </div>
@@ -190,30 +191,36 @@ export default function Dashboard() {
   const balance = creditsData?.balance ?? dashboardData.green_credits.balance;
   const tier = getTier(balance);
   const nextTier = TIERS[TIERS.indexOf(tier) + 1];
-  const tierProgress = nextTier ? Math.round(((balance - tier.min) / (nextTier.min - tier.min)) * 100) : 100;
+  const overallProgress = Math.min(100, (balance / 1000) * 100);
 
   const co2TrendData = [
     { month: "Jan", co2: 45 },
     { month: "Feb", co2: 98 },
     { month: "Mar", co2: 156 },
-    { month: "Apr", co2: 230 },
-    { month: "May", co2: 335 },
+    { month: "Apr", co2: 280 },
+    { month: "May", co2: 450 },
     { month: "Jun", co2: dashboardData.impact.co2_saved_kg },
   ];
 
+  const slices = {
+    p2p: { label: "P2P Resale", pct: 30, val: `${dashboardData.impact.items_p2p} Items`, co2: 126, color: "#2563EB" },
+    ngo: { label: "NGO Donation", pct: 30, val: `${dashboardData.impact.items_donated} Items`, co2: 25, color: "#16A34A" },
+    refurbish: { label: "Refurbished", pct: 40, val: `${dashboardData.impact.items_refurbished} Items`, co2: 269, color: "#D97706" }
+  };
+
   const routeLabel = { refurbish: "Refurbished", p2p: "P2P Resale", ngo_donate: "Donated", recycle: "Recycled", landfill: "Disposed" };
-  const routeColor = { refurbish: "text-amber-600", p2p: "text-blue-600", ngo_donate: "text-emerald-600", recycle: "text-teal-600", landfill: "text-gray-400" };
-  const routeBg = { refurbish: "bg-amber-50", p2p: "bg-blue-50", ngo_donate: "bg-emerald-50", recycle: "bg-teal-50", landfill: "bg-gray-50" };
+  const routeColor = { refurbish: "text-amber-600", p2p: "text-blue-600", ngo_donate: "text-emerald-600", recycle: "text-[#16A34A]", landfill: "text-gray-400" };
+  const routeBg = { refurbish: "bg-amber-50", p2p: "bg-blue-50", ngo_donate: "bg-emerald-50", recycle: "bg-emerald-50", landfill: "bg-gray-50" };
 
   return (
-    <div className="bg-gradient-to-br from-[#f8fffe] via-[#f0fdf4] to-[#f0f9ff] min-h-screen w-full text-gray-900 font-sans">
-      <div className="max-w-[1200px] w-full mx-auto px-10 py-8 space-y-8">
+    <div className="bg-[#F3F4F6] min-h-screen w-full text-slate-900 font-sans pb-12">
+      <div className="w-full px-6 py-8 space-y-6">
 
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs text-gray-400">
-          <span className="hover:text-emerald-600 cursor-pointer transition-colors" onClick={() => navigate("/profile")}>Your Account</span>
-          <ChevronRight size={12} />
-          <span className="text-emerald-600 font-medium">Eco Dashboard</span>
+        <nav className="flex items-center gap-1.5 text-[13px] text-slate-500 font-medium">
+          <span className="hover:text-[#16A34A] cursor-pointer transition-colors" onClick={() => navigate("/profile")}>Your Account</span>
+          <span className="text-slate-400">›</span>
+          <span className="text-[#16A34A]">Eco Dashboard</span>
         </nav>
 
         {/* ── Header ── */}
@@ -221,163 +228,261 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
               Eco Dashboard
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-100">
-                <Leaf size={16} className="text-emerald-600" />
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50 border border-green-100">
+                <Leaf size={16} className="text-[#16A34A]" />
               </span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Welcome back, <span className="font-medium text-gray-700">{dashboardData.user.name}</span> · Member since {dashboardData.user.member_since}
-            </p>
+            <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
+              <p className="text-xs text-slate-500">
+                Welcome back, <span className="font-semibold text-slate-700">{dashboardData.user.name}</span> · Member since {dashboardData.user.member_since}
+              </p>
+              <span className="text-slate-300">|</span>
+              <button
+                id="rank-leaderboard-badge"
+                onClick={() => setLeaderboardOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-black text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-full cursor-pointer transition-all shadow-xs"
+              >
+                <Trophy size={12} className="text-amber-500" />
+                <span>Rank #{dashboardData.leaderboard_rank} in India</span>
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setLeaderboardOpen(true)}
-            className="flex items-center gap-2.5 bg-white hover:bg-amber-50 border border-gray-200 hover:border-amber-300 px-5 py-2.5 rounded-full text-sm font-semibold cursor-pointer text-gray-700 transition-all shadow-sm hover:shadow-md group"
-          >
-            <Trophy size={16} className="text-amber-500 group-hover:scale-110 transition-transform" />
-            <span>Rank <span className="text-amber-600 font-bold">#{dashboardData.leaderboard_rank}</span> in India</span>
-          </button>
         </div>
 
-        {/* ── Tier + Credits Hero Section ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* SECTION 1 — Hero (Tier + Credits) */}
+        <div className="bg-[#F0FDF4] border border-[#D1FAE5] rounded-3xl p-6 flex flex-col lg:flex-row gap-6 items-stretch shadow-xs">
           {/* Tier Card */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm">
+          <div className="flex-1 bg-white rounded-2xl border border-slate-200/80 p-6 flex flex-col justify-between">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-[#F0FDF4] border border-[#D1FAE5] flex items-center justify-center text-3xl flex-shrink-0 shadow-xs">
                 {tier.icon}
               </div>
-              <div className="flex-1 space-y-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
-                      {tier.name} Tier
-                    </span>
-                    <ShieldCheck size={14} className="text-emerald-500" />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1.5">{tier.desc}</p>
+              <div className="flex-1 text-left space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 bg-[#16A34A] text-white text-sm font-black px-4 py-1.5 rounded-full shadow-xs">
+                    <CheckCircle size={14} className="text-white" />
+                    {tier.name.toUpperCase()} TIER
+                  </span>
                 </div>
-                {nextTier && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span className="font-semibold text-gray-700">{balance.toLocaleString()} pts</span>
-                      <span>{nextTier.min.toLocaleString()} pts → {nextTier.name} {nextTier.icon}</span>
-                    </div>
-                    <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500 shadow-sm"
-                        style={{ width: `${tierProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-                {!nextTier && (
-                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-lg">
-                    <Sparkles size={14} className="text-emerald-500" />
-                    <p className="text-xs text-emerald-700 font-semibold">Maximum tier achieved!</p>
-                  </div>
-                )}
+                <p className="text-xs text-slate-500 mt-1">{tier.desc}</p>
               </div>
+            </div>
+            
+            {/* 16px Milestone Progress Bar */}
+            <div className="space-y-4 pt-4 relative">
+              <div className="relative h-4 bg-slate-100 rounded-full border border-slate-200/80">
+                {/* Active Fill Gradient */}
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#86EFAC] to-[#16A34A] transition-all duration-1000 ease-out shadow-xs"
+                  style={{ width: `${overallProgress}%` }}
+                />
+
+                {/* Vertical Tick Marks & Labelled Dots */}
+                {[
+                  { name: "Seedling", val: 0, pos: 0 },
+                  { name: "Green", val: 200, pos: 20 },
+                  { name: "Eco Hero", val: 500, pos: 50 },
+                  { name: "Planet Saver", val: 1000, pos: 100 }
+                ].map((ms, idx) => (
+                  <div 
+                    key={idx} 
+                    className="absolute top-0 bottom-0 flex flex-col items-center justify-center z-10" 
+                    style={{ left: `${ms.pos}%` }}
+                  >
+                    {/* Vertical Tick Mark */}
+                    <div className="w-[2px] h-full bg-slate-300/60" />
+                    {/* Dot */}
+                    <div className={`w-3 h-3 rounded-full border border-white absolute top-1/2 -translate-y-1/2 -translate-x-1/2 shadow-xs ${
+                      balance >= ms.val ? "bg-[#16A34A]" : "bg-slate-300"
+                    }`} />
+                    {/* Label below dot */}
+                    <span className="text-[10px] font-bold text-slate-400 absolute top-6 -translate-x-1/2 whitespace-nowrap">
+                      {ms.name} ({ms.val} pts)
+                    </span>
+                  </div>
+                ))}
+
+                {/* Animated Glowing Dot Indicator at current position */}
+                <div 
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-[#16A34A] border-2 border-white shadow-[0_0_12px_#16A34A] animate-pulse z-20"
+                  style={{ left: `${overallProgress}%` }}
+                />
+
+                {/* Tooltip label above the glowing dot */}
+                <div 
+                  className="absolute -top-10 -translate-x-1/2 bg-[#14532D] text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md shadow-md whitespace-nowrap z-20 flex items-center gap-1 animate-bounce"
+                  style={{ left: `${overallProgress}%` }}
+                >
+                  {nextTier ? `🔥 ${nextTier.min - balance} pts to next tier` : "🏆 Max Tier Achieved!"}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#14532D] rotate-45" />
+                </div>
+              </div>
+              <div className="h-6" /> {/* spacer for labels below */}
             </div>
           </div>
 
-          {/* Credits Balance Card */}
+          {/* Credits Balance Card Widget */}
           <div
+            id="credits-balance-card"
             onClick={handleCreditsClick}
-            className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl p-6 text-white cursor-pointer hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] group"
+            className="w-full lg:w-72 flex-shrink-0 bg-white border border-slate-200 border-l-4 border-l-[#16A34A] rounded-2xl p-5 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group text-left"
             title="Click to view transaction ledger"
           >
-            <div className="flex flex-col h-full justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-emerald-100 uppercase tracking-wider">Credits Balance</span>
-                <CreditCard size={18} className="text-emerald-200 group-hover:rotate-12 transition-transform" />
+            <div className="flex justify-between items-center w-full">
+              <div>
+                <p className="text-[13px] text-slate-500 font-bold uppercase tracking-wider">Green Credits</p>
+                <h3 className="text-[48px] font-black text-[#16A34A] leading-none mt-1">{balance.toLocaleString()}</h3>
               </div>
-              <div className="mt-3">
-                <span className="text-4xl font-black tracking-tight">{balance.toLocaleString()}</span>
-                <p className="text-emerald-100 text-sm font-medium mt-1">Green Credits</p>
+              {/* Circular donut ring */}
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <svg className="w-16 h-16 transform -rotate-90">
+                  <circle cx="32" cy="32" r="22" stroke="#F1F5F9" strokeWidth="4" fill="transparent" />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="22"
+                    stroke="#16A34A"
+                    strokeWidth="4"
+                    fill="transparent"
+                    strokeDasharray="138.2"
+                    strokeDashoffset={138.2 * (1 - (balance % 500) / 500)}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-[#16A34A]">
+                  {Math.round(((balance % 500) / 500) * 100)}%
+                </div>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between">
-                <span className="text-xs text-emerald-200">Total earned: {dashboardData.green_credits.total_earned.toLocaleString()}</span>
-                <ChevronRight size={14} className="text-emerald-200 group-hover:translate-x-1 transition-transform" />
-              </div>
+            </div>
+
+            <div className="mt-4 pt-2.5 border-t border-slate-100 flex flex-col gap-2">
+              <p className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                <TrendingUp size={12} className="text-emerald-500" />
+                <span>Total earned: <strong>{dashboardData.green_credits.total_earned.toLocaleString()}</strong></span>
+              </p>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate("/profile"); }}
+                className="text-xs text-[#16A34A] hover:text-[#14532D] hover:underline font-bold flex items-center gap-1 cursor-pointer w-fit"
+              >
+                Convert to Amazon Pay
+                <ChevronRight size={12} />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* ── 4 Impact Stats ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Divider 1 */}
+        <hr className="border-slate-200" />
+
+        {/* SECTION 2 — Impact Stats Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { label: "CO₂ Saved", value: `${dashboardData.impact.co2_saved_kg}`, unit: "kg", icon: <Leaf size={20} />, gradient: "from-emerald-500 to-green-500", bg: "bg-emerald-50", iconColor: "text-emerald-600", clickable: true, onClick: handleImpactClick },
-            { label: "Trees Equiv.", value: `${dashboardData.impact.trees_equivalent}`, unit: "🌳", icon: <TreePine size={20} />, gradient: "from-green-500 to-emerald-600", bg: "bg-green-50", iconColor: "text-green-600", clickable: true, onClick: handleImpactClick },
-            { label: "Items Recirculated", value: `${dashboardData.impact.items_refurbished + dashboardData.impact.items_donated + dashboardData.impact.items_p2p}`, unit: "", icon: <Recycle size={20} />, gradient: "from-teal-500 to-cyan-500", bg: "bg-teal-50", iconColor: "text-teal-600", clickable: false },
-            { label: "Returns Avoided", value: `${dashboardData.impact.returns_avoided}`, unit: "", icon: <Shield size={20} />, gradient: "from-indigo-500 to-purple-500", bg: "bg-indigo-50", iconColor: "text-indigo-600", clickable: false },
-          ].map(({ label, value, unit, icon, gradient, bg, iconColor, clickable, onClick }, idx) => (
+            { label: "CO₂ Saved", value: `${dashboardData.impact.co2_saved_kg}`, unit: "kg", icon: <Leaf size={20} />, bg: "bg-emerald-50", text: "text-emerald-600", color: "#16A34A" },
+            { label: "Trees Equiv.", value: `${dashboardData.impact.trees_equivalent}`, unit: "🌳", icon: <TreePine size={20} />, bg: "bg-teal-50", text: "text-teal-600", color: "#0D9488" },
+            { label: "Items Reused", value: `${dashboardData.impact.items_refurbished + dashboardData.impact.items_donated + dashboardData.impact.items_p2p}`, unit: "", icon: <Recycle size={20} />, bg: "bg-blue-50", text: "text-blue-600", color: "#2563EB" },
+            { label: "Returns Saved", value: `${dashboardData.impact.returns_avoided}`, unit: "", icon: <Shield size={20} />, bg: "bg-amber-50", text: "text-amber-600", color: "#D97706" },
+          ].map((stat, idx) => (
             <div
               key={idx}
-              onClick={clickable ? onClick : undefined}
-              className={`bg-white rounded-2xl border border-gray-100 p-5 transition-all shadow-sm ${clickable
-                ? "cursor-pointer hover:shadow-md hover:border-emerald-200 hover:scale-[1.02] group"
-                : ""
-                }`}
+              id={idx === 0 ? "co2-saved-card" : undefined}
+              className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] relative overflow-hidden flex flex-col justify-between min-h-[120px] text-left"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${iconColor}`}>
-                  {icon}
+              {/* Mini sparkline SVG top-right */}
+              <svg className={`w-14 h-8 ${stat.text} absolute top-3 right-3 opacity-30`} viewBox="0 0 50 20">
+                <path d="M0,15 Q10,5 20,12 T40,2 T50,8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-full ${stat.bg} ${stat.text} flex items-center justify-center`}>
+                  {stat.icon}
                 </div>
-                {clickable && (
-                  <TrendingUp size={14} className="text-gray-300 group-hover:text-emerald-500 transition-colors" />
-                )}
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">{stat.label}</span>
               </div>
-              <p className="text-2xl font-black text-gray-900">{value}<span className="text-lg ml-1">{unit}</span></p>
-              <p className="text-xs text-gray-500 mt-1 font-medium">{label}</p>
+
+              <h3 
+                className="text-[40px] font-black leading-none mt-4" 
+                style={{ color: stat.color }}
+              >
+                {stat.value}
+                {stat.unit && <span className="text-xs font-semibold text-slate-500 ml-1">{stat.unit}</span>}
+              </h3>
             </div>
           ))}
         </div>
 
-        {/* ── Rewards Section ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-                <Gift size={18} className="text-amber-500" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-gray-900">Redeem Green Credits</h3>
-                <p className="text-xs text-gray-500">Your Balance: <span className="font-bold text-emerald-600">{balance.toLocaleString()} pts</span></p>
-              </div>
+        {/* Divider 2 */}
+        <hr className="border-slate-200" />
+
+        {/* SECTION 3 — Redeem Credits */}
+        <div className="bg-white border border-[#D1FAE5] rounded-xl p-6 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-2.5 text-left">
+              <Gift className="text-[#16A34A]" size={20} />
+              <h3 className="text-base font-extrabold text-slate-900">Redeem Green Credits</h3>
             </div>
+            <span className="text-xs bg-[#F0FDF4] text-[#16A34A] border border-[#D1FAE5] px-3.5 py-1.5 rounded-full font-bold">
+              Wallet Balance: <strong>{balance.toLocaleString()} pts</strong>
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {REWARDS.map((reward) => {
               const canAfford = balance >= reward.credits;
               return (
                 <div
                   key={reward.reward_id}
-                  className={`relative rounded-xl border p-5 transition-all ${canAfford
-                    ? "border-gray-200 bg-white hover:border-emerald-300 hover:shadow-md cursor-pointer group"
-                    : "border-gray-100 bg-gray-50/50 opacity-60 cursor-not-allowed"
-                    }`}
+                  id={`redeem-reward-${reward.reward_id}`}
                   onClick={() => canAfford && (setRedeemModal(reward), setRedeemStatus(null), setCouponCode(""), setRedeemError(""))}
+                  className={`relative rounded-lg border p-5 flex flex-col justify-between bg-white border-[#D1FAE5] shadow-xs ${
+                    canAfford ? "hover:border-[#16A34A] hover:shadow-md transition-all duration-200 cursor-pointer" : "opacity-85"
+                  }`}
                 >
+                  {/* Top right badge if available */}
                   {canAfford && (
-                    <span className="absolute top-3 right-3 text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">
+                    <span className="absolute top-3 right-3 text-[9px] bg-[#F0FDF4] text-[#16A34A] border border-[#D1FAE5] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                       Available
                     </span>
                   )}
-                  <span className="text-2xl block mb-3">{reward.icon}</span>
-                  <p className="text-sm font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">{reward.title}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Value: <strong className="text-emerald-600">{reward.value}</strong>
-                  </p>
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-600">{reward.credits} credits</span>
-                    {canAfford ? (
-                      <span className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-[10px] rounded-lg shadow-sm transition-all uppercase tracking-wide">
-                        Redeem
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-gray-400 font-medium">Need {reward.credits - balance} more</span>
+                  
+                  {/* Icon in colored circle */}
+                  <div className="w-10 h-10 rounded-full bg-[#F0FDF4] border border-[#D1FAE5] flex items-center justify-center text-lg mb-3">
+                    {reward.icon}
+                  </div>
+
+                  <div className="space-y-1 text-left">
+                    <h4 className="text-sm font-bold text-slate-800 leading-snug">{reward.title}</h4>
+                    <p className="text-xs text-slate-500">
+                      Value: <span className="text-[#16A34A] font-extrabold">{reward.value}</span>
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium">{reward.credits} credits required</p>
+                  </div>
+
+                  {/* Bottom element */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-3">
+                    {!canAfford && (
+                      <div className="space-y-1.5 text-left">
+                        <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                          <span>Need {reward.credits - balance} more credits</span>
+                          <span>{Math.round((balance / reward.credits) * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full" style={{ width: `${(balance / reward.credits) * 100}%` }} />
+                        </div>
+                      </div>
                     )}
+
+                    <button
+                      onClick={() => canAfford && (setRedeemModal(reward), setRedeemStatus(null), setCouponCode(""), setRedeemError(""))}
+                      className={`w-full py-2 flex items-center justify-center gap-1.5 text-xs font-bold rounded-lg transition-all border border-transparent cursor-pointer ${
+                        canAfford 
+                          ? "bg-[#16A34A] hover:bg-[#14532D] text-white shadow-xs" 
+                          : "bg-slate-150 text-slate-400 border-slate-200 cursor-not-allowed"
+                      }`}
+                      disabled={!canAfford}
+                    >
+                      {!canAfford && <span className="text-[10px]">🔒 Locked</span>}
+                      {canAfford ? "Redeem Reward" : "Locked"}
+                    </button>
                   </div>
                 </div>
               );
@@ -385,132 +490,247 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── CO₂ Trend Chart ── */}
-        <div ref={chartRef} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-gray-900">CO₂ Savings Trend</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Cumulative carbon offset (kg) across your returns</p>
-            </div>
-            <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full">
-              <TrendingUp size={14} className="text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-700">+{dashboardData.impact.co2_saved_kg} kg total</span>
-            </div>
-          </div>
-          <div className="h-56 w-full mt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={co2TrendData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="co2Gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} unit="kg" />
-                <ChartTooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="co2"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  fill="url(#co2Gradient)"
-                  dot={{ fill: '#10b981', r: 5, strokeWidth: 3, stroke: '#fff' }}
-                  activeDot={{ r: 7, strokeWidth: 3, stroke: '#10b981', fill: '#fff' }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        {/* Divider 3 */}
+        <hr className="border-slate-200" />
 
-        {/* ── Recent Returns ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 pb-4">
-            <h3 className="text-base font-bold text-gray-900">Recent Circular Returns</h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead>
-                <tr className="bg-gray-50 border-y border-gray-100">
-                  {["Product", "Grade", "Disposition", "CO₂ Saved", "Credits", "Date"].map(h => (
-                    <th key={h} className="px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {dashboardData.recent_returns.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1">
-                        <span
-                          onClick={() => navigate(`/passport/${item.product_id}`)}
-                          className="text-sm font-semibold text-gray-900 hover:text-emerald-600 cursor-pointer transition-colors"
-                        >
-                          {item.product_name}
-                        </span>
-                        {(item.route === 'refurbish' || item.route === 'p2p') && (
-                          <span
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/renewed/${item.product_id}`);
-                            }}
-                            className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer transition-all w-fit"
-                          >
-                            View Listing <ChevronRight size={12} />
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 capitalize">
-                        {item.grade || "—"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${routeColor[item.route] || "text-gray-400"} ${routeBg[item.route] || "bg-gray-50"}`}>
-                        {routeLabel[item.route] || item.route || "—"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-bold text-emerald-600 text-sm">+{item.co2_saved || 0} kg</td>
-                    <td className="px-6 py-4 font-bold text-emerald-700 text-sm">+{item.credits_earned || 0} pts</td>
-                    <td className="px-6 py-4 text-gray-500 text-sm">{item.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── Transaction Ledger (collapsible) ── */}
-        <div ref={ledgerRef} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <button
-            onClick={() => setLedgerOpen(v => !v)}
-            className="w-full flex items-center justify-between p-6 text-base font-bold text-gray-900 hover:bg-gray-50 transition-colors focus:outline-none"
-          >
-            <span className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <CreditCard size={18} className="text-emerald-600" />
+        {/* SECTION 4 — Charts Row (Left 65% CO2 savings trend, Right 35% Recirculation Breakdown) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* CO2 Savings Trend line plot (col span 8) */}
+          <div className="lg:col-span-8 bg-white border border-[#D1FAE5] rounded-2xl p-6 shadow-sm relative text-left">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">CO₂ Savings Trend</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Cumulative carbon offset (kg) across your returns</p>
               </div>
-              Credit Transaction Ledger
-            </span>
-            <ChevronRight size={18} className={`text-gray-400 transition-transform duration-200 ${ledgerOpen ? "rotate-90" : ""}`} />
-          </button>
-          {ledgerOpen && (
-            <div className="px-6 pb-6 space-y-3 animate-fade-in">
-              {(creditsData?.transactions || []).map((t, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-gray-50 border border-gray-100 p-4 rounded-xl">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{t.notes}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{(t.timestamp || "").slice(0, 10)}</p>
-                  </div>
-                  <span className={`font-bold text-base ${t.amount > 0 ? "text-emerald-600" : "text-rose-500"}`}>
-                    {t.amount > 0 ? "+" : ""}{t.amount} pts
-                  </span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 bg-[#F0FDF4] border border-[#D1FAE5] px-3.5 py-1.5 rounded-full shadow-xs">
+                <TrendingUp size={14} className="text-[#16A34A]" />
+                <span className="text-xs font-bold text-[#16A34A]">+{dashboardData.impact.co2_saved_kg} kg total</span>
+              </div>
             </div>
-          )}
+
+            {/* Annotation Tooltip flag for June dip */}
+            <div className="absolute bottom-20 right-16 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-xs z-10">
+              <AlertCircle size={10} className="text-amber-500" />
+              <span>Fewer returns this month</span>
+              <div className="absolute -bottom-1 right-8 w-1.5 h-1.5 bg-amber-50 border-r border-b border-amber-200 rotate-45" />
+            </div>
+
+            {/* Chart Area */}
+            <div className="h-60 w-full mt-4 flex items-stretch">
+              {/* Y-Axis Label */}
+              <div className="flex items-center justify-center w-6 text-slate-400 select-none">
+                <span className="rotate-270 text-[10px] font-bold whitespace-nowrap tracking-wider">CO₂ OFFSET (KG)</span>
+              </div>
+              <div className="flex-1 min-w-0 pr-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={co2TrendData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="co2Gradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#16A34A" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={13} fontWeight="600" tickLine={false} axisLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} unit="kg" />
+                    <ChartTooltip content={<CustomTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="co2"
+                      stroke="#16A34A"
+                      strokeWidth={3}
+                      fill="url(#co2Gradient)"
+                      dot={{ fill: '#16A34A', r: 5, strokeWidth: 3, stroke: '#fff' }}
+                      activeDot={{ r: 7, strokeWidth: 3, stroke: '#16A34A', fill: '#fff' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Recirculation breakdown donut plot (col span 4) */}
+          <div className="lg:col-span-4 bg-white border border-[#D1FAE5] rounded-2xl p-6 shadow-sm flex flex-col justify-between text-left min-h-[360px]">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Recirculation Breakdown</h3>
+              <p className="text-xs text-slate-500 mt-0.5">How your returned items were reused</p>
+            </div>
+
+            {/* SVG Donut Ring */}
+            <div className="flex items-center justify-center py-6 relative">
+              <svg className="w-36 h-36 transform -rotate-90">
+                {/* Circumference = 2 * pi * 48 = 301.59 */}
+                {/* Base circle */}
+                <circle cx="72" cy="72" r="48" stroke="#f1f5f9" strokeWidth="12" fill="transparent" />
+                {/* Refurbished segment (40% - amber) */}
+                <circle
+                  cx="72" cy="72" r="48" stroke="#D97706" strokeWidth="12" fill="transparent"
+                  strokeDasharray="301.59" strokeDashoffset="0"
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.40) }}
+                  strokeLinecap="round"
+                  className="cursor-pointer transition-all hover:stroke-[14px]"
+                  onMouseEnter={() => setHoveredSlice(slices.refurbish)}
+                  onMouseLeave={() => setHoveredSlice(null)}
+                />
+                {/* Donated segment (30% - green) */}
+                <circle
+                  cx="72" cy="72" r="48" stroke="#16A34A" strokeWidth="12" fill="transparent"
+                  strokeDasharray="301.59"
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.30) }}
+                  className="origin-center rotate-[144deg] cursor-pointer transition-all hover:stroke-[14px]"
+                  strokeLinecap="round"
+                  onMouseEnter={() => setHoveredSlice(slices.ngo)}
+                  onMouseLeave={() => setHoveredSlice(null)}
+                />
+                {/* P2P segment (30% - blue) */}
+                <circle
+                  cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
+                  strokeDasharray="301.59"
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.30) }}
+                  className="origin-center rotate-[252deg] cursor-pointer transition-all hover:stroke-[14px]"
+                  strokeLinecap="round"
+                  onMouseEnter={() => setHoveredSlice(slices.p2p)}
+                  onMouseLeave={() => setHoveredSlice(null)}
+                />
+              </svg>
+              <div className="absolute flex flex-col items-center text-center px-4 select-none pointer-events-none">
+                {hoveredSlice ? (
+                  <>
+                    <span className="text-xl font-black text-slate-800 leading-none">{hoveredSlice.val}</span>
+                    <span className="text-[10px] font-extrabold uppercase mt-1" style={{ color: hoveredSlice.color }}>
+                      {hoveredSlice.pct}% ({hoveredSlice.co2}kg Saved)
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl font-black text-slate-900 leading-none">10</span>
+                    <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Donut Legend */}
+            <div className="flex flex-col gap-2 pt-4 border-t border-slate-50 text-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 font-semibold text-slate-600">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
+                  <span>🔵 P2P Resale (30%)</span>
+                </div>
+                <span className="font-bold text-slate-800">{dashboardData.impact.items_p2p} items</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 font-semibold text-slate-600">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#16A34A]" />
+                  <span>🟢 NGO Donation (30%)</span>
+                </div>
+                <span className="font-bold text-slate-800">{dashboardData.impact.items_donated} items</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 font-semibold text-slate-600">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
+                  <span>🟠 Recommerced (40%)</span>
+                </div>
+                <span className="font-bold text-slate-800">{dashboardData.impact.items_refurbished} items</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider 4 */}
+        <hr className="border-slate-200" />
+
+        {/* SECTION 5 — Recent Returns Table & Ledger */}
+        <div className="grid grid-cols-1 gap-6">
+          {/* Recent Returns */}
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="px-6 py-4 border-b border-slate-200 text-left">
+              <h3 className="text-base font-bold text-slate-800">Recent Circular Returns</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">Product</th>
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">Grade</th>
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">Disposition</th>
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">CO₂ Saved</th>
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">Credits</th>
+                    <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {dashboardData.recent_returns.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/85 transition-colors">
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100">
+                        <div className="flex flex-col gap-1 items-start">
+                          <span
+                            onClick={() => navigate(`/passport/${item.product_id}`)}
+                            className="text-sm font-semibold text-slate-900 hover:text-[#16A34A] hover:underline cursor-pointer transition-colors"
+                          >
+                            {item.product_name}
+                          </span>
+                          {(item.route === 'refurbish' || item.route === 'p2p') && (
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/renewed/${item.product_id}`);
+                              }}
+                              className="text-xs text-[#16A34A] font-bold hover:underline block mt-0.5 cursor-pointer"
+                            >
+                              View Listing ➜
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 uppercase tracking-wide">
+                          {item.grade || "—"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${routeColor[item.route] || "text-slate-400"} ${routeBg[item.route] || "bg-slate-50"}`}>
+                          {routeLabel[item.route] || item.route || "—"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 font-extrabold text-[#16A34A]">+{item.co2_saved || 0} kg</td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 font-extrabold text-[#16A34A]">+{item.credits_earned || 0} pts</td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 text-slate-500 font-semibold">{item.date}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Transaction Ledger */}
+          <div ref={ledgerRef} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <button
+              onClick={() => setLedgerOpen(v => !v)}
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors focus:outline-none border-b border-slate-200 cursor-pointer"
+            >
+              <span className="flex items-center text-base font-semibold text-slate-800">
+                <CreditCard size={18} className="text-[#16A34A] mr-2" />
+                Credit Transaction Ledger
+              </span>
+              <ChevronRight size={18} className={`text-slate-400 transition-transform duration-200 ${ledgerOpen ? "rotate-90" : ""}`} />
+            </button>
+            {ledgerOpen && (
+              <div className="px-6 pb-6 pt-4 space-y-3 animate-fade-in">
+                {(creditsData?.transactions || []).map((t, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-100 p-4 rounded-xl text-left">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{t.notes}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 font-semibold">{(t.timestamp || "").slice(0, 10)}</p>
+                    </div>
+                    <span className={`font-bold text-base ${t.amount > 0 ? "text-[#16A34A]" : "text-rose-500"}`}>
+                      {t.amount > 0 ? "+" : ""}{t.amount} pts
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
@@ -518,14 +738,14 @@ export default function Dashboard() {
       {/* ── Redeem Modal ── */}
       {redeemModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in">
+          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in text-left">
 
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Confirm Redemption</span>
                 <h3 className="text-lg font-bold text-gray-900 mt-1">{redeemModal.title}</h3>
               </div>
-              <button onClick={() => setRedeemModal(null)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none">
+              <button onClick={() => setRedeemModal(null)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -553,12 +773,12 @@ export default function Dashboard() {
                   <p className="text-xs text-gray-500 mb-1.5">Your coupon code (tap to copy):</p>
                   <p className="text-lg font-black text-emerald-700 font-mono tracking-widest group-hover:scale-105 transition-transform">{couponCode}</p>
                 </div>
-                <button onClick={() => setRedeemModal(null)} className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-xl text-sm transition-all shadow-sm">Done</button>
+                <button onClick={() => setRedeemModal(null)} className="w-full py-3 bg-[#16A34A] hover:bg-[#14532D] text-white font-bold rounded-xl text-sm transition-all shadow-xs cursor-pointer border border-transparent">Done</button>
               </div>
             ) : redeemStatus === "error" ? (
               <div className="space-y-4">
                 <p className="text-sm text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl font-medium">{redeemError || "An error occurred."}</p>
-                <button onClick={() => setRedeemModal(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition-all">Dismiss</button>
+                <button onClick={() => setRedeemModal(null)} className="w-full py-3 bg-gray-150 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition-all cursor-pointer">Dismiss</button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -569,14 +789,14 @@ export default function Dashboard() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setRedeemModal(null)}
-                    className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition-all"
+                    className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleRedeem}
                     disabled={redeemStatus === "loading"}
-                    className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-xl text-sm transition-all shadow-sm disabled:opacity-60"
+                    className="flex-1 py-3 bg-[#16A34A] hover:bg-[#14532D] text-white font-bold rounded-xl text-sm transition-all shadow-xs disabled:opacity-60 cursor-pointer border border-transparent"
                   >
                     {redeemStatus === "loading" ? "Processing..." : "Confirm Redeem"}
                   </button>
@@ -590,7 +810,7 @@ export default function Dashboard() {
       {/* ── Leaderboard Modal ── */}
       {leaderboardOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in">
+          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in text-left">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
@@ -601,7 +821,7 @@ export default function Dashboard() {
                   <p className="text-xs text-gray-500">Green shoppers across India</p>
                 </div>
               </div>
-              <button onClick={() => setLeaderboardOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none">
+              <button onClick={() => setLeaderboardOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -635,14 +855,14 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-xl text-center">
-              <p className="text-xs text-emerald-700 font-medium leading-relaxed">
+              <p className="text-xs text-emerald-700 font-semibold leading-relaxed">
                 🚀 Earn more Green Credits by returning items and buying Renewed products. Level up your tier!
               </p>
             </div>
 
             <button
               onClick={() => setLeaderboardOpen(false)}
-              className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition-all"
+              className="w-full py-3 bg-gray-150 hover:bg-gray-200 text-gray-850 font-semibold rounded-xl text-sm transition-all cursor-pointer"
             >
               Close
             </button>
@@ -652,11 +872,11 @@ export default function Dashboard() {
 
       {/* ── Toast Message ── */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-white border border-gray-200 text-gray-800 px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 z-50 animate-slide-up">
+        <div className="fixed bottom-6 right-6 bg-white border border-gray-200 text-gray-850 px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 z-50 animate-slide-up">
           <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
             <CheckCircle size={16} className="text-emerald-500" />
           </div>
-          <span className="text-sm font-medium">{toastMessage}</span>
+          <span className="text-sm font-semibold">{toastMessage}</span>
         </div>
       )}
 

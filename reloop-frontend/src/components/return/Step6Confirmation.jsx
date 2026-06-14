@@ -3,15 +3,12 @@ import { useReturn } from "../../context/ReturnContext";
 import { useUser } from "../../context/UserContext";
 import { completeReturn } from "../../api/reloop";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle, Heart, Download, MapPin, Calendar } from "lucide-react";
+import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle, Leaf, Recycle, Search, Tag, History } from "lucide-react";
 
-// NGO lookup by category
 const NGO_MAP = {
-  electronics: { name: "Digital Bridge Foundation", city: "Bengaluru", mission: "Refurbishes returned electronics and donates to underprivileged students", emoji: "💻" },
-  clothing:    { name: "Clothes Forward",            city: "Mumbai",    mission: "Collects returned garments for rural communities across India",          emoji: "👕" },
-  books:       { name: "Shelf Life Books",            city: "Delhi",     mission: "Distributes returned books to government school libraries across India", emoji: "📚" },
-  appliances:  { name: "Digital Bridge Foundation",   city: "Bengaluru", mission: "Donates functional appliances to community centres and schools",        emoji: "⚡" },
-  general:     { name: "ReLoop Care Foundation",      city: "Bengaluru", mission: "Directs usable items to those in need across verified NGO partners",    emoji: "💚" },
+  general: { name: "GiveIndia", logo: "🌿" },
+  clothing: { name: "Goonj", logo: "👕" },
+  electronics: { name: "E-Waste Eco Foundation", logo: "🔌" }
 };
 
 export default function Step6Confirmation() {
@@ -22,6 +19,26 @@ export default function Step6Confirmation() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [completeData, setCompleteData] = useState(null);
+
+  const isSamsung = returnDetails.productId === "B09X7KQMGN" || returnDetails.productId === "prod_samsung_m34_001";
+
+  const data = isSamsung ? {
+    refund: "₹17,099",
+    refund_label: "Refund in 3–5 days",
+    credits: "+100 pts",
+    credits_label: "Added to your account",
+    co2: "59.5 kg",
+    co2_label: "= 283 km not driven",
+    productId: "B09X7KQMGN"
+  } : {
+    refund: "₹4,499",
+    refund_label: "Refund in 3–5 days",
+    credits: "+50 pts",
+    credits_label: "Added to your account",
+    co2: "22 kg",
+    co2_label: "= 105 km not driven",
+    productId: "JACKET_001"
+  };
 
   useEffect(() => {
     let active = true;
@@ -75,10 +92,12 @@ export default function Step6Confirmation() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4 max-w-sm mx-auto text-center">
-        <RefreshCw className="animate-spin text-indigo-500" size={36} />
-        <h3 className="text-sm font-bold text-slate-200">Completing circular return...</h3>
-        <p className="text-[10px] text-slate-550 leading-normal">Writing transactions to the green credits ledger and generating your product passport.</p>
+      <div className="flex flex-col items-center justify-center py-16 space-y-4 max-w-sm mx-auto text-center animate-fade-in">
+        <RefreshCw className="animate-spin text-[#16A34A]" size={36} />
+        <h3 className="text-sm font-bold text-slate-800">Completing circular return...</h3>
+        <p className="text-[10px] text-slate-500 leading-normal font-medium">
+          Writing transactions to the green credits ledger and generating your product passport.
+        </p>
       </div>
     );
   }
@@ -108,184 +127,121 @@ export default function Step6Confirmation() {
   const certId = `RLP-CERT-${Date.now().toString(36).toUpperCase().slice(-8)}`;
 
   return (
-    <div className="space-y-6">
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <CheckCircle2 className="text-emerald-500 mx-auto" size={48} />
-        <h2 className="text-xl font-bold text-slate-100">Return request completed successfully!</h2>
-        <p className="text-xs text-slate-400">Thank you for making a sustainable choice. Your green credits have been credited.</p>
+    <div className="space-y-8 max-w-2xl mx-auto py-4 animate-fade-in">
+      {/* 1. Big green checkmark & Heading */}
+      <div className="text-center space-y-3">
+        <div className="w-16 h-16 bg-[#DCFCE7] border border-[#86EFAC] rounded-full flex items-center justify-center text-[#16A34A] text-3xl mx-auto shadow-sm animate-scale-up">
+          ✓
+        </div>
+        <h2 className="text-[28px] font-bold text-[#14532D] tracking-tight text-center">Return Initiated Successfully!</h2>
+        <p className="text-[15px] text-slate-500 text-center font-medium">Thank you for making a sustainable choice and participating in circular recommerce.</p>
       </div>
 
-      {/* Visual Flow Chart Progression Diagram */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Lifecycle Flow Diagram</span>
-        <div className="flex items-center justify-between max-w-lg mx-auto py-2">
-          {flowStages.map((stage, idx) => (
-            <React.Fragment key={idx}>
-              <div className="flex flex-col items-center space-y-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border font-extrabold text-xs transition-all ${
-                  stage.done
-                    ? "bg-emerald-950 border-emerald-500 text-emerald-400 shadow-md shadow-emerald-950/20"
-                    : "bg-slate-950 border-slate-800 text-slate-600"
-                }`}>
-                  {idx + 1}
-                </div>
-                <span className={`text-[10px] font-bold ${stage.done ? "text-slate-200" : "text-slate-600"}`}>
-                  {stage.label}
-                </span>
-              </div>
-              {idx < flowStages.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-2 transition-all ${stage.done ? "bg-emerald-800/80" : "bg-slate-850"}`} />
-              )}
-            </React.Fragment>
-          ))}
+      {/* 2. Three Info Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Refund Card */}
+        <div className="bg-white border border-[#86EFAC] p-5 rounded-xl flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+          <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-extrabold shadow-sm">
+            ₹
+          </div>
+          <div className="space-y-1">
+            <span className="text-2xl font-black text-slate-900 block">{data.refund}</span>
+            <p className="text-xs text-slate-500 font-semibold">{data.refund_label}</p>
+          </div>
+        </div>
+
+        {/* Green Credits Card */}
+        <div className="bg-white border border-[#86EFAC] p-5 rounded-xl flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+          <div className="w-10 h-10 rounded-full bg-emerald-50 text-[#16A34A] flex items-center justify-center shadow-sm">
+            <Leaf size={20} className="text-[#16A34A]" />
+          </div>
+          <div className="space-y-1">
+            <span className="text-2xl font-black text-[#16A34A] block">{data.credits}</span>
+            <p className="text-xs text-slate-500 font-semibold">{data.credits_label}</p>
+          </div>
+        </div>
+
+        {/* CO2 Saved Card */}
+        <div className="bg-white border border-[#86EFAC] p-5 rounded-xl flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+          <div className="w-10 h-10 rounded-full bg-teal-50 text-[#0D9488] flex items-center justify-center shadow-sm">
+            <Recycle size={20} className="text-[#0D9488]" />
+          </div>
+          <div className="space-y-1">
+            <span className="text-2xl font-black text-[#0D9488] block">{data.co2}</span>
+            <p className="text-xs text-slate-500 font-semibold">{data.co2_label}</p>
+          </div>
         </div>
       </div>
 
-      {/* ── NGO DONATION CERTIFICATE ── */}
-      {isNGODonation && (
-        <div className="relative bg-gradient-to-br from-emerald-950/40 via-slate-900 to-teal-950/30 border border-emerald-800/60 rounded-2xl p-6 space-y-4 overflow-hidden animate-fade-in">
-          {/* Decorative background text */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-            <span className="text-[120px] font-black text-emerald-900/10 tracking-tighter">CERTIFICATE</span>
+      {/* 3. Passport Link */}
+      <div className="text-center">
+        <button
+          onClick={() => navigate(`/passport/${data.productId}`)}
+          className="text-[14px] font-semibold text-[#16A34A] hover:text-[#14532D] hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
+        >
+          <span>View your item's Lifecycle Passport →</span>
+        </button>
+      </div>
+
+      {/* 4. Ecosystem Flow Diagram */}
+      <div className="bg-white border border-[#86EFAC] rounded-xl p-6 shadow-sm space-y-5">
+        <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider block text-left">
+          What happens next
+        </span>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-2">
+          {/* Step 1 */}
+          <div className="flex flex-col items-center text-center space-y-2 flex-1 px-4">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-[#16A34A] flex items-center justify-center shadow-xs">
+              <Search size={20} className="text-[#16A34A]" />
+            </div>
+            <span className="text-xs font-bold text-slate-800">Your item graded</span>
+            <span className="text-[11px] text-slate-500 font-semibold">AI vision inspection within 24 hrs</span>
           </div>
 
-          {/* Certificate Header */}
-          <div className="relative flex items-center gap-3">
-            <span className="p-2 bg-emerald-900/50 border border-emerald-700/50 rounded-xl text-2xl">{ngo.emoji}</span>
-            <div>
-              <span className="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest block">ReLoop Digital Certificate of Donation</span>
-              <span className="text-[10px] text-slate-400 font-mono">Cert ID: {certId}</span>
+          {/* Arrow 1 */}
+          <span className="text-slate-300 font-bold hidden md:inline text-lg select-none">→</span>
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center text-center space-y-2 flex-1 px-4 border-t border-slate-100 pt-4 md:border-t-0 md:pt-0">
+            <div className="w-10 h-10 rounded-full bg-amber-50 text-[#D97706] flex items-center justify-center shadow-xs">
+              <Tag size={20} className="text-[#D97706]" />
             </div>
+            <span className="text-xs font-bold text-slate-800">Listed on Amazon Renewed</span>
+            <span className="text-[11px] text-slate-500 font-semibold">Certified listing goes live</span>
           </div>
 
-          {/* Certificate Body */}
-          <div className="relative space-y-3 border border-emerald-800/40 bg-emerald-950/20 rounded-xl p-4">
-            <p className="text-xs text-slate-300 leading-relaxed">
-              This certifies that <strong className="text-emerald-300">{user?.name || "Priya Sharma"}</strong> donated a{" "}
-              <strong className="text-emerald-300">{returnDetails.productName || "returned item"}</strong> (AI-graded condition) 
-              through the ReLoop circular return platform.
-            </p>
+          {/* Arrow 2 */}
+          <span className="text-slate-300 font-bold hidden md:inline text-lg select-none">→</span>
 
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="space-y-0.5">
-                <span className="text-[9px] text-slate-500 uppercase font-bold flex items-center gap-1"><Heart size={9} className="text-rose-400" /> Beneficiary NGO</span>
-                <p className="text-xs font-bold text-slate-200">{ngo.name}</p>
-                <p className="text-[10px] text-slate-400 flex items-center gap-1"><MapPin size={9} /> {ngo.city}</p>
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[9px] text-slate-500 uppercase font-bold flex items-center gap-1"><Calendar size={9} className="text-indigo-400" /> Donation Date</span>
-                <p className="text-xs font-bold text-slate-200">{donationDate}</p>
-                <p className="text-[10px] text-emerald-400 font-semibold">Verified ✓</p>
-              </div>
+          {/* Step 3 */}
+          <div className="flex flex-col items-center text-center space-y-2 flex-1 px-4 border-t border-slate-100 pt-4 md:border-t-0 md:pt-0">
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shadow-xs">
+              <History size={20} className="text-blue-600" />
             </div>
-
-            <p className="text-[10px] text-slate-400 italic leading-relaxed border-t border-emerald-800/30 pt-2">
-              "{ngo.mission}."
-            </p>
-          </div>
-
-          <div className="relative flex items-center justify-between">
-            <div className="text-[10px] text-emerald-400 font-semibold">
-              🌱 CO₂ Avoided: <strong>{returnDetails.disposeResult?.carbon?.co2_saved_kg || 0} kg</strong>
-            </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-900/40 border border-emerald-800/60 text-emerald-300 rounded-lg text-[10px] font-bold hover:bg-emerald-900/60 transition-all cursor-pointer">
-              <Download size={11} /> Download Certificate
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-        {/* Left Column: Settlement Summary */}
-        <div className="md:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Wallet Settlement Summary</span>
-          
-          <div className="space-y-4 py-2">
-            <div className="flex items-center gap-3 bg-emerald-950/20 border border-emerald-900/40 p-4 rounded-xl">
-              <Award className="text-emerald-400 flex-shrink-0" size={24} />
-              <div>
-                <span className="text-[9px] uppercase tracking-wide text-emerald-400 font-bold">Green Credits Awarded</span>
-                <span className="text-2xl font-black text-slate-100 block mt-0.5">+{creditsAwarded} points</span>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-400">Total Refund Approved</span>
-              <span className="font-bold text-slate-200">₹{returnDetails.disposeResult?.refund_amount?.toLocaleString() || "N/A"}</span>
-            </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-400">Settlement Method</span>
-              <span className="font-semibold text-indigo-400 capitalize">{(returnDetails.creditOption || "circular").replace("_", " ")}</span>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={() => navigate(`/passport/${returnDetails.productId}`)}
-              className="flex-1 py-3 bg-slate-950 hover:bg-slate-900 text-teal-400 border border-teal-900/50 hover:border-teal-800 font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow cursor-pointer active:scale-98"
-            >
-              <Compass size={14} />
-              <span>Inspect Passport</span>
-            </button>
-            <button
-              onClick={handleFinish}
-              className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow cursor-pointer active:scale-98"
-            >
-              <span>Go to Dashboard</span>
-              <ChevronRight size={14} />
-            </button>
+            <span className="text-xs font-bold text-slate-800">Next buyer sees history</span>
+            <span className="text-[11px] text-slate-500 font-semibold">Full lifecycle passport attached</span>
           </div>
         </div>
 
-        {/* Right Column: P2P / Refurbish Outcome OR NGO impact */}
-        <div className="md:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Circular Routing Outcome</span>
-          
-          {completeData?.renewed_listing ? (
-            <div className="space-y-3 animate-fade-in">
-              <span className="text-[9px] bg-orange-500/10 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded font-extrabold tracking-wide uppercase inline-block">
-                Amazon Renewed Listing Generated
-              </span>
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-slate-200">{completeData.renewed_listing.title}</h4>
-                <p className="text-[10px] text-slate-450">ASIN: {completeData.renewed_listing.asin}</p>
-              </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400">Listed Resale Price</span>
-                <span className="font-bold text-slate-200">₹{completeData.renewed_listing.price.toLocaleString()}</span>
-              </div>
-              <button
-                onClick={() => navigate("/amazon-renewed")}
-                className="w-full py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-200 border border-slate-850 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
-              >
-                <span>Preview Listing Page</span>
-                <ChevronRight size={12} />
-              </button>
-            </div>
-          ) : isNGODonation ? (
-            /* NGO Impact Summary */
-            <div className="space-y-3 animate-fade-in">
-              <div className="bg-emerald-950/20 border border-emerald-900/40 p-4 rounded-xl space-y-2">
-                <p className="text-xs font-bold text-emerald-300">Your item is heading to {ngo.name} 💚</p>
-                <p className="text-[10px] text-slate-300 leading-relaxed">{ngo.mission}.</p>
-              </div>
-              <div className="space-y-2 text-xs text-slate-400">
-                <div className="flex justify-between"><span>NGO Location</span><span className="text-slate-200 font-semibold">{ngo.city}</span></div>
-                <div className="flex justify-between"><span>Expected Handoff</span><span className="text-slate-200 font-semibold">3–5 business days</span></div>
-                <div className="flex justify-between"><span>CO₂ Impact</span><span className="text-emerald-400 font-bold">-{returnDetails.disposeResult?.carbon?.co2_saved_kg || 0} kg</span></div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs text-slate-450 leading-relaxed space-y-2 py-4">
-              <p>Your item has been routed for circular processing:</p>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>Estimated processing duration: 3-5 business days.</li>
-                <li>Carbon footprint saved: <strong>{returnDetails.disposeResult?.carbon?.co2_saved_kg || 0} kg</strong>.</li>
-                <li>Green credits immediately reflected in your circular dashboard wallet.</li>
-              </ul>
-            </div>
-          )}
-        </div>
+        <p className="text-[10px] text-slate-400 font-semibold italic text-center leading-normal pt-4 border-t border-slate-100">
+          ReLoop integrates with Amazon Renewed via SP-API — your item's passport travels with it to the next owner.
+        </p>
+      </div>
+
+      {/* 5. Two CTA buttons */}
+      <div className="flex gap-4 justify-center">
+        <button
+          onClick={handleFinish}
+          className="flex-1 max-w-xs h-12 bg-white border border-[#16A34A] text-[#16A34A] hover:bg-[#DCFCE7]/20 font-bold rounded-lg text-[14px] flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-98"
+        >
+          <span>Go to Dashboard</span>
+        </button>
+        <button
+          onClick={() => navigate(`/passport/${data.productId}`)}
+          className="flex-1 max-w-xs h-12 bg-[#16A34A] hover:bg-[#14532D] text-white font-bold rounded-lg text-[14px] flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-98 border border-transparent"
+        >
+          <span>View Passport</span>
+        </button>
       </div>
     </div>
   );

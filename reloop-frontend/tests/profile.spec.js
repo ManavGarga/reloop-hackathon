@@ -11,7 +11,7 @@ test('ReLoop Profile Settings and Conversion Test', async ({ page }) => {
   const creditsSummary = page.locator('#profile-green-credits-bal[data-loaded="true"]');
   await expect(creditsSummary).toBeVisible({ timeout: 10000 });
   const initialCredits = await creditsSummary.innerText();
-  const initialCreditsVal = parseFloat(initialCredits);
+  const initialCreditsVal = parseFloat(initialCredits.replace(/,/g, ''));
   console.log(`Initial Credits Balance: ${initialCreditsVal}`);
 
   console.log('4. Testing Login & Security edit flow...');
@@ -84,7 +84,7 @@ test('ReLoop Profile Settings and Conversion Test', async ({ page }) => {
 
   // Verify updated balance on the header card
   const finalCredits = await creditsSummary.innerText();
-  const finalCreditsVal = parseFloat(finalCredits);
+  const finalCreditsVal = parseFloat(finalCredits.replace(/,/g, ''));
   console.log(`Final Credits Balance: ${finalCreditsVal}`);
   expect(finalCreditsVal).toBeLessThan(initialCreditsVal);
 

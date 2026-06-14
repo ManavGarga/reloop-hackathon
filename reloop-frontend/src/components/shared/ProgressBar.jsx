@@ -12,33 +12,35 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }) {
   ];
 
   return (
-    <div className="w-full max-w-3xl mx-auto py-6 px-4">
+    <div className="w-full max-w-3xl mx-auto py-6 pl-[40px] pr-4">
       <div className="relative flex items-center justify-between">
         {/* Connecting Line background */}
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-800 -z-10" />
+        <div className="absolute top-5 left-6 right-6 h-[2px] bg-slate-200 z-0" />
 
         {/* Active Line Fill */}
         <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-green-primary transition-all duration-500 ease-in-out -z-10"
+          className={`absolute top-5 left-6 h-[2px] bg-[#16A34A] transition-all duration-500 ease-in-out z-0 ${
+            currentStep === 6 ? "right-6" : ""
+          }`}
           style={{
-            width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
+            width: currentStep === 6 ? "auto" : `${((currentStep - 1) / (totalSteps - 1)) * 92}%`,
           }}
         />
 
         {steps.map((step) => {
-          const isCompleted = step.number < currentStep;
-          const isActive = step.number === currentStep;
+          const isCompleted = step.number < currentStep || (currentStep === 6 && step.number === 6);
+          const isActive = step.number === currentStep && currentStep !== 6;
 
           return (
             <div key={step.number} className="flex flex-col items-center group relative">
               {/* Dot */}
               <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-sm font-bold transition-all duration-300 ${
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold relative z-10 transition-all duration-300 ${
                   isCompleted
-                    ? "bg-green-primary border-green-primary text-white shadow-md shadow-green-900/30"
+                    ? "bg-[#16A34A] text-white border-2 border-[#16A34A]"
                     : isActive
-                    ? "bg-slate-900 border-green-primary text-green-primary scale-110 shadow-lg shadow-green-950/20"
-                    : "bg-slate-950 border-slate-800 text-slate-500"
+                    ? "bg-white text-[#16A34A] border-2 border-[#16A34A] shadow-[0_0_8px_rgba(22,163,74,0.4)] animate-pulse"
+                    : "bg-white text-slate-400 border-2 border-slate-300"
                 }`}
               >
                 {isCompleted ? <Check size={16} strokeWidth={3} /> : step.number}
@@ -46,12 +48,10 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }) {
 
               {/* Label */}
               <span
-                className={`absolute top-11 text-[11px] font-medium tracking-wide whitespace-nowrap transition-colors duration-300 ${
-                  isActive
-                    ? "text-green-primary font-semibold"
-                    : isCompleted
-                    ? "text-slate-300"
-                    : "text-slate-500"
+                className={`absolute top-12 text-[12px] tracking-wide whitespace-nowrap transition-colors duration-300 left-1/2 -translate-x-1/2 text-center ${
+                  isActive || isCompleted
+                    ? "text-[#16A34A] font-medium"
+                    : "text-slate-400 font-normal"
                 }`}
               >
                 {step.label}
