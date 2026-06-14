@@ -26,9 +26,8 @@ test('ReLoop returns flow end-to-end and state reset test', async ({ page }) => 
   await page.locator('main select').selectOption({ index: 0 });
   await page.locator('main textarea').fill('The screen is fine but battery life is extremely poor.');
 
-  // Click on front & back scan boxes to upload
-  await page.getByText('Front Scan', { exact: true }).click();
-  await page.getByText('Back Scan', { exact: true }).click();
+  // Click on drag-and-drop zone to add mock photo
+  await page.getByText('Drag and drop images here').click();
   
   // Submit scans
   const submitScansBtn = page.locator('button:has-text("Submit Scans")');
@@ -47,9 +46,14 @@ test('ReLoop returns flow end-to-end and state reset test', async ({ page }) => 
   await continueToChoicesBtn.click();
 
   console.log('7. Step 5: Choosing circular recommendation options...');
+  const p2pAcceptBtn = page.locator('button:has-text("Accept P2P Offer")');
   const continueToConfirmationBtn = page.locator('button:has-text("Continue to Confirmation")');
-  await expect(continueToConfirmationBtn).toBeVisible({ timeout: 15000 });
-  await continueToConfirmationBtn.click();
+  if (await p2pAcceptBtn.count() > 0) {
+    await p2pAcceptBtn.click();
+  } else {
+    await expect(continueToConfirmationBtn).toBeVisible({ timeout: 15000 });
+    await continueToConfirmationBtn.click();
+  }
 
   console.log('8. Step 6: Finalizing return and redirecting...');
   // Wait for completion (Go to Dashboard button visible)

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom'
-import { Package, RotateCcw, BarChart2, Sparkles, ShoppingBag, User, ShoppingCart, MapPin, Search, Coins, Award, X, Trash2 } from 'lucide-react'
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { Package, RotateCcw, BarChart2, Sparkles, ShoppingBag, User, ShoppingCart, MapPin, Search, Coins, Award, X, Trash2, Leaf } from 'lucide-react'
 import './index.css'
 import { getCredits } from './api/reloop'
 
@@ -121,23 +121,14 @@ function Navbar() {
     <>
       <header style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex', flexDirection: 'column' }}>
         {/* Top Main Nav Belt */}
-        <div style={{
-          background: '#131921',
-          height: '60px',
-          padding: '0 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '20px',
-          color: 'white'
-        }}>
+        <div className="h-14 flex items-center px-4 gap-4 text-white" style={{ background: '#14532D' }}>
           {/* Left: Logo and Address */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <NavLink to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 800, fontSize: 20, color: 'white', letterSpacing: '-0.5px' }}>
-                amazon<span style={{ color: '#4ade80', fontWeight: '800' }}>reloop</span>
+            <NavLink to="/" className="flex items-center gap-1" style={{ textDecoration: 'none' }}>
+              <span style={{ fontSize: '20px', lineHeight: 1 }}>♻</span>
+              <span style={{ fontWeight: 900, fontSize: 20, color: 'white', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+                Re<span style={{ color: '#86efac' }}>Loop</span>
               </span>
-              <div style={{ height: '3px', width: '100%', background: 'linear-gradient(90deg, #febd69, #4ade80)', borderRadius: '2px', marginTop: '-2px' }} />
             </NavLink>
 
             <div
@@ -318,37 +309,28 @@ function Navbar() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
                   <button
                     onClick={() => setIsLoggedIn(!isLoggedIn)}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      background: 'linear-gradient(to bottom, #f7dfa5, #f0c14b)',
-                      border: '1px solid #a88734',
-                      borderRadius: '3px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
+                    className="w-full bg-[#16A34A] text-white font-bold py-2 rounded mb-3 text-sm cursor-pointer hover:bg-[#15803D] transition-colors"
                   >
                     {isLoggedIn ? "Sign Out" : "Sign In"}
                   </button>
-                  <span style={{ fontSize: '11px', marginTop: '6px', color: '#565959' }}>New customer? <strong style={{ color: '#007185', cursor: 'pointer' }}>Start here.</strong></span>
+                  <span className="text-xs text-center text-slate-500 border-b border-slate-200 pb-3 mb-3 w-full">New customer? <strong style={{ color: '#16A34A', cursor: 'pointer' }} className="hover:underline">Start here.</strong></span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '12px', textAlign: 'left' }}>
                   <div>
-                    <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Lists</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
-                      <span>Create a Wish List</span>
-                      <span>Wish From Any Website</span>
-                      <span>Baby Wishlist</span>
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Your Lists</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#64748b' }}>
+                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Create Wishlist</span>
+                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Any Website</span>
+                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Baby Wishlist</span>
                     </div>
                   </div>
                   <div>
-                    <h4 style={{ fontWeight: '700', color: '#111', marginBottom: '8px' }}>Your Account</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#565959' }}>
-                      <NavLink to="/profile" style={{ textDecoration: 'none', color: '#565959' }}>Your Account</NavLink>
-                      <NavLink to="/returns" style={{ textDecoration: 'none', color: '#565959' }}>Your Orders</NavLink>
-                      <NavLink to="/dashboard" style={{ textDecoration: 'none', color: '#565959' }}>Eco Dashboard</NavLink>
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Your Account</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <NavLink to="/profile" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Account</NavLink>
+                      <NavLink to="/returns" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Orders</NavLink>
+                      <NavLink to="/dashboard" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Eco Dashboard</NavLink>
                     </div>
                   </div>
                 </div>
@@ -360,21 +342,21 @@ function Navbar() {
               <span style={{ fontWeight: '700' }}>& Smart ReLoop</span>
             </NavLink>
 
-            {/* Green Credits Coin - live balance */}
+            {/* Amber Credits pill — only amber in the UI */}
             <NavLink to="/dashboard" style={{
               textDecoration: 'none',
-              color: '#131921',
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              padding: '4px 12px',
-              borderRadius: '16px',
+              color: '#1c1917',
+              background: 'linear-gradient(135deg, #D97706, #F59E0B)',
+              padding: '5px 14px',
+              borderRadius: '20px',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
               fontWeight: '800',
               fontSize: '13px',
-              boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)'
+              boxShadow: '0 2px 8px rgba(217,119,6,0.4)'
             }}>
-              <Coins size={15} />
+              <Leaf size={13} />
               <span>{liveCredits !== null ? `${liveCredits} Credits` : 'Credits'}</span>
             </NavLink>
 
@@ -411,53 +393,45 @@ function Navbar() {
         </div>
 
         {/* Sub-Nav Belt */}
-        <div style={{
-          background: '#232f3e',
-          height: '38px',
-          padding: '0 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          color: 'white',
-          fontSize: '13px',
-          borderBottom: '1px solid rgba(255,255,255,0.05)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+        <div className="h-10 bg-[#232F3E] flex items-center px-4 gap-1 text-white text-xs">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             {navItems.map(({ to, label }) => (
               <NavLink
                 key={to} to={to} end={to === '/'}
                 style={({ isActive }) => ({
                   textDecoration: 'none',
-                  color: '#ffffff',
-                  fontWeight: '700',
-                  fontSize: '14px',
-                  padding: '6px 10px',
-                  border: isActive ? '1px solid #ffffff' : '1px solid transparent',
-                  borderRadius: '2px',
+                  color: isActive ? '#ffffff' : '#d1fae5',
+                  fontWeight: isActive ? '700' : '500',
+                  fontSize: '13px',
+                  padding: '6px 11px',
                   display: 'inline-flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  borderBottom: isActive ? '2px solid #86efac' : '2px solid transparent',
+                  transition: 'color 0.15s, border-color 0.15s',
+                  whiteSpace: 'nowrap',
                 })}
-                onMouseOver={e => {
-                  if (e.currentTarget.style.borderColor !== 'rgb(255, 255, 255)') {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-                  }
-                }}
-                onMouseOut={e => {
-                  if (e.currentTarget.style.borderColor !== 'rgb(255, 255, 255)') {
-                    e.currentTarget.style.borderColor = 'transparent';
-                  }
-                }}
               >
                 {label}
               </NavLink>
             ))}
           </div>
 
-          {/* Right side Highlight - pulls tier from credits */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80', fontWeight: '600', fontSize: '12px' }}>
+          {/* Right: Sustainability Score */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80', fontWeight: '700', fontSize: '12px' }}>
             <Award size={14} />
-            <span>Sustainability Score: {liveCredits >= 1000 ? 'Planet Saver 🌍' : liveCredits >= 500 ? 'Eco Hero 🏆' : liveCredits >= 200 ? 'Green 🍃' : 'Seedling 🌱'}</span>
+            <span>{liveCredits >= 1000 ? 'Planet Saver 🌍' : liveCredits >= 500 ? 'Eco Hero 🏆' : liveCredits >= 200 ? 'Green 🍃' : 'Seedling 🌱'}</span>
           </div>
+        </div>
+
+        {/* Sustainability Progress Bar */}
+        <div style={{ height: '3px', background: '#1a2e1a', position: 'relative', overflow: 'hidden' }}>
+          <div style={{
+            position: 'absolute', left: 0, top: 0, height: '100%',
+            width: liveCredits !== null ? `${Math.min(100, (liveCredits / 2000) * 100)}%` : '0%',
+            background: 'linear-gradient(90deg, #4ade80, #22d3ee)',
+            borderRadius: '0 2px 2px 0',
+            transition: 'width 1s ease',
+          }} />
         </div>
       </header>
 
@@ -676,6 +650,44 @@ function Navbar() {
   )
 }
 
+// ── Demo Reset Button ──────────────────────────────────────────────────────────
+function DemoResetButton() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname.startsWith('/renewed')) return null;
+
+  const handleReset = () => {
+    const confirmed = window.confirm('Reset demo? This will return you to the product page.');
+    if (confirmed) {
+      navigate('/product/B09X7KQMGN');
+      fetch('http://localhost:8000/api/demo/reset', { method: 'POST' }).catch(() => {});
+    }
+  };
+
+  return (
+    <button
+      onClick={handleReset}
+      style={{
+        position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999,
+        background: 'rgba(17, 24, 39, 0.55)',
+        backdropFilter: 'blur(8px)',
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: '11px', fontWeight: '600',
+        padding: '6px 14px', borderRadius: '20px',
+        border: '1px solid rgba(255,255,255,0.15)',
+        cursor: 'pointer',
+        transition: 'opacity 0.2s, background 0.2s',
+        opacity: 0.6,
+        letterSpacing: '0.3px',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.background = 'rgba(17,24,39,0.85)'; }}
+      onMouseLeave={e => { e.currentTarget.style.opacity = '0.6'; e.currentTarget.style.background = 'rgba(17,24,39,0.55)'; }}
+    >
+      ↺ Reset Demo
+    </button>
+  );
+}
 export default function App() {
   return (
     <UserProvider>
@@ -697,6 +709,7 @@ export default function App() {
               <Route path="/profile" element={<Profile />} />
             </Routes>
           </main>
+          <DemoResetButton />
         </BrowserRouter>
       </CartProvider>
     </UserProvider>

@@ -4,7 +4,7 @@ import { ReturnProvider, useReturn } from "../context/ReturnContext";
 import { useUser } from "../context/UserContext";
 import { useCart } from "../context/CartContext";
 import ProgressBar from "../components/shared/ProgressBar";
-import { CheckCircle2, ChevronRight, ArrowLeft, Package, Sparkles, Printer, Star, X, Check } from "lucide-react";
+import { CheckCircle2, ChevronRight, ArrowLeft, Package, Sparkles, Printer, Star, X, Check, Leaf } from "lucide-react";
 
 // Import step components
 import Step1ProductSelect from "../components/return/Step1ProductSelect";
@@ -77,45 +77,41 @@ function ReturnFlowContainer() {
   }
 
   return (
-    <div style={{ background: '#090d16', minHeight: '100vh', padding: '32px 24px', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', borderRadius: '12px' }}>
-      <div className="min-h-screen flex flex-col items-center max-w-5xl mx-auto space-y-6">
+    <div className="bg-[#F9FAFB] min-h-screen">
+      <div className="w-full px-6 py-8">
         
         {/* Return to Orders */}
         <button 
           onClick={() => navigate('/returns')}
-          style={{
-            alignSelf: 'flex-start',
-            background: 'none',
-            border: 'none',
-            color: '#38bdf8',
-            cursor: 'pointer',
-            fontSize: '13px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontWeight: '600',
-            marginBottom: '10px'
-          }}
+          className="text-sm text-[#16A34A] hover:text-[#14532D] flex items-center gap-1 mb-6 cursor-pointer font-semibold"
         >
           <ArrowLeft size={16} /> Back to Your Orders
         </button>
 
         {/* Wizard Header Title */}
-        <div className="text-center space-y-2 py-2">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight flex items-center justify-center gap-2">
-            <Sparkles size={24} className="text-emerald-450 animate-glow" />
-            amazon<span className="text-emerald-400">reloop</span> <span className="font-light text-slate-300">AI Return Hub</span>
+        <div className="text-center space-y-2 mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center justify-center gap-2">
+            <Sparkles size={24} className="text-[#16A34A]" />
+            amazon<span className="text-[#16A34A]">reloop</span> <span className="font-light text-slate-500">AI Return Hub</span>
           </h1>
           <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
             Reduce carbon waste, earn green credits, and circularize returns via automated computer vision grading.
           </p>
         </div>
 
+        {/* CO2 Savings Pill */}
+        <div className="flex justify-center mb-6">
+          <span className="inline-flex items-center gap-1.5 bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC] text-[13px] font-bold px-5 py-2.5 rounded-full shadow-sm">
+            <Leaf size={16} className="text-[#16A34A]" />
+            Circular returns save 59.5 kg CO₂ and earn 150 Green Credits
+          </span>
+        </div>
+
         {/* Progress Bar */}
         <ProgressBar currentStep={currentStep} />
 
-        {/* Step Container Card */}
-        <div className="w-full bg-slate-900/60 backdrop-blur-xl border border-slate-850 rounded-3xl p-6 md:p-8 shadow-2xl animate-slide-up">
+        {/* Step Container Card with left border */}
+        <div className="w-full bg-white rounded-xl shadow-sm border-l-4 border-l-[#16A34A] border-y border-r border-[#D1FAE5] p-6 md:p-8 animate-slide-up mt-6">
           {renderActiveStep()}
         </div>
       </div>
@@ -222,8 +218,8 @@ function OrdersList({ user }) {
 
   if (activeTab === "refund-status" && selectedOrder) {
     return (
-      <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', background: 'white', borderRadius: '8px', border: '1px solid #ddd', padding: '24px' }}>
+      <div className="bg-[#F0FDF4] min-h-screen w-full" style={{ color: '#0F172A', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif" }}>
+        <div className="w-full bg-white min-h-screen px-6 py-8">
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '22px', fontWeight: '500' }}>Return/Refund Status</h2>
@@ -336,7 +332,7 @@ function OrdersList({ user }) {
         </div>
       )}
 
-      <div style={{ maxWidth: '1000px', margin: '0 auto', spaceY: '16px' }}>
+      <div className="w-full px-6 py-8 space-y-6">
         
         <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
           <span>Your Account</span> <ChevronRight size={10} style={{ display: 'inline' }} /> <span style={{ color: '#c7511f' }}>Your Orders</span>
@@ -379,54 +375,79 @@ function OrdersList({ user }) {
               </div>
 
               {/* Card Item body */}
-              <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 240px', gap: '20px' }}>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                  <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', border: '1px solid #eee', borderRadius: '6px' }}>
-                    <img src={order.img} alt={order.productName} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
+              <div className="flex items-start gap-6 px-6 py-5">
+                <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center bg-[#F0FDF4] border border-green-100 rounded-xl p-2">
+                  <img src={order.img} alt={order.productName} className="max-h-full max-w-full object-contain" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="mb-1.5 flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-0.5 rounded-full">
+                      {order.status}
+                    </span>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>{order.status}</h4>
-                    <p style={{ fontSize: '13px', color: '#565959', marginBottom: '12px' }}>{order.statusDesc}</p>
-                    <span style={{ fontSize: '13px', color: '#007185', cursor: 'pointer', lineHeight: '1.4', fontWeight: '600' }}>{order.productName}</span>
+                  <p className="text-sm text-slate-500 mb-1.5">{order.statusDesc}</p>
+                  <span 
+                    onClick={() => navigate(order.productId === 'JACKET_001' ? '/passport/JACKET_001' : '/product/B09X7KQMGN')} 
+                    className="text-sm text-teal-600 hover:underline cursor-pointer font-semibold block leading-tight mb-2"
+                  >
+                    {order.productName}
+                  </span>
+
+                  {/* CO2 Impact Line */}
+                  <div className="inline-flex items-center gap-1.5 bg-[#F0FDF4] border border-green-200 rounded-lg px-3 py-1.5 mb-3">
+                    <span className="text-sm">♻️</span>
+                    <span className="text-xs font-semibold text-[#1A6B3C]">
+                      Returning this saves <strong>{order.carbon_footprint_kg ? (order.carbon_footprint_kg * 0.85).toFixed(1) : '59.5'} kg CO₂</strong> from manufacturing
+                    </span>
+                  </div>
+
+                  {/* Journey Timeline */}
+                  <div className="flex items-center gap-0 mt-1">
+                    {[
+                      { label: 'Return Initiated', icon: '📦' },
+                      { label: 'AI Graded',        icon: '🔍' },
+                      { label: 'Recommerced',      icon: '♻️' },
+                      { label: 'Credits Earned',   icon: '🌿' },
+                    ].map((step, idx) => (
+                      <div key={idx} className="flex items-center">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm border-2 ${
+                            idx === 0 ? 'bg-[#1A6B3C] border-[#1A6B3C] text-white' : 'bg-white border-slate-200 text-slate-400'
+                          }`}>
+                            {step.icon}
+                          </div>
+                          <span className="text-[9px] text-slate-400 mt-0.5 text-center leading-tight w-14">{step.label}</span>
+                        </div>
+                        {idx < 3 && <div className="w-8 h-0.5 bg-slate-200 mb-3 flex-shrink-0" />}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="flex flex-col gap-2 w-48 flex-shrink-0">
+                  {/* Primary green CTA */}
                   <button 
                     onClick={() => navigate(`/return/${order.productId}`)}
-                    style={{
-                      padding: '10px',
-                      background: 'linear-gradient(135deg, #4ade80, #22c55e)',
-                      border: 'none',
-                      borderRadius: '100px',
-                      fontSize: '12px',
-                      fontWeight: '800',
-                      color: '#0f1111',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px',
-                      boxShadow: '0 2px 6px rgba(34, 197, 94, 0.2)'
-                    }}
+                    className="w-full text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg shadow-md"
+                    style={{ background: 'linear-gradient(135deg, #1A6B3C, #0D9488)' }}
                   >
-                    ♻️ Return via ReLoop
+                    <span className="text-base">♻</span> Return via ReLoop
                   </button>
                   <button 
                     onClick={() => handleBuyAgain(order)}
-                    style={{ padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '100px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}
+                    className="bg-[#F59E0B] hover:bg-[#D97706] text-white text-sm font-semibold py-2.5 rounded-xl text-center cursor-pointer transition-all"
                   >
                     Buy it again
                   </button>
                   <button 
                     onClick={() => handleViewStatus(order)}
-                    style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}
+                    className="bg-white border border-slate-200 text-slate-700 text-sm py-2 rounded-xl text-center hover:bg-slate-50 cursor-pointer transition-colors"
                   >
                     View Refund Status
                   </button>
                   <button 
                     onClick={() => setReviewingOrder(order)}
-                    style={{ padding: '10px', background: 'white', border: '1px solid #ddd', borderRadius: '100px', fontSize: '12px', cursor: 'pointer' }}
+                    className="bg-white border border-slate-200 text-slate-700 text-sm py-2 rounded-xl text-center hover:bg-slate-50 cursor-pointer transition-colors"
                   >
                     Write product review
                   </button>
@@ -553,7 +574,7 @@ function OrdersList({ user }) {
                     <button 
                       type="button" 
                       onClick={suggestAIReview} 
-                      style={{ background: 'none', border: 'none', color: '#007185', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}
+                      style={{ background: 'none', border: 'none', color: '#16A34A', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}
                     >
                       ✨ Auto-Draft Eco Review
                     </button>
@@ -577,7 +598,7 @@ function OrdersList({ user }) {
                   </button>
                   <button 
                     type="submit" 
-                    style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
+                    style={{ flex: 1, padding: '10px', background: '#16A34A', border: 'none', color: '#ffffff', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
                   >
                     Submit Review
                   </button>
