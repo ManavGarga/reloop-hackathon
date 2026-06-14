@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useReturn } from "../../context/ReturnContext";
-import { ArrowRight, ArrowLeft, ArrowLeftRight, Heart, Sparkles, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, ArrowLeftRight, Heart, Sparkles, Check, Bell, Users } from "lucide-react";
+import { getBuyerDemand } from "../../api/reloop";
 
 export default function Step5ReLoopOptions({ onNext, onBack }) {
   const { returnDetails, updateReturn } = useReturn();
@@ -11,6 +12,16 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
   const [askingPrice, setAskingPrice] = useState(
     dispose.p2p_offer_price || Math.round(dispose.estimated_resale_value * 0.9) || 12000
   );
+  const [buyerDemand, setBuyerDemand] = useState(null);
+
+  // Fetch buyer demand signals for P2P route
+  useEffect(() => {
+    if (route === "p2p" && returnDetails.productId) {
+      getBuyerDemand(returnDetails.productId).then((res) => {
+        if (res && res.status === "ok") setBuyerDemand(res);
+      });
+    }
+  }, [route, returnDetails.productId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -106,6 +117,31 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
               </div>
             </div>
 
+            {/* Buyer Demand Notification Banner for P2P */}
+            {route === "p2p" && selectedRoute === "circular" && buyerDemand && (
+              <div className="bg-indigo-950/30 border border-indigo-800/50 p-3 rounded-xl animate-fade-in">
+                <div className="flex items-start gap-2.5">
+                  <span className="p-1.5 bg-indigo-900/50 rounded-lg text-indigo-400 flex-shrink-0">
+                    <Bell size={14} />
+                  </span>
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wide">Live Demand Signal</span>
+                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping" />
+                    </div>
+                    <p className="text-[11px] text-slate-200 leading-relaxed">
+                      <strong className="text-indigo-300">{buyerDemand.signals.matched_buyers} buyers</strong> on Amazon are actively looking for a certified refurbished version of this product. They will receive a notification the moment your listing goes live.
+                    </p>
+                    <div className="flex gap-3 text-[10px] text-slate-400">
+                      <span>🔖 {buyerDemand.signals.wishlist_count} wishlisted</span>
+                      <span>🛒 {buyerDemand.signals.cart_count} in cart</span>
+                      <span>🔍 {buyerDemand.signals.recent_search_count} recent searches</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* P2P Listing Pricing Controls if P2P */}
             {route === "p2p" && selectedRoute === "circular" && (
               <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-850 space-y-3 animate-fade-in">
@@ -120,6 +156,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
                       onChange={(e) => setAskingPrice(Number(e.target.value))}
                       className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-xs"
                       min={0}
+                      step="any"
                     />
                   </div>
                   <div className="text-xs text-slate-400">

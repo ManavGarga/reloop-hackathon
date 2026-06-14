@@ -1,7 +1,7 @@
 import React from "react";
 import { Leaf } from "lucide-react";
 
-export default function CarbonBadge({ carbon_kg, context_string, source, size = "md" }) {
+export default function CarbonBadge({ carbon_kg, context_string, source, size = "md", isLight = false }) {
   // Determine sizing styles
   const sizeStyles = {
     sm: {
@@ -41,30 +41,62 @@ export default function CarbonBadge({ carbon_kg, context_string, source, size = 
   const smartphoneCharges = Math.round(carbon_kg * 122);
   const carKm = Math.round(carbon_kg * 4.1);
 
+  const containerClass = isLight
+    ? `flex flex-col bg-[#F5FBF7] border border-[#BEE7D1] text-[#0F1111] ${current.card} shadow-sm`
+    : `flex flex-col bg-emerald-950/25 border border-emerald-800/40 text-emerald-100 ${current.card} shadow-lg shadow-emerald-950/10`;
+
+  const iconContainerClass = isLight
+    ? "p-1.5 bg-[#EAF7ED] text-[#007600] rounded-lg border border-[#BEE7D1]"
+    : "p-1.5 bg-emerald-900/40 text-emerald-400 rounded-lg border border-emerald-800/30";
+
+  const titleClass = isLight
+    ? `${current.title} text-[#007600] font-bold`
+    : `${current.title} text-emerald-400 font-bold`;
+
+  const valueClass = isLight
+    ? `${current.value} font-extrabold text-[#0F1111] tracking-tight`
+    : `${current.value} font-extrabold text-slate-100 tracking-tight`;
+
+  const valueSuffixClass = isLight
+    ? "text-[#007600] font-medium text-sm"
+    : "text-emerald-400 font-medium text-sm";
+
+  const descClass = isLight
+    ? `${current.desc} text-[#565959] font-normal mt-1 leading-relaxed`
+    : `${current.desc} text-slate-300 font-normal mt-1 leading-relaxed`;
+
+  const eqClass = isLight
+    ? `border-t border-[#BEE7D1] text-[#565959] ${current.eq} flex flex-col gap-1`
+    : `border-t border-emerald-800/30 text-emerald-300/80 ${current.eq} flex flex-col gap-1`;
+
+  const sourceClass = isLight
+    ? `${current.src} text-[#007600] italic font-medium`
+    : `${current.src} text-emerald-500 italic font-medium`;
+
   return (
-    <div className={`flex flex-col bg-emerald-950/25 border border-emerald-800/40 text-emerald-100 ${current.card} shadow-lg shadow-emerald-950/10`}>
+    <div className={containerClass}>
       <div className="flex items-center gap-2">
-        <span className="p-1.5 bg-emerald-900/40 text-emerald-400 rounded-lg border border-emerald-800/30">
+        <span className={iconContainerClass}>
           <Leaf size={current.icon} />
         </span>
-        <span className={`${current.title} text-emerald-400 font-bold`}>
+        <span className={titleClass}>
           Carbon Footprint
         </span>
       </div>
 
       <div className="mt-1">
-        <span className={`${current.value} font-extrabold text-slate-100 tracking-tight`}>
-          {carbon_kg} kg <span className="text-emerald-400 font-medium text-sm">CO₂e</span>
+        <span className={valueClass}>
+          {carbon_kg} kg <span className={valueSuffixClass}>CO₂e</span>
         </span>
       </div>
 
       {context_string && (
-        <p className={`${current.desc} text-slate-300 font-normal mt-1 leading-relaxed`}>
+        <p className={descClass}>
           {context_string}
         </p>
       )}
 
-      <div className={`border-t border-emerald-800/30 text-emerald-300/80 ${current.eq} flex flex-col gap-1`}>
+      <div className={eqClass}>
         <div className="flex items-center gap-1.5">
           <span>⚡ Equivalent to charging <strong>{smartphoneCharges.toLocaleString()}</strong> smartphones</span>
         </div>
@@ -74,7 +106,7 @@ export default function CarbonBadge({ carbon_kg, context_string, source, size = 
       </div>
 
       {source && (
-        <div className={`${current.src} text-emerald-500 italic font-medium`}>
+        <div className={sourceClass}>
           Source: {source}
         </div>
       )}

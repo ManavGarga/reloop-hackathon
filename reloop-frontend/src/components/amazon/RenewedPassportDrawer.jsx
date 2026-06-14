@@ -2,8 +2,10 @@ import React from "react";
 import { X, ShieldCheck, Milestone, Leaf, Calendar, ArrowRight } from "lucide-react";
 import CarbonBadge from "../passport/CarbonBadge";
 import GradeTag from "../shared/GradeTag";
+import { useUser } from "../../context/UserContext";
 
 export default function RenewedPassportDrawer({ productId, isOpen, onClose }) {
+  const { user } = useUser();
   if (!isOpen) return null;
 
   // Mock timeline events for Amazon Renewed view (typically 3 recent events)
@@ -22,7 +24,7 @@ export default function RenewedPassportDrawer({ productId, isOpen, onClose }) {
       event_type: "sold",
       title: "Purchased (First Owner)",
       date: "Mar 15, 2026",
-      actor: "Priya Sharma",
+      actor: user ? user.name : "Priya Sharma",
       notes: "Original purchase via Amazon India. Used for 73 days.",
       location: "Bengaluru, KA",
       co2_delta_kg: 0.0,

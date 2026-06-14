@@ -1,34 +1,62 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useReturn } from "../../context/ReturnContext";
-import { mockProducts } from "../../data/mockProducts";
+import { getProducts } from "../../api/reloop";
 import { ArrowRight, Check } from "lucide-react";
 
 export default function Step1ProductSelect({ preselectedId, onNext }) {
   const { returnDetails, updateReturn } = useReturn();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // If a product is preselected in the URL and not yet set in context
-    if (preselectedId && !returnDetails.productId) {
-      // B09X7KQMGN matches prod_samsung_m34_001 in our routes
-      const targetId = preselectedId === "B09X7KQMGN" ? "prod_samsung_m34_001" : preselectedId;
-      const product = mockProducts.find((p) => p.product_id === targetId) || mockProducts[0];
-      if (product) {
-        updateReturn({
-          productId: product.product_id,
-          productName: product.name,
-        });
+    async function loadProducts() {
+      try {
+        setLoading(true);
+        const res = await getProducts();
+        if (res && res.status === "ok" && res.products) {
+          setProducts(res.products);
+
+          // If a product is preselected or set in context, ensure all metadata details are fully populated
+          const targetId = preselectedId === "B09X7KQMGN" ? "prod_samsung_m34_001" : preselectedId;
+          const currentId = returnDetails.productId || targetId;
+          if (currentId) {
+            const product = res.products.find((p) => p.product_id === currentId) || res.products[0];
+            if (product && (!returnDetails.productId || !returnDetails.productName || !returnDetails.category)) {
+              updateReturn({
+                productId: product.product_id,
+                productName: product.name,
+                category: product.category,
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load products in return wizard:", e);
+      } finally {
+        setLoading(false);
       }
     }
-  }, [preselectedId, returnDetails.productId, updateReturn]);
+    loadProducts();
+  }, [preselectedId, returnDetails.productId, returnDetails.productName, returnDetails.category, updateReturn]);
 
-  const selectedProduct = mockProducts.find((p) => p.product_id === returnDetails.productId);
+  const selectedProduct = products.find((p) => p.product_id === returnDetails.productId);
 
   const handleSelectProduct = (product) => {
     updateReturn({
       productId: product.product_id,
       productName: product.name,
+      category: product.category,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-3">
+        <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-400">Loading your eligible returns...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -42,7 +70,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
         <div className="md:col-span-7 space-y-3">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Recent Purchases</span>
           <div className="space-y-3">
-            {mockProducts.map((p) => {
+            {products.map((p) => {
               const isSelected = returnDetails.productId === p.product_id;
               return (
                 <div
@@ -60,7 +88,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-slate-200">{p.name}</h4>
-                      <p className="text-[10px] text-slate-450 mt-0.5">Purchased on Amazon • ₹{p.price_new.toLocaleString()}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Purchased on Amazon • ₹{p.price_new.toLocaleString()}</p>
                     </div>
                   </div>
                   {isSelected && (
@@ -101,7 +129,7 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
               </div>
               <div className="space-y-1 bg-slate-950/30 p-3 rounded-xl border border-slate-850 text-xs">
                 <span className="text-[9px] text-slate-500 uppercase font-bold">Standard Warranty</span>
-                <p className="text-slate-300 leading-normal mt-0.5">1-Year Warranty active. Eligible for instant green credits upon circular routing.</p>
+                <p className="text-slate-300 leading-normal mt-0.5">1-Year Warranty active. Eligible for instant green credits upon circular circular routing.</p>
               </div>
 
               <button

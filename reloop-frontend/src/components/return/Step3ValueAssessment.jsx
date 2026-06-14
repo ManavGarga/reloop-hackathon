@@ -82,7 +82,13 @@ export default function Step3ValueAssessment({ onNext }) {
 
       const res = await disposeReturn(payload);
       if (res && res.status === "ok") {
-        updateReturn({ disposeResult: res });
+        updateReturn({
+          disposeResult: {
+            ...res,
+            // inject category so Step6 can resolve correct NGO
+            category: returnDetails.category || returnDetails.productCategory || "general",
+          },
+        });
         onNext();
       } else {
         throw new Error(res.detail || "Disposition failed");

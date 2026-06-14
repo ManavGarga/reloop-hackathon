@@ -1,38 +1,47 @@
-import { useState, useEffect } from 'react'
-import { Sparkles, Brain, Lightbulb, Send, CheckCircle2, Leaf } from 'lucide-react'
-import { getProducts, sendChat } from '../api/reloop'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Sparkles, Brain, Lightbulb, Send, CheckCircle2, Leaf, ChevronRight, Recycle } from 'lucide-react'
+import { getPersonalisedFeed, sendChat } from '../api/reloop'
+import { useUser } from '../context/UserContext'
 
 export default function Recommendations() {
-  const [products, setProducts] = useState([])
+  const navigate = useNavigate()
+  const { user } = useUser()
+  const [feedProducts, setFeedProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  
+  const chatEndRef = useRef(null)
+
   // AI Chat State
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hello Priya! I'm your ReLoop AI assistant. I can help you find eco-friendly products, give tips to reduce your return rate, or explain how to earn more Green Credits. What's on your mind today?" }
-  ])
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
 
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        const res = await getProducts()
-        if (res && res.status === 'ok') {
-          // Filter to items with low return rates as recommendations
-          setProducts(res.products.filter(p => p.return_rate_percent < 20.0))
-        }
-      } catch (e) {
-        console.error('Error loading recommendations:', e)
-      } finally {
-        setLoading(false)
-      }
+    if (user) {
+      setMessages([
+        { role: 'assistant', content: `Hello ${user.name.split(' ')[0]}! I'm your ReLoop AI assistant. I can help you find eco-friendly products, give tips to reduce your return rate, or explain how to earn more Green Credits. What's on your mind today?` }
+      ]);
     }
-    loadProducts()
-  }, [])
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.user_id) {
+      setLoading(true);
+      getPersonalisedFeed(user.user_id).then((res) => {
+        if (res && res.status === 'ok' && res.feed?.length) {
+          setFeedProducts(res.feed)
+        }
+      }).finally(() => setLoading(false))
+    }
+  }, [user])
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const handleSend = async (e) => {
     e.preventDefault()
-    if (!input.trim() || sending) return
+    if (!input.trim() || sending || !user) return
 
     const userMessage = { role: 'user', content: input }
     setMessages(prev => [...prev, userMessage])
@@ -40,7 +49,7 @@ export default function Recommendations() {
     setSending(true)
 
     try {
-      const res = await sendChat({ message: userMessage.content, history: messages.slice(-5) })
+      const res = await sendChat({ message: userMessage.content, history: messages.slice(-5), user_id: user.user_id })
       if (res && res.status === 'ok') {
         setMessages(prev => [...prev, { role: 'assistant', content: res.reply }])
       } else {
@@ -226,75 +235,51 @@ export default function Recommendations() {
 
         {/* Sustainable Choices Recommendations */}
         <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '24px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Recommended Low-Return Products</h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '20px'
-          }}>
-            {products.length > 0 ? (
-              products.map((p) => (
-                <div 
-                  key={p.product_id}
-                  style={{ 
-                    background: '#fcfcfc',
-                    border: '1px solid #eee',
-                    borderRadius: '6px',
-                    padding: '16px', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '12px'
-                  }}
-                >
-                  <div style={{ 
-                    height: '160px', 
-                    borderRadius: '4px', 
-                    background: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                  }}>
-                    <img 
-                      src={p.image_url} 
-                      alt={p.name} 
-                      style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain' }} 
-                    />
+          <h2 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '4px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+            ✨ Personalised Refurbished Picks
+          </h2>
+          <p style={{ fontSize: '12px', color: '#565959', marginBottom: '20px' }}>Based on your return history and purchase patterns</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+            {loading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} style={{ height: '240px', borderRadius: '8px', background: '#f6f6f6' }} />
+              ))
+            ) : feedProducts.length > 0 ? (
+              feedProducts.map((p) => (
+                <div key={p.product_id} style={{ background: '#fcfcfc', border: '1px solid #eee', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ height: '160px', borderRadius: '4px', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
+                    <img src={p.image_url} alt={p.name} style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain' }} />
+                    <span style={{ position: 'absolute', top: '8px', left: '8px', background: '#ff9900', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px' }}>
+                      -{p.discount_pct}% OFF
+                    </span>
                   </div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '10px', color: '#565959', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                        {p.brand}
-                      </span>
-                      <span style={{ 
-                        fontSize: '10px', 
-                        background: '#e6f4ea', 
-                        color: '#137333', 
-                        padding: '2px 6px', 
-                        borderRadius: '4px',
-                        fontWeight: 'bold'
-                      }}>
-                        Return Rate: {p.return_rate_percent}%
-                      </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '10px', color: '#565959', textTransform: 'uppercase', fontWeight: 'bold' }}>{p.brand}</span>
+                      <span style={{ fontSize: '10px', background: '#e6f4ea', color: '#137333', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>♻️ Renewed</span>
                     </div>
-                    <h3 style={{ fontSize: '14px', fontWeight: '600', marginTop: '6px', height: '40px', overflow: 'hidden', color: '#111' }}>
-                      {p.name}
-                    </h3>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                      <span style={{ fontSize: '16px', fontWeight: '800', color: '#B12704' }}>
-                        ₹{p.price_new.toLocaleString()}
-                      </span>
-                      <span style={{ fontSize: '11px', color: '#565959' }}>
-                        -{p.carbon_footprint_kg} kg CO₂
-                      </span>
-                    </div>
+                    <h3 style={{ fontSize: '13px', fontWeight: '600', color: '#111', height: '38px', overflow: 'hidden' }}>{p.name}</h3>
+                    <p style={{ fontSize: '10px', color: '#6366f1', fontWeight: '600', marginTop: '4px' }}>{p.match_reason}</p>
                   </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: '16px', fontWeight: '800', color: '#B12704' }}>₹{Math.round(p.price_renewed).toLocaleString()}</span>
+                      <span style={{ fontSize: '11px', color: '#aaa', textDecoration: 'line-through', marginLeft: '6px' }}>₹{p.price_new.toLocaleString()}</span>
+                    </div>
+                    <span style={{ fontSize: '10px', color: '#137333' }}>-{p.carbon_saved} kg CO₂</span>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/renewed/${p.product_id}`)}
+                    style={{ padding: '8px', background: 'linear-gradient(180deg,#ffd814,#ffa41c)', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', color: '#0f1111' }}
+                  >
+                    View Renewed Listing →
+                  </button>
                 </div>
               ))
             ) : (
-              [1, 2, 3].map((i) => (
-                <div key={i} style={{ height: '220px', borderRadius: '8px', background: '#f6f6f6' }} />
-              ))
+              <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#565959' }}>
+                <p>Complete a return to get personalised recommendations!</p>
+              </div>
             )}
           </div>
         </div>
@@ -302,3 +287,4 @@ export default function Recommendations() {
     </div>
   )
 }
+

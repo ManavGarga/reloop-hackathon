@@ -1,5 +1,4 @@
 // ReLoop API client
-// All functions return mock data for now — Person 2 will wire real calls
 
 const BASE = "http://localhost:8000/api"
 
@@ -28,6 +27,9 @@ export const registerUser = (data) => request("POST", "/users/register", data)
 export const loginUser    = (data) => request("POST", "/users/login", data)
 export const getMe        = ()     => request("GET",  "/users/me")
 export const updateMe     = (data) => request("PUT",  "/users/me", data)
+export const getUserProfile   = (userId)       => request("GET", `/users/${userId}`)
+export const updateUserProfile = (userId, data) => request("PUT", `/users/${userId}`, data)
+
 
 // ─── Products ─────────────────────────────────────────────
 export const getProducts   = ()     => request("GET",  "/products")
@@ -47,6 +49,10 @@ export const getSimilar          = (productId) => request("GET", `/recommendatio
 export const getPersonalizedFeed = (userId)    => request("GET", `/recommendations/for/${userId}`)
 export const gradeItem           = (data)      => request("POST", "/recommendations/grade", data)
 
+// ─── Prevention Nudges ────────────────────────────────────
+export const getPreventionNudge = (userId, productId, reason = "") =>
+  request("GET", `/prevention/${userId}/${productId}?return_reason=${encodeURIComponent(reason)}`)
+
 // ─── Analytics ────────────────────────────────────────────
 export const getAnalyticsOverview     = () => request("GET", "/analytics/overview")
 export const getReturnsTrend          = () => request("GET", "/analytics/returns-trend")
@@ -62,4 +68,11 @@ export const gradeItemAI     = (data) => request("POST", "/ai/grade-item", data)
 export const getPassport = (productId) => request("GET", `/passport/${productId}`)
 export const getUserDashboard = (userId) => request("GET", `/user/${userId}/dashboard`)
 export const getCredits = (userId) => request("GET", `/credits/${userId}`)
+export const redeemCredits = (userId, rewardId) => request("POST", `/credits/${userId}/redeem`, { reward_id: rewardId })
+export const convertCredits = (userId, amount) => request("POST", `/credits/${userId}/convert`, { amount })
+export const getRewardCatalogue = () => request("GET", `/credits/catalogue/rewards`)
 
+// ─── Recommendations & Buyer Targeting ──────────────────────
+export const getBuyerDemand = (productId) => request("GET", `/recommendations/buyer-demand/${productId}`)
+export const getSimilarRefurbished = (productId) => request("GET", `/recommendations/similar/${productId}`)
+export const getPersonalisedFeed = (userId) => request("GET", `/recommendations/for/${userId}`)
