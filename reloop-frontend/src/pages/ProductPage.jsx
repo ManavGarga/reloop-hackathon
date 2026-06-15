@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Star, ShieldCheck, AlertTriangle, Recycle, X, ChevronRight, Lightbulb } from "lucide-react";
-import { getProducts, getPreventionNudge } from "../api/reloop";
+import { AlertTriangle, Recycle, Lightbulb, ShieldCheck, ChevronRight } from "lucide-react";
+import { getPreventionNudge } from "../api/reloop";
 import { useCart } from "../context/CartContext";
+import { useProducts } from "../hooks/useProducts";
+import { Button, Card, Badge, Modal, StarRating } from "../components/ui";
 
 const USER_ID = "user_priya_001";
 
@@ -10,22 +12,10 @@ export default function ProductPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { products, loading } = useProducts();
 
   const query = searchParams.get("q") || "";
   const categoryParam = searchParams.get("category") || "";
-
-  // Products from backend API
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    getProducts().then((res) => {
-      if (res && res.status === "ok" && res.products?.length) {
-        setProducts(res.products);
-      }
-    }).finally(() => setLoading(false));
-  }, []);
 
   const filteredProducts = products.filter((p) => {
     const matchesQuery = !query ||
@@ -67,7 +57,6 @@ export default function ProductPage() {
 
   const handleActionClick = async (actionType, prod) => {
     if (actionType === "return") {
-      // Fetch prevention nudge from backend before sending to return flow
       setNudgeLoading(true);
       const reason = prod.common_return_reasons?.[0] || "general issue";
       const res = await getPreventionNudge(USER_ID, prod.product_id, reason);
@@ -77,7 +66,6 @@ export default function ProductPage() {
         setNudgeModal({ nudge: res, pendingAction: actionType, product: prod });
         return;
       }
-      // No nudge needed — go straight to return
       navigate(`/return/${prod.product_id}`);
       return;
     }
@@ -91,114 +79,142 @@ export default function ProductPage() {
   };
 
   return (
-    <div style={{ background: "#eaeded", minHeight: "100vh", padding: "16px 24px", color: "#111111", fontFamily: "Arial, sans-serif", position: "relative" }}>
-
+    <div className="bg-[#F7F8FA] min-h-screen p-4 md:p-6 pb-28 md:pb-32 text-[#111111] font-sans relative">
       {/* Toast */}
       {toastMessage && (
-        <div style={{ position: "fixed", top: "80px", right: "24px", background: "#06b6d4", color: "white", padding: "12px 24px", borderRadius: "4px", fontWeight: "bold", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 2000 }}>
+        <div className="fixed top-20 right-6 bg-[#FF9900] text-[#111111] px-6 py-3 rounded-lg font-bold shadow-lg z-[2000] animate-slide-up">
           {toastMessage}
         </div>
       )}
 
       {/* Search results info */}
-      <div style={{ background: "white", padding: "10px 16px", border: "1px solid #ddd", borderRadius: "4px", marginBottom: "16px", fontSize: "14px" }}>
+      <Card className="py-2.5 px-4 mb-4 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
         <span>
           {loading ? "Loading products..." : `1–${filteredProducts.length} of ${filteredProducts.length} results`}
-          {query && <> for "<strong style={{ color: "#c7511f" }}>{query}</strong>"</>}
+          {query && <> for "<strong className="text-[#C7511F]">{query}</strong>"</>}
         </span>
-      </div>
+      </Card>
 
-      <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: "20px", alignItems: "start" }}>
-
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-5 items-start">
         {/* Left Filter Panel */}
-        <div style={{ background: "white", border: "1px solid #ddd", borderRadius: "4px", padding: "16px", fontSize: "13px" }}>
-          <h4 style={{ fontWeight: "700", marginBottom: "8px" }}>Eligible for Free Shipping</h4>
-          <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#565959" }}>
-            <input type="checkbox" defaultChecked /> Free Shipping
-          </label>
+        <Card className="p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-xs space-y-4">
+          <div>
+            <h4 className="font-bold text-[#565959] uppercase tracking-wide mb-2">Eligible for Free Shipping</h4>
+            <label className="flex items-center gap-1.5 cursor-pointer text-[#565959]">
+              <input type="checkbox" defaultChecked className="accent-[#FF9900]" /> Free Shipping
+            </label>
+          </div>
 
-          <hr style={{ border: "none", borderTop: "1px solid #eee", margin: "14px 0" }} />
-          <h4 style={{ fontWeight: "700", marginBottom: "8px" }}>ReLoop Category</h4>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "6px" }}>
-            {["All ReLoop Stores", "Electronics", "Clothing", "Books", "Appliances"].map((cat) => (
-              <li key={cat} style={{ color: cat === "All ReLoop Stores" ? "#007185" : "#565959", paddingLeft: cat === "All ReLoop Stores" ? 0 : "8px", cursor: "pointer", fontWeight: cat === "All ReLoop Stores" ? "bold" : "normal" }}>{cat}</li>
-            ))}
-          </ul>
+          <hr className="border-[#E7E7E7]" />
 
-          <hr style={{ border: "none", borderTop: "1px solid #eee", margin: "14px 0" }} />
-          <h4 style={{ fontWeight: "700", marginBottom: "8px" }}>Customer Reviews</h4>
-          <span style={{ color: "#ff9900", cursor: "pointer" }}>⭐⭐⭐⭐ & Up</span>
-        </div>
+          <div>
+            <h4 className="font-bold text-[#565959] uppercase tracking-wide mb-2">ReLoop Category</h4>
+            <ul className="space-y-1.5">
+              {["All ReLoop Stores", "Electronics", "Clothing", "Books", "Appliances"].map((cat) => (
+                <li
+                  key={cat}
+                  className={`cursor-pointer ${cat === "All ReLoop Stores" ? "font-bold text-[#007185]" : "text-[#565959] pl-2 hover:text-[#C7511F]"}`}
+                >
+                  {cat}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <hr className="border-[#E7E7E7]" />
+
+          <div>
+            <h4 className="font-bold text-[#565959] uppercase tracking-wide mb-2">Customer Reviews</h4>
+            <span className="text-[#FF9900] cursor-pointer font-medium hover:text-[#C7511F]">⭐⭐⭐⭐ & Up</span>
+          </div>
+        </Card>
 
         {/* Right Product List */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="flex flex-col gap-4">
           {loading ? (
             [1, 2, 3].map((i) => (
-              <div key={i} style={{ height: "200px", background: "white", border: "1px solid #ddd", borderRadius: "4px", opacity: 0.6, animation: "pulse 1.5s infinite" }} />
+              <Card key={i} className="h-[200px] opacity-60 animate-pulse bg-white border border-[#E7E7E7]" />
             ))
           ) : filteredProducts.length === 0 ? (
-            <div style={{ background: "white", padding: "40px", textAlign: "center", border: "1px solid #ddd", borderRadius: "4px" }}>
-              <h3 style={{ fontSize: "18px", fontWeight: "750" }}>No results matching your query.</h3>
-              <p style={{ color: "#565959", marginTop: "6px", fontSize: "13px" }}>Try exploring categories on the Home page.</p>
-            </div>
+            <Card className="p-10 text-center">
+              <h3 className="text-lg font-bold">No results matching your query.</h3>
+              <p className="text-[#565959] mt-1.5 text-xs">Try exploring categories on the Home page.</p>
+            </Card>
           ) : (
             filteredProducts.map((prod) => (
-              <div key={prod.product_id} style={{ background: "white", border: "1px solid #ddd", borderRadius: "4px", padding: "16px", display: "grid", gridTemplateColumns: "200px 1fr 240px", gap: "20px", position: "relative" }}>
-
+              <Card
+                key={prod.product_id}
+                padding="none"
+                className="bg-white border-b border-[#E7E7E7] p-6 grid grid-cols-1 md:grid-cols-[180px_1fr_200px] gap-5 relative overflow-hidden"
+              >
                 {/* Image */}
-                <div onClick={() => setSelectedProduct(prod)} style={{ cursor: "pointer", height: "180px", background: "#fcfcfc", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <img src={prod.image_url} alt={prod.name} style={{ maxHeight: "95%", maxWidth: "95%", objectFit: "contain" }} />
+                <div
+                  onClick={() => setSelectedProduct(prod)}
+                  className="cursor-pointer w-full md:w-[180px] h-[180px] bg-white rounded-lg border border-[#E7E7E7] flex items-center justify-center p-2 mx-auto"
+                >
+                  <img src={prod.image_url} alt={prod.name} className="max-h-[95%] max-w-[95%] object-contain rounded-md" />
                 </div>
 
                 {/* Details */}
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div className="flex flex-col justify-between text-left">
                   <div>
-                    <h3 onClick={() => setSelectedProduct(prod)} style={{ fontSize: "16px", fontWeight: "600", color: "#0f1111", cursor: "pointer", lineHeight: "1.4" }}
-                      onMouseOver={(e) => (e.currentTarget.style.color = "#007185")} onMouseOut={(e) => (e.currentTarget.style.color = "#0f1111")}>
+                    <h3
+                      onClick={() => setSelectedProduct(prod)}
+                      className="text-base font-semibold text-[#111111] cursor-pointer leading-snug hover:text-[#C7511F] transition-colors"
+                    >
                       {prod.name}
                     </h3>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "13px", color: "#565959" }}>
-                      <span style={{ color: "#ff9900" }}>⭐ {prod.rating || "4.2"}</span>
-                      <span>({(prod.reviews_count || 0).toLocaleString()} ratings)</span>
+                    <div className="flex items-center gap-1.5 mt-1 text-xs text-[#565959]">
+                      <StarRating rating={prod.rating || 4.2} count={prod.reviews_count} />
                     </div>
-                    <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                      <span style={{ fontSize: "11px", background: "#e6f4ea", color: "#137333", padding: "4px 8px", borderRadius: "4px", fontWeight: "bold" }}>♻️ ReLoop Verified</span>
-                      <span style={{ fontSize: "11px", background: "rgba(234,179,8,0.1)", color: "#ca8a04", padding: "4px 8px", borderRadius: "4px", fontWeight: "bold" }}>
-                        Carbon: {prod.carbon_footprint_kg} kg CO₂
-                      </span>
-                      <span style={{ fontSize: "11px", background: "rgba(99,102,241,0.08)", color: "#6366f1", padding: "4px 8px", borderRadius: "4px", fontWeight: "bold" }}>
-                        Return Rate: {prod.return_rate_percent}%
-                      </span>
+                    <div className="mt-3.5 flex flex-wrap gap-2">
+                      <Badge variant="success">ReLoop Verified</Badge>
+                      <Badge variant="success">Carbon: {prod.carbon_footprint_kg} kg CO₂</Badge>
+                      <Badge variant="success">Return Rate: {prod.return_rate_percent}%</Badge>
                     </div>
-                    <p style={{ fontSize: "12px", color: "#565959", marginTop: "12px", lineHeight: "1.5" }}>{prod.description}</p>
+                    <p className="text-xs text-[#565959] mt-3 leading-relaxed">{prod.description}</p>
                   </div>
 
                   {/* Return This Item CTA */}
-                  <button
+                  <Button
                     onClick={() => handleActionClick("return", prod)}
                     disabled={nudgeLoading}
-                    style={{ marginTop: "12px", alignSelf: "flex-start", padding: "8px 16px", background: "linear-gradient(135deg, #4ade80, #22c55e)", border: "none", borderRadius: "20px", fontSize: "12px", fontWeight: "700", color: "#0f1111", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 8px rgba(34,197,94,0.3)" }}>
-                    <Recycle size={14} />
+                    variant="secondary"
+                    icon={<Recycle size={14} />}
+                    className="mt-3 self-start !h-[36px] !px-4 !border-[#067D62] !text-[#067D62] hover:!bg-[#F0FFF4] font-bold"
+                  >
                     Return This Item
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Pricing Column */}
-                <div style={{ borderLeft: "1px solid #eee", paddingLeft: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    <span style={{ fontSize: "24px", fontWeight: "800" }}>₹{prod.price_new.toLocaleString()}</span>
-                    <p style={{ fontSize: "12px", color: "#565959", marginTop: "4px" }}>FREE delivery <strong style={{ color: "#111" }}>Mon, 16 Jun</strong></p>
+                <div className="md:border-l border-[#E7E7E7] md:pl-5 flex flex-col justify-between items-end gap-4">
+                  <div className="text-right">
+                    <span className="text-2xl font-bold text-[#B12704]">
+                      {Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(prod.price_new)}
+                    </span>
+                    <p className="text-xs text-[#565959] mt-1">
+                      FREE delivery <strong className="text-[#111111]">Mon, 16 Jun</strong>
+                    </p>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <button onClick={() => handleActionClick("cart", prod)} style={{ padding: "10px", background: "#ffd814", border: "1px solid #fcd200", borderRadius: "100px", fontSize: "12px", fontWeight: "700", color: "#0f1111", cursor: "pointer" }}>
+                  <div className="flex flex-col gap-2 w-full md:w-[160px]">
+                    <Button
+                      onClick={() => handleActionClick("cart", prod)}
+                      variant="primary"
+                      className="w-full"
+                    >
                       Add to cart
-                    </button>
-                    <button onClick={() => handleActionClick("buy", prod)} style={{ padding: "10px", background: "#ffa41c", border: "1px solid #ff8f00", borderRadius: "100px", fontSize: "12px", fontWeight: "700", color: "white", cursor: "pointer" }}>
+                    </Button>
+                    <Button
+                      onClick={() => handleActionClick("buy", prod)}
+                      variant="primary"
+                      className="w-full !bg-[#FFA41C] !border-[#FFA41C]"
+                    >
                       Buy Now
-                    </button>
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </Card>
             ))
           )}
         </div>
@@ -206,121 +222,163 @@ export default function ProductPage() {
 
       {/* Product Detail Modal */}
       {selectedProduct && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-          <div style={{ background: "white", width: "100%", maxWidth: "1000px", maxHeight: "90vh", overflowY: "auto", borderRadius: "8px", padding: "24px", position: "relative", boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}>
-            <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: "20px", right: "20px", background: "none", border: "none", fontSize: "24px", cursor: "pointer", color: "#565959" }}>✕</button>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginTop: "12px" }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-                <div style={{ height: "350px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f9f9f9", width: "100%", borderRadius: "6px", border: "1px solid #eee" }}>
-                  <img src={selectedProduct.activeImage || selectedProduct.image_url} alt={selectedProduct.name} style={{ maxHeight: "90%", maxWidth: "90%", objectFit: "contain" }} />
+        <Modal
+          open={!!selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          title="Product Details"
+          maxWidth="900px"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-3">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-[350px] w-full display-flex items-center justify-center bg-[#f9f9f9] rounded-lg border border-slate-100 flex p-4">
+                <img
+                  src={selectedProduct.activeImage || selectedProduct.image_url}
+                  alt={selectedProduct.name}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+              {selectedProduct.images?.length > 0 && (
+                <div className="flex gap-2 justify-center flex-wrap">
+                  {selectedProduct.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setSelectedProduct({ ...selectedProduct, activeImage: img })}
+                      className={`w-12 h-12 border rounded cursor-pointer flex items-center justify-center p-1 bg-white
+                        ${(selectedProduct.activeImage || selectedProduct.image_url) === img ? "border-[#e77600] border-2" : "border-[#ddd]"}`}
+                    >
+                      <img src={img} alt="" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ))}
                 </div>
-                {selectedProduct.images?.length > 0 && (
-                  <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-                    {selectedProduct.images.map((img, idx) => (
-                      <div key={idx} onClick={() => setSelectedProduct({ ...selectedProduct, activeImage: img })}
-                        style={{ width: "50px", height: "50px", border: (selectedProduct.activeImage || selectedProduct.image_url) === img ? "2px solid #e77600" : "1px solid #ddd", borderRadius: "4px", overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}>
-                        <img src={img} alt="" style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} />
-                      </div>
-                    ))}
+              )}
+            </div>
+
+            <div className="flex flex-col justify-between space-y-4">
+              <div>
+                <span className="text-xs text-[#007185] font-bold">Brand: {selectedProduct.brand}</span>
+                <h2 className="text-xl font-bold mt-1 text-[#0f1111]">{selectedProduct.name}</h2>
+                <div className="flex items-center gap-1.5 mt-2 text-xs text-[#565959]">
+                  <StarRating rating={selectedProduct.rating || 4.2} count={selectedProduct.reviews_count} />
+                </div>
+                <hr className="border-[#eee] my-4" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-sm text-[#565959]">Price:</span>
+                  <span className="text-3xl font-extrabold text-[#B12704]">
+                    {Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(selectedProduct.price_new)}
+                  </span>
+                </div>
+                <Card className="mt-4 bg-[#F7F8FA] p-3 border border-[#E7E7E7] rounded-lg text-xs leading-relaxed space-y-1 shadow-none">
+                  <span className="font-bold text-[#067D62] block">♻️ ReLoop Circular Economy</span>
+                  <p className="text-[#565959]">
+                    Carbon footprint: {selectedProduct.carbon_footprint_kg} kg CO₂. Return rate: {selectedProduct.return_rate_percent}%.
+                    Choosing Renewed saves up to 85% of manufacturing emissions.
+                  </p>
+                </Card>
+                {selectedProduct.category === "electronics" && (
+                  <div
+                    onClick={() => {
+                      setSelectedProduct(null);
+                      navigate(`/renewed/${selectedProduct.product_id}`);
+                    }}
+                    className="mt-4 bg-[#fff8f2] border border-[#FF9900] rounded-lg p-3 cursor-pointer flex justify-between items-center transition-all hover:bg-[#fffcf7]"
+                  >
+                    <div className="space-y-1">
+                      <span className="text-[10px] bg-[#FF9900] text-[#111111] px-2 py-0.5 rounded font-bold uppercase">
+                        Amazon Renewed
+                      </span>
+                      <p className="text-xs font-bold mt-1">Certified pre-owned available — save up to 45%</p>
+                      <p className="text-[10px] text-[#565959]">
+                        Saves {Math.round(selectedProduct.carbon_footprint_kg * 0.85)} kg CO₂ • 1-year brand warranty
+                      </p>
+                    </div>
+                    <ChevronRight size={20} className="text-[#FF9900]" />
                   </div>
                 )}
               </div>
-
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <div>
-                  <span style={{ fontSize: "12px", color: "#007185", fontWeight: "bold" }}>Brand: {selectedProduct.brand}</span>
-                  <h2 style={{ fontSize: "22px", fontWeight: "700", marginTop: "6px", color: "#0f1111" }}>{selectedProduct.name}</h2>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px", fontSize: "13px", color: "#565959" }}>
-                    <span style={{ color: "#ff9900" }}>⭐ {selectedProduct.rating || "4.2"}</span>
-                    <span>({(selectedProduct.reviews_count || 0).toLocaleString()} customer reviews)</span>
-                  </div>
-                  <hr style={{ border: "none", borderTop: "1px solid #eee", margin: "16px 0" }} />
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
-                    <span style={{ fontSize: "14px", color: "#565959" }}>Price:</span>
-                    <span style={{ fontSize: "28px", fontWeight: "800", color: "#B12704" }}>₹{selectedProduct.price_new.toLocaleString()}</span>
-                  </div>
-                  <div style={{ marginTop: "16px", background: "#f7f7f7", padding: "12px", borderRadius: "6px", border: "1px solid #e7e7e7" }}>
-                    <span style={{ fontSize: "12px", fontWeight: "bold", color: "#137333", display: "block" }}>♻️ ReLoop Circular Economy</span>
-                    <p style={{ fontSize: "11px", color: "#565959", marginTop: "4px" }}>
-                      Carbon footprint: {selectedProduct.carbon_footprint_kg} kg CO₂. Return rate: {selectedProduct.return_rate_percent}%.
-                      Choosing Renewed saves up to 85% of manufacturing emissions.
-                    </p>
-                  </div>
-                  {selectedProduct.category === "electronics" && (
-                    <div onClick={() => { setSelectedProduct(null); navigate(`/renewed/${selectedProduct.product_id}`); }}
-                      style={{ marginTop: "16px", background: "#fff8f2", border: "1px solid #ff9900", borderRadius: "6px", padding: "12px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <span style={{ fontSize: "11px", background: "#ff9900", color: "white", padding: "2px 6px", borderRadius: "3px", fontWeight: "bold" }}>Amazon Renewed</span>
-                        <p style={{ fontSize: "12px", fontWeight: "bold", marginTop: "6px" }}>Certified pre-owned available — save up to 45%</p>
-                        <p style={{ fontSize: "11px", color: "#565959", marginTop: "2px" }}>Saves {Math.round(selectedProduct.carbon_footprint_kg * 0.85)} kg CO₂ • 1-year brand warranty</p>
-                      </div>
-                      <ChevronRight size={20} style={{ color: "#ff9900" }} />
-                    </div>
-                  )}
-                </div>
-                <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
-                  <button onClick={() => handleActionClick("cart", selectedProduct)} style={{ flex: 1, padding: "12px", background: "#ffd814", border: "1px solid #fcd200", borderRadius: "100px", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}>Add to Cart</button>
-                  <button onClick={() => handleActionClick("return", selectedProduct)} style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,#4ade80,#22c55e)", border: "none", borderRadius: "100px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                    <Recycle size={14} /> Return
-                  </button>
-                </div>
+              <div className="flex gap-3 pt-4 border-t border-slate-100">
+                <Button
+                  onClick={() => handleActionClick("cart", selectedProduct)}
+                  variant="primary"
+                  className="flex-1"
+                >
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={() => handleActionClick("return", selectedProduct)}
+                  variant="secondary"
+                  icon={<Recycle size={14} />}
+                  className="flex-1 !border-[#067D62] !text-[#067D62] hover:!bg-[#F0FFF4] font-bold"
+                >
+                  Return
+                </Button>
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
-      {/* Prevention Nudge Modal (real backend data) */}
+      {/* Prevention Nudge Modal */}
       {nudgeModal && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-          <div style={{ background: "white", width: "100%", maxWidth: "520px", borderRadius: "12px", padding: "24px", boxShadow: "0 8px 32px rgba(0,0,0,0.3)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid #eee", paddingBottom: "12px", marginBottom: "16px" }}>
-              <AlertTriangle size={24} style={{ color: "#d97706" }} />
-              <h3 style={{ fontSize: "16px", fontWeight: "800" }}>ReLoop Return Prevention</h3>
-              <button onClick={() => setNudgeModal(null)} style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", color: "#565959" }}><X size={18} /></button>
+        <Modal
+          open={!!nudgeModal}
+          onClose={() => setNudgeModal(null)}
+          title="ReLoop Return Prevention"
+          maxWidth="520px"
+        >
+          <div className="space-y-5 text-left mt-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={20} className="text-[#D13212] shrink-0" />
+              <p className="text-sm font-semibold text-[#111111]">Help us reduce carbon emissions from logistics.</p>
             </div>
 
             {nudgeModal.nudge ? (
               <>
-                <p style={{ fontSize: "13px", color: "#0f1111", lineHeight: "1.6", marginBottom: "16px" }}>
+                <p className="text-sm text-[#111111] leading-relaxed">
                   {nudgeModal.nudge.nudge_message}
                 </p>
                 {nudgeModal.nudge.quick_fixes?.length > 0 && (
-                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "14px", marginBottom: "16px" }}>
-                    <p style={{ fontSize: "11px", fontWeight: "800", color: "#166534", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div className="bg-[#F0FFF4] border border-[#067D62] rounded-lg p-4 space-y-2.5">
+                    <p className="text-xs font-bold text-[#067D62] flex items-center gap-1.5">
                       <Lightbulb size={14} /> QUICK FIXES TO TRY FIRST
                     </p>
-                    {nudgeModal.nudge.quick_fixes.map((fix, i) => (
-                      <p key={i} style={{ fontSize: "12px", color: "#374151", marginBottom: "6px", paddingLeft: "6px", borderLeft: "2px solid #4ade80" }}>✓ {fix}</p>
-                    ))}
+                    <div className="space-y-1">
+                      {nudgeModal.nudge.quick_fixes.map((fix, i) => (
+                        <p key={i} className="text-xs text-gray-700 pl-2 border-l-2 border-[#067D62]">
+                          ✓ {fix}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 )}
-                <div style={{ display: "flex", gap: "8px", fontSize: "12px", color: "#565959", marginBottom: "20px", flexWrap: "wrap" }}>
-                  <span style={{ background: "#f0fdf4", color: "#166534", padding: "3px 8px", borderRadius: "12px", fontWeight: "bold" }}>
-                    🌱 CO₂ saved if kept: {nudgeModal.nudge.co2_cost_of_return_kg} kg
-                  </span>
-                  <span style={{ background: "#fefce8", color: "#854d0e", padding: "3px 8px", borderRadius: "12px", fontWeight: "bold" }}>
-                    +{nudgeModal.nudge.green_credits_if_kept} credits if you keep it
-                  </span>
+                <div className="flex gap-2 text-[10px] font-bold flex-wrap">
+                  <Badge variant="success">🌱 CO₂ saved if kept: {nudgeModal.nudge.co2_cost_of_return_kg} kg</Badge>
+                  <Badge variant="orange">+{nudgeModal.nudge.green_credits_if_kept} credits if you keep it</Badge>
                 </div>
               </>
             ) : (
-              <p style={{ fontSize: "13px", color: "#565959", lineHeight: "1.6", marginBottom: "20px" }}>
+              <p className="text-sm text-[#565959] leading-relaxed">
                 This item has a high return rate ({nudgeModal.product?.return_rate_percent}%) in your region. Consider verifying sizing and specifications before returning to save carbon emissions.
               </p>
             )}
 
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button onClick={() => setNudgeModal(null)} style={{ flex: 1, padding: "10px", background: "#e7e7e7", border: "1px solid #ddd", borderRadius: "8px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>
+            <div className="flex gap-3 pt-4 border-t border-[#E7E7E7]">
+              <Button
+                variant="secondary"
+                fullWidth
+                onClick={() => setNudgeModal(null)}
+              >
                 Keep the Item
-              </button>
-              <button onClick={() => executeAction(nudgeModal.pendingAction, nudgeModal.product)} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#4ade80,#22c55e)", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>
+              </Button>
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={() => executeAction(nudgeModal.pendingAction, nudgeModal.product)}
+              >
                 Proceed to Return
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

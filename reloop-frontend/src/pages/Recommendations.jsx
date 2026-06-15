@@ -55,17 +55,16 @@ function ChatMessage({ msg, isLast, onQuickReply }) {
     <div className={`flex gap-2.5 ${isBot ? 'items-start' : 'items-end flex-row-reverse animate-fade-in'}`}>
       {/* Bot avatar */}
       {isBot && (
-        <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-lg animate-glow"
-          style={{ background: 'linear-gradient(135deg, #14532D, #16A34A)' }}>
-          ♻
+        <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white bg-[#232F3E] shadow-sm animate-glow">
+          🤖
         </div>
       )}
 
       <div className="max-w-[82%] space-y-2 text-left">
         <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-xs ${
           isBot
-            ? 'bg-[#F0FDF4] border border-[#D1FAE5] text-slate-800 rounded-tl-none'
-            : 'bg-[#14532D] text-white rounded-tr-none border border-[#14532D]'
+            ? 'bg-white border border-[#E7E7E7] text-[#111111] shadow-sm rounded-tl-none rounded-xl'
+            : 'bg-[#F0F2F2] border border-[#D5D9D9] text-[#111111] rounded-tr-none rounded-xl'
         }`}
         >
           {isBot ? displayed : msg.content}
@@ -81,7 +80,7 @@ function ChatMessage({ msg, isLast, onQuickReply }) {
               <button
                 key={i}
                 onClick={() => onQuickReply(q)}
-                className="text-[11px] font-bold text-[#16A34A] bg-[#F0FDF4] border border-[#D1FAE5] hover:bg-emerald-50 px-3 py-1 rounded-full transition-all cursor-pointer shadow-xs"
+                className="text-[13px] font-semibold text-[#111111] bg-white border border-[#E7E7E7] hover:bg-gray-50 px-4 py-2 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
               >
                 {q}
               </button>
@@ -168,7 +167,7 @@ function EcoRankWidget({ credits = 1720 }) {
 const IMPACT_CONFIGS = {
   HIGH: { color: '#EF4444', bg: '#FEF2F2', border: '#FEE2E2', icon: '🔥' },
   MEDIUM: { color: '#D97706', bg: '#FFFBEB', border: '#FEF3C7', icon: '⚡' },
-  LOW: { color: '#16A34A', bg: '#F0FDF4', border: '#D1FAE5', icon: '🌱' },
+  LOW: { color: '#067D62', bg: '#F0FFF4', border: '#D1FAE5', icon: '🌱' },
 }
 
 function TipCard({ title, desc, impact }) {
@@ -177,38 +176,31 @@ function TipCard({ title, desc, impact }) {
 
   return (
     <div 
-      className="border rounded-xl transition-all duration-200 overflow-hidden bg-white hover:shadow-xs cursor-pointer"
-      style={{ 
-        borderColor: cfg.border,
-        borderLeftWidth: '4px',
-        borderLeftColor: cfg.color
-      }}
+      className="border border-[#E7E7E7] rounded-xl transition-all duration-200 overflow-hidden bg-white hover:shadow-xs cursor-pointer"
       onClick={() => setIsOpen(!isOpen)}
     >
-      <div className="p-3.5 flex items-center justify-between select-none">
-        <div className="flex items-center gap-3">
-          <span className="text-sm flex-shrink-0" style={{ color: cfg.color }}>
-            {cfg.icon}
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-xs font-bold text-slate-800">{title}</h4>
-              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wide text-white"
-                style={{ background: cfg.color }}>
-                {impact}
-              </span>
-            </div>
-          </div>
+      <div className="h-[48px] px-3.5 flex items-center justify-between select-none">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {/* Left colored dot */}
+          <span className="w-3.5 h-3.5 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.color }} />
+          <h4 className="text-xs font-bold text-slate-800 truncate">{title}</h4>
         </div>
-        <ChevronRight 
-          size={14} 
-          className="text-slate-400 transition-transform duration-200 flex-shrink-0" 
-          style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }} 
-        />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Right badge pill */}
+          <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wide text-white"
+            style={{ background: cfg.color }}>
+            {impact}
+          </span>
+          <ChevronRight 
+            size={14} 
+            className="text-slate-400 transition-transform duration-200" 
+            style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }} 
+          />
+        </div>
       </div>
       
       {isOpen && (
-        <div className="px-3.5 pb-3.5 pt-0 text-[11px] text-slate-500 leading-relaxed border-t border-slate-50 animate-fade-in">
+        <div className="px-3.5 pb-3.5 pt-2 text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 animate-fade-in text-left">
           {desc}
         </div>
       )}
@@ -220,28 +212,28 @@ function TipCard({ title, desc, impact }) {
 function RecommendedCard({ p, navigate }) {
   const [showTooltip, setShowTooltip] = useState(false)
   return (
-    <div className="eco-hover bg-white border border-slate-200 rounded-2xl p-4 flex flex-col gap-3 relative group">
-      <div className="relative bg-[#F0FDF4] rounded-xl p-2 border border-green-100 flex items-center justify-center overflow-hidden h-40">
+    <div className="eco-hover bg-white border border-[#E7E7E7] rounded-2xl p-4 flex flex-col gap-3 relative group">
+      <div className="relative bg-[#F7F8FA] rounded-xl p-2 border border-slate-100 flex items-center justify-center overflow-hidden h-40">
         <img src={p.image_url} alt={p.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
-        <span className="absolute top-2 left-2 bg-[#16A34A] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+        <span className="absolute top-2 left-2 bg-[#D13212] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
           -{p.discount_pct}% OFF
         </span>
         {/* Why recommended tooltip */}
         <button
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="absolute top-2 right-2 w-5 h-5 bg-white border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 flex items-center justify-center hover:bg-[#F0FDF4] hover:text-[#16A34A] transition-colors"
+          className="absolute top-2 right-2 w-5 h-5 bg-white border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 flex items-center justify-center hover:bg-[#F7F8FA] hover:text-[#FF9900] transition-colors"
         >?</button>
         {showTooltip && (
-          <div className="absolute top-9 right-2 bg-white border border-slate-200 rounded-xl p-3 shadow-xl z-10 w-48 text-[11px] text-slate-700 leading-relaxed animate-fade-in">
-            <strong className="text-[#16A34A]">Why recommended:</strong><br />{p.match_reason}
+          <div className="absolute top-9 right-2 bg-white border border-[#E7E7E7] rounded-xl p-3 shadow-xl z-10 w-48 text-[11px] text-slate-700 leading-relaxed animate-fade-in">
+            <strong className="text-[#067D62]">Why recommended:</strong><br />{p.match_reason}
           </div>
         )}
       </div>
       <div>
         <div className="flex justify-between items-center mb-1">
           <span className="text-[10px] text-slate-400 uppercase font-bold">{p.brand}</span>
-          <span className="inline-flex items-center gap-1 text-[10px] bg-[#F0FDF4] text-[#16A34A] border border-green-200 px-2 py-0.5 rounded-full font-bold">
+          <span className="inline-flex items-center gap-1 text-[10px] bg-[#F7F8FA] text-[#067D62] border border-[#E7E7E7] px-2 py-0.5 rounded-full font-bold">
             <ShieldCheck size={9} /> Renewed
           </span>
         </div>
@@ -252,17 +244,16 @@ function RecommendedCard({ p, navigate }) {
       </div>
       <div className="flex justify-between items-center mt-auto pt-2 border-t border-slate-100">
         <div>
-          <span className="text-base font-bold text-[#B12704]">₹{Math.round(p.price_renewed).toLocaleString()}</span>
-          <span className="text-xs text-slate-400 line-through ml-2">₹{p.price_new.toLocaleString()}</span>
+          <span className="text-base font-bold text-[#B12704]">₹{Math.round(p.price_renewed).toLocaleString('en-IN')}</span>
+          <span className="text-xs text-slate-400 line-through ml-2">₹{p.price_new.toLocaleString('en-IN')}</span>
         </div>
-        <span className="text-xs text-[#16A34A] font-bold flex items-center gap-1">
+        <span className="text-xs text-[#067D62] font-bold flex items-center gap-1">
           <Leaf size={10} /> -{p.carbon_saved} kg
         </span>
       </div>
       <button
         onClick={() => navigate(`/renewed/${p.product_id}`)}
-        className="w-full py-2.5 font-bold rounded-xl text-xs text-white transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-md border border-transparent"
-        style={{ background: 'linear-gradient(135deg, #16A34A, #14532D)' }}
+        className="btn-primary w-full text-xs"
       >
         View Renewed Listing →
       </button>
@@ -333,14 +324,14 @@ export default function Recommendations() {
   ]
 
   return (
-    <div className="bg-[#F0FDF4] min-h-screen" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+    <div className="bg-[#F7F8FA] min-h-screen" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
       <div className="w-full px-6 py-8 space-y-6">
 
         {/* Title */}
         <div className="flex items-center gap-2 animate-fade-in">
-          <Sparkles className="text-[#F59E0B]" size={22} />
+          <Sparkles className="text-[#FF9900]" size={22} />
           <h1 className="text-2xl font-black text-slate-900">For You</h1>
-          <span className="text-xs text-slate-400 font-medium ml-1">AI-Personalised Picks</span>
+          <span className="text-xs text-[#565959] font-medium ml-1">AI-Personalised Picks</span>
         </div>
 
         {/* Two-column layout */}
@@ -348,21 +339,21 @@ export default function Recommendations() {
 
           {/* Left: AI Chat */}
           <div className="flex-1 w-full">
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col" style={{ minHeight: '520px' }}>
+            <div className="bg-white border border-[#E7E7E7] rounded-xl overflow-hidden shadow-sm flex flex-col" style={{ minHeight: '520px' }}>
               {/* Chat header */}
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100" style={{ background: 'linear-gradient(135deg, #16A34A, #14532D)' }}>
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-xl animate-glow">♻</div>
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 bg-[#131921]">
+                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-base animate-glow text-white font-bold">♻</div>
                 <div>
                   <h2 className="text-sm font-bold text-white">ReLoop AI Advisor</h2>
                   <p className="text-[10px] text-white/70">Sustainability intelligence · Always on</p>
                 </div>
                 <span className="ml-auto flex items-center gap-1 text-[10px] text-white/80 font-semibold">
-                  <span className="w-1.5 h-1.5 bg-[#4ade80] rounded-full animate-pulse" /> Online
+                  <span className="w-1.5 h-1.5 bg-[#067D62] rounded-full animate-pulse" /> Online
                 </span>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-5 bg-slate-50/50" style={{ height: '340px' }}>
+              <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-5 bg-[#F7F8FA]" style={{ height: '340px' }}>
                 {messages.map((m, i) => (
                   <ChatMessage
                     key={i}
@@ -373,12 +364,11 @@ export default function Recommendations() {
                 ))}
                 {sending && (
                   <div className="flex gap-2.5 items-start">
-                    <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-lg"
-                      style={{ background: 'linear-gradient(135deg, #16A34A, #14532D)' }}>♻</div>
-                    <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-tl-sm">
+                    <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white bg-[#232F3E] shadow-sm animate-glow">🤖</div>
+                    <div className="bg-white border border-[#E7E7E7] px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm">
                       <div className="flex gap-1 items-center h-4">
                         {[0,1,2].map(i => (
-                          <span key={i} className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
+                          <span key={i} className="w-1.5 h-1.5 bg-slate-450 rounded-full animate-bounce"
                             style={{ animationDelay: `${i * 0.15}s` }} />
                         ))}
                       </div>
@@ -389,20 +379,19 @@ export default function Recommendations() {
               </div>
 
               {/* Input */}
-              <div className="p-4 border-t border-slate-100 bg-white">
-                <form onSubmit={handleSend} className="flex gap-2">
+              <div className="p-4 border-t border-[#E7E7E7] bg-white">
+                <form onSubmit={handleSend} className="flex items-center">
                   <input
                     type="text"
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="Ask about credits, eco tips, returns..."
-                    className="flex-1 h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 outline-none focus:border-[#16A34A] focus:ring-2 focus:ring-[#16A34A]/15 transition-all"
+                    className="flex-1 h-[48px] px-4 bg-white border-[1.5px] border-[#D5D9D9] rounded-[24px] text-sm text-[#111111] outline-none focus:border-[#FF9900] focus:ring-2 focus:ring-[#FF9900]/15 transition-all"
                   />
                   <button
                     type="submit"
                     disabled={sending}
-                    className="w-12 h-12 flex items-center justify-center rounded-xl text-white font-bold transition-all disabled:opacity-50 cursor-pointer hover:scale-105"
-                    style={{ background: 'linear-gradient(135deg, #16A34A, #14532D)' }}
+                    className="w-10 h-10 flex items-center justify-center rounded-full text-white bg-[#FF9900] hover:bg-[#F08804] transition-all disabled:opacity-50 cursor-pointer active:scale-95 shadow-sm ml-2 self-center"
                   >
                     <Send size={16} />
                   </button>
@@ -415,17 +404,17 @@ export default function Recommendations() {
           <div className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4">
 
             {/* Eco Rank Widget */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <h2 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
-                <Leaf className="text-[#16A34A]" size={16} /> Your Eco Rank
+            <div className="bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm">
+              <h2 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
+                <Leaf className="text-[#067D62]" size={16} /> Your Eco Rank
               </h2>
               <EcoRankWidget credits={1720} />
             </div>
 
             {/* Sustainability Tips */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
-                <Lightbulb className="text-[#F59E0B]" size={16} /> AI Sustainability Tips
+            <div className="bg-white border border-[#E7E7E7] rounded-xl p-5 shadow-sm">
+              <h2 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
+                <Lightbulb className="text-[#FF9900]" size={16} /> AI Sustainability Tips
               </h2>
               <div className="flex flex-col gap-2.5">
                 {tips.map((t, idx) => <TipCard key={idx} {...t} />)}
@@ -436,33 +425,32 @@ export default function Recommendations() {
         </div>
 
         {/* Personalised Picks */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+        <div className="bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5 text-left">
             <div>
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles size={16} className="text-[#F59E0B]" /> Personalised Refurbished Picks
+                <Sparkles size={16} className="text-[#FF9900]" /> Personalised Refurbished Picks
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Based on your return history and purchase patterns</p>
+              <p className="text-xs text-slate-450 mt-0.5">Based on your return history and purchase patterns</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {loading ? (
               [1,2,3].map(i => (
-                <div key={i} className="h-72 rounded-2xl skeleton-green border border-green-100" />
+                <div key={i} className="h-72 rounded-xl skeleton-green border border-green-150" />
               ))
             ) : feedProducts.length > 0 ? (
               feedProducts.map(p => <RecommendedCard key={p.product_id} p={p} navigate={navigate} />)
             ) : (
               <div className="col-span-3 py-16 flex flex-col items-center text-center">
-                <Recycle className="text-slate-300 mb-3" size={48} />
+                <Recycle className="text-slate-350 mb-3" size={48} />
                 <p className="text-sm font-bold text-slate-700">Complete a return to get personalised recommendations!</p>
-                <p className="text-xs text-slate-400 mt-1">Your AI picks will appear after your first ReLoop return.</p>
+                <p className="text-xs text-slate-450 mt-1">Your AI picks will appear after your first ReLoop return.</p>
                 <button
                   onClick={() => navigate('/returns')}
-                  className="mt-4 px-5 py-2.5 text-white text-sm font-bold rounded-xl transition-all hover:-translate-y-0.5"
-                  style={{ background: 'linear-gradient(135deg, #16A34A, #14532D)' }}
+                  className="btn-primary mt-4 min-w-[180px]"
                 >
-                  Start a Return →
+                  Start a Return
                 </button>
               </div>
             )}

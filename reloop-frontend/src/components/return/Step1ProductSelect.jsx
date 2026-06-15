@@ -52,8 +52,8 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 space-y-3">
-        <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-sm text-slate-400">Loading your eligible returns...</p>
+        <div className="w-8 h-8 border-4 border-[#FF9900] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-500">Loading your eligible returns...</p>
       </div>
     );
   }
@@ -61,14 +61,14 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
   return (
     <div className="space-y-6">
       <div className="text-center max-w-xl mx-auto space-y-2">
-        <h2 className="text-xl font-bold text-slate-100">Which item would you like to return?</h2>
-        <p className="text-xs text-slate-400">Select an item from your recent purchases below to initiate a circular return.</p>
+        <h2 className="text-xl font-bold text-[#111111]">Which item would you like to return?</h2>
+        <p className="text-xs text-[#565959]">Select an item from your recent purchases below to initiate a circular return.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         {/* Left Column: Product Cards */}
         <div className="md:col-span-7 space-y-3">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Recent Purchases</span>
+          <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide block text-left">Recent Purchases</span>
           <div className="space-y-3">
             {products.map((p) => {
               const isSelected = returnDetails.productId === p.product_id;
@@ -76,23 +76,23 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
                 <div
                   key={p.product_id}
                   onClick={() => handleSelectProduct(p)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
+                  className={`h-[64px] px-4 border rounded-lg transition-all cursor-pointer flex items-center justify-between gap-4 ${
                     isSelected
-                      ? "bg-indigo-950/20 border-indigo-500/80 shadow-md shadow-indigo-950/40"
-                      : "bg-slate-900/40 border-slate-850 hover:bg-slate-900 hover:border-slate-800"
+                      ? "bg-[#FFF8F0] border-2 border-[#FF9900] shadow-sm"
+                      : "bg-white border-[#D5D9D9] hover:bg-[#F7F8FA]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-slate-950 rounded-xl p-1.5 flex items-center justify-center border border-slate-850">
+                    <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center border border-[#E7E7E7] flex-shrink-0">
                       <img src={p.image_url} alt={p.name} className="max-h-full max-w-full object-contain" />
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-200">{p.name}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Purchased on Amazon • ₹{p.price_new.toLocaleString()}</p>
+                    <div className="text-left">
+                      <h4 className="text-xs font-bold text-[#111111] line-clamp-1">{p.name}</h4>
+                      <p className="text-[10px] text-[#565959] mt-0.5">Purchased on Amazon • ₹{p.price_new.toLocaleString()}</p>
                     </div>
                   </div>
                   {isSelected && (
-                    <span className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-white border border-indigo-400">
+                    <span className="w-5 h-5 bg-[#FF9900] rounded-full flex items-center justify-center text-[#111111] border border-[#FF9900]">
                       <Check size={12} strokeWidth={3} />
                     </span>
                   )}
@@ -103,38 +103,38 @@ export default function Step1ProductSelect({ preselectedId, onNext }) {
         </div>
 
         {/* Right Column: Preview Selected Specs */}
-        <div className="md:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Item Overview</span>
+        <div className="md:col-span-5 bg-white border border-[#E7E7E7] rounded-xl p-5 space-y-4 shadow-sm text-left">
+          <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide block">Item Overview</span>
           {selectedProduct ? (
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center gap-3">
-                <div className="w-16 h-16 bg-slate-950 rounded-xl p-2 flex items-center justify-center border border-slate-850">
+                <div className="w-16 h-16 bg-white rounded-lg p-2 flex items-center justify-center border border-[#E7E7E7]">
                   <img src={selectedProduct.image_url} alt={selectedProduct.name} className="max-h-full object-contain" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-100">{selectedProduct.name}</h3>
-                  <p className="text-xs text-indigo-400 font-semibold">{selectedProduct.brand}</p>
+                  <h3 className="text-sm font-bold text-[#111111]">{selectedProduct.name}</h3>
+                  <p className="text-xs text-[#067D62] font-semibold">{selectedProduct.brand}</p>
                 </div>
               </div>
-              <hr className="border-slate-800/80" />
+              <hr className="border-[#E7E7E7]" />
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="bg-slate-950/40 p-2.5 rounded-lg border border-slate-850">
-                  <span className="text-[9px] text-slate-500 uppercase font-bold block">Original Price</span>
-                  <span className="font-bold text-slate-300 block mt-0.5">₹{selectedProduct.price_new.toLocaleString()}</span>
+                <div className="bg-gray-50 p-2.5 rounded-lg border border-[#E7E7E7]">
+                  <span className="text-[9px] text-[#565959] uppercase font-bold block">Original Price</span>
+                  <span className="font-bold text-[#B12704] block mt-0.5">₹{selectedProduct.price_new.toLocaleString()}</span>
                 </div>
-                <div className="bg-slate-950/40 p-2.5 rounded-lg border border-slate-850">
-                  <span className="text-[9px] text-slate-500 uppercase font-bold block">Carbon Footprint</span>
-                  <span className="font-bold text-slate-300 block mt-0.5">{selectedProduct.carbon_footprint_kg} kg CO₂</span>
+                <div className="bg-gray-50 p-2.5 rounded-lg border border-[#E7E7E7]">
+                  <span className="text-[9px] text-[#565959] uppercase font-bold block">Carbon Footprint</span>
+                  <span className="font-bold text-[#067D62] block mt-0.5">{selectedProduct.carbon_footprint_kg} kg CO₂</span>
                 </div>
               </div>
-              <div className="space-y-1 bg-slate-950/30 p-3 rounded-xl border border-slate-850 text-xs">
-                <span className="text-[9px] text-slate-500 uppercase font-bold">Standard Warranty</span>
-                <p className="text-slate-300 leading-normal mt-0.5">1-Year Warranty active. Eligible for instant green credits upon circular circular routing.</p>
+              <div className="space-y-1 bg-gray-50 p-3 rounded-lg border border-[#E7E7E7] text-xs">
+                <span className="text-[9px] text-[#565959] uppercase font-bold">Standard Warranty</span>
+                <p className="text-[#111111] leading-normal mt-0.5">1-Year Warranty active. Eligible for instant green credits upon circular circular routing.</p>
               </div>
 
               <button
                 onClick={onNext}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow cursor-pointer active:scale-98"
+                className="w-full h-[44px] bg-[#FF9900] hover:bg-[#F08804] text-[#111111] font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-[0.98]"
               >
                 <span>Continue to Condition Check</span>
                 <ArrowRight size={14} />

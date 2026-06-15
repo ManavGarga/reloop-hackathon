@@ -54,7 +54,7 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
   if (fetchingProduct || !product) {
     return (
       <div className="flex flex-col items-center justify-center p-12 space-y-3">
-        <div className="w-8 h-8 border-4 border-[#16A34A] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[#FF9900] border-t-transparent rounded-full animate-spin"></div>
         <p className="text-sm text-slate-500">Loading product details...</p>
       </div>
     );
@@ -113,15 +113,15 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         {/* Left Column: Return Reasons */}
-        <div className="md:col-span-6 bg-white border border-[#D1FAE5] p-6 rounded-2xl space-y-4 shadow-sm text-left">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Reason Details</span>
+        <div className="md:col-span-6 bg-white border border-[#E7E7E7] p-6 rounded-2xl space-y-4 shadow-sm text-left">
+          <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide block">Reason Details</span>
           
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-500 block">Select Primary Reason</label>
+            <label className="text-[11px] font-bold text-[#565959] block">Select Primary Reason</label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full bg-[#F0FDF4] text-slate-800 border border-[#D1FAE5] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#16A34A]"
+              className="w-full bg-white text-slate-800 border border-[#D5D9D9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#FF9900] focus:border-[#FF9900]"
             >
               {(product.common_return_reasons || []).map((r, idx) => (
                 <option key={idx} value={r}>{r}</option>
@@ -131,40 +131,39 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-500 block">Describe the issue in detail</label>
+            <label className="text-[11px] font-bold text-[#565959] block">Describe the issue in detail</label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="E.g. Screen works but battery drops from 100% to 50% within 2 hours of normal usage..."
-              className="w-full h-28 bg-[#F0FDF4] text-slate-800 border border-[#D1FAE5] rounded-xl p-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#16A34A] leading-normal"
+              className="w-full h-28 bg-white text-slate-850 border border-[#D5D9D9] rounded-lg p-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#FF9900] focus:border-[#FF9900] leading-normal"
               required
             />
           </div>
         </div>
-
         {/* Right Column: Photo Upload Drag-and-Drop */}
-        <div className="md:col-span-6 bg-white border border-[#D1FAE5] p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm text-left">
+        <div className="md:col-span-6 bg-white border border-[#E7E7E7] p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm text-left">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Upload 2–3 clear photos of your item</span>
-              <span className="text-[10px] font-bold text-slate-500 font-mono">{photos.length}/3</span>
+              <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide">Upload 2–3 clear photos of your item</span>
+              <span className="text-[10px] font-bold text-[#565959] font-mono">{photos.length}/3</span>
             </div>
             
             {/* Drag-and-Drop Mock Zone */}
             <div 
               onClick={handleAddPhoto}
-              className="border-2 border-dashed border-[#D1FAE5] hover:border-[#16A34A]/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-[#F0FDF4]/30 text-slate-500 flex flex-col items-center justify-center space-y-2 active:scale-98"
+              className="border-2 border-dashed border-[#D5D9D9] hover:border-[#FF9900]/50 rounded-lg p-6 text-center cursor-pointer transition-all bg-gray-50 text-slate-500 flex flex-col items-center justify-center space-y-2 active:scale-[0.98]"
             >
-              <Upload className="text-[#16A34A]" size={32} />
+              <Upload className="text-[#FF9900]" size={32} />
               <span className="text-xs font-bold text-slate-700">Drag and drop images here, or click to browse</span>
             </div>
             {/* Mock Thumbnail List */}
             {photos.length > 0 && (
               <div className="grid grid-cols-3 gap-3 animate-fade-in">
                 {photos.map((photo) => (
-                  <div key={photo.id} className="relative p-2 bg-[#F0FDF4] border border-[#D1FAE5] rounded-xl flex flex-col items-center space-y-1">
+                  <div key={photo.id} className="relative p-2 bg-gray-50 border border-[#E7E7E7] rounded-xl flex flex-col items-center space-y-1">
                     {/* Grey thumbnail box */}
-                    <div className="w-full h-12 bg-white rounded-lg flex items-center justify-center text-slate-500 text-xl border border-slate-100">
+                    <div className="w-full h-12 bg-white rounded-lg flex items-center justify-center text-slate-500 text-xl border border-[#E7E7E7]">
                       📸
                     </div>
                     <span className="text-[9px] font-bold text-slate-600 truncate w-full text-center">{photo.name}</span>
@@ -176,7 +175,7 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
                         e.stopPropagation();
                         handleRemovePhoto(photo.id);
                       }}
-                      className="absolute top-1 right-1 p-1 bg-white hover:bg-slate-50 rounded-full text-slate-400 hover:text-red-500 transition-colors shadow-sm border border-slate-100"
+                      className="absolute top-1 right-1 p-1 bg-white hover:bg-slate-50 rounded-full text-slate-400 hover:text-red-500 transition-colors shadow-sm border border-[#E7E7E7]"
                     >
                       <X size={10} />
                     </button>
@@ -197,14 +196,14 @@ export default function Step2ConditionCheck({ onNext, onBack }) {
             <button
               type="button"
               onClick={onBack}
-              className="px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all active:scale-98"
+              className="h-[44px] px-6 bg-white hover:bg-gray-50 text-[#111111] border border-[#D5D9D9] rounded-lg text-sm font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-[0.98]"
             >
               <ArrowLeft size={14} /> Back
             </button>
             <button
               type="submit"
               disabled={loading || photos.length === 0}
-              className="flex-1 py-3 bg-[#16A34A] hover:bg-[#15803D] disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow cursor-pointer active:scale-98"
+              className="flex-1 h-[44px] bg-[#FF9900] hover:bg-[#F08804] disabled:bg-gray-100 disabled:text-gray-400 text-[#111111] font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-[0.98] border border-transparent"
             >
               <span>{loading ? "Registering return..." : "Submit Scans & Assess"}</span>
               <ArrowRight size={14} />

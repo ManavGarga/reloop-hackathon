@@ -25,7 +25,7 @@ async def chat_with_advisor(req: ChatRequest):
     user_name = user.get("name", "Priya Sharma") if user else "Priya Sharma"
     first_name = user_name.split(" ")[0]
     credits_bal = Math_round_credits = int(credits_ledger.get("balance", 240)) if credits_ledger else 240
-    co2_saved = user.get("co2_saved_kg", 28.4) if user else 28.4
+    co2_saved = user.get("co2_saved_kg", 78.2) if user else 78.2
     city = user.get("city", "Bengaluru") if user else "Bengaluru"
 
     # Fallback ReLoop responses (customized dynamically)

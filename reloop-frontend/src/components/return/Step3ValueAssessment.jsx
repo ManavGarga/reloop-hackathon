@@ -105,14 +105,14 @@ export default function Step3ValueAssessment({ onNext }) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-6 max-w-md mx-auto text-center">
         {/* Computer Vision Scanner Graphic */}
-        <div className="relative w-32 h-32 bg-slate-900 border border-indigo-900/40 rounded-2xl flex items-center justify-center overflow-hidden shadow-inner shadow-indigo-950">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-bounce" />
-          <Loader2 className="animate-spin text-indigo-500" size={36} />
+        <div className="relative w-32 h-32 bg-gray-50 border border-[#E7E7E7] rounded-2xl flex items-center justify-center overflow-hidden shadow-inner">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-[#FF9900] to-transparent animate-bounce" />
+          <Loader2 className="animate-spin text-[#FF9900]" size={36} />
         </div>
         <div className="space-y-2">
-          <h3 className="text-sm font-bold text-slate-200">ReLoop AI Vision Inspecting{dots}</h3>
-          <p className="text-[11px] font-semibold text-indigo-400 capitalize tracking-wide">{scanState}</p>
-          <p className="text-[10px] text-slate-500 max-w-xs leading-normal">
+          <h3 className="text-sm font-bold text-[#111111]">ReLoop AI Vision Inspecting{dots}</h3>
+          <p className="text-[11px] font-semibold text-[#FF9900] capitalize tracking-wide">{scanState}</p>
+          <p className="text-[10px] text-[#565959] max-w-xs leading-normal">
             Scanning front & back images for scratch depths, discoloration, and structural defects.
           </p>
         </div>
@@ -125,60 +125,62 @@ export default function Step3ValueAssessment({ onNext }) {
   return (
     <div className="space-y-6">
       <div className="text-center max-w-xl mx-auto space-y-2">
-        <h2 className="text-xl font-bold text-slate-100 flex items-center justify-center gap-1.5">
-          <Sparkles className="text-indigo-400" size={20} /> AI Grading Assessment Complete
+        <h2 className="text-xl font-bold text-[#111111] flex items-center justify-center gap-1.5">
+          <Sparkles className="text-[#FF9900]" size={20} /> AI Grading Assessment Complete
         </h2>
-        <p className="text-xs text-slate-400">Our machine learning models have graded your item's condition.</p>
+        <p className="text-xs text-[#565959]">Our machine learning models have graded your item's condition.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         {/* Left Column: Grade Card */}
-        <div className="md:col-span-5 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Grading Summary</span>
+        <div className="md:col-span-5 bg-white border border-[#E7E7E7] p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+          <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide block text-left">Grading Summary</span>
           
           <div className="space-y-3 py-2 text-center">
-            <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">AI Quality Score</span>
-            <div className="text-4xl font-black text-slate-100 mt-1 block">
-              {grade_score}<span className="text-slate-500 font-normal text-lg">/100</span>
+            <span className="text-[10px] text-[#565959] uppercase font-bold tracking-wider">AI Quality Score</span>
+            <div className="text-[48px] font-bold text-[#111111] leading-none mt-1 block">
+              {grade_score}<span className="text-[#565959] font-normal text-lg">/100</span>
             </div>
             <div className="flex justify-center mt-2">
-              <GradeTag grade={condition} />
+              <span className="bg-[#067D62] text-white text-xs font-bold px-[12px] py-[6px] rounded-full uppercase tracking-wider">
+                {condition || "GOOD"}
+              </span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-2">
+            <p className="text-[10px] text-[#565959] mt-2 font-medium">
               AI Confidence: <strong>{(confidence * 100).toFixed(0)}%</strong> (Verified Scan)
             </p>
           </div>
 
-          <div className="bg-slate-950/40 border border-slate-850 p-3 rounded-xl flex items-start gap-2 text-[10px] text-slate-400">
-            <ShieldCheck className="text-teal-400 flex-shrink-0" size={16} />
+          <div className="bg-gray-50 border border-[#E7E7E7] p-3 rounded-xl flex items-start gap-2 text-[10px] text-[#565959] text-left">
+            <ShieldCheck className="text-[#067D62] flex-shrink-0" size={16} />
             <span>This grade determines your green credits eligibility and recommerical resale multiplier.</span>
           </div>
         </div>
 
         {/* Right Column: Flaws Detected */}
-        <div className="md:col-span-7 bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
+        <div className="md:col-span-7 bg-white border border-[#E7E7E7] p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm text-left">
           <div className="space-y-3">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Detected Flaws ({flaw_breakdown?.length || 0})</span>
+            <span className="text-[10px] font-bold text-[#565959] uppercase tracking-wide block">Detected Flaws ({flaw_breakdown?.length || 0})</span>
             {flaw_breakdown && flaw_breakdown.length > 0 ? (
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {flaw_breakdown.map((item, idx) => (
-                  <div key={idx} className="flex items-start justify-between bg-slate-950/40 border border-slate-850 p-3 rounded-xl text-xs">
-                    <span className="text-slate-300 leading-tight pr-4">{item.flaw}</span>
-                    <span className="bg-amber-950/40 text-amber-400 border border-amber-900/40 px-2 py-0.5 rounded text-[10px] font-bold capitalize">
+                  <div key={idx} className="flex items-start justify-between bg-gray-50 border border-[#E7E7E7] p-3 rounded-xl text-xs">
+                    <span className="text-[#111111] leading-tight pr-4">{item.flaw}</span>
+                    <span className="bg-[#D13212]/15 text-[#D13212] border border-[#D13212]/20 px-2 py-0.5 rounded text-[10px] font-bold capitalize">
                       {item.severity}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center py-10 bg-slate-950/20 rounded-xl border border-slate-850 text-xs text-slate-500 gap-1.5">
-                <CheckCircle2 className="text-emerald-400" size={16} />
+              <div className="flex items-center justify-center py-10 bg-[#067D62]/10 rounded-xl border border-[#067D62]/20 text-[#067D62] text-xs gap-1.5">
+                <CheckCircle2 className="text-[#067D62]" size={16} />
                 <span>No major cosmetic or functional flaws detected!</span>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-950/30 border border-red-900/40 text-red-400 p-2.5 rounded-lg text-xs">
+              <div className="bg-red-50 border border-red-200 text-red-700 p-2.5 rounded-lg text-xs">
                 {error}
               </div>
             )}
@@ -187,7 +189,7 @@ export default function Step3ValueAssessment({ onNext }) {
           <button
             onClick={handleProceedToChoices}
             disabled={loadingDispose}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow cursor-pointer active:scale-98"
+            className="w-full h-[44px] bg-[#FF9900] hover:bg-[#F08804] disabled:bg-gray-100 disabled:text-gray-400 text-[#111111] font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-[0.98] border border-transparent"
           >
             <span>{loadingDispose ? "Evaluating..." : "Proceed to Circular Choices"}</span>
             <ArrowRight size={14} />

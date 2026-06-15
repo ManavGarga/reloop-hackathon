@@ -112,7 +112,7 @@ USERS = [
             "balance": 240.0,
         },
         "total_returns": 3,
-        "co2_saved_kg": 28.4,
+        "co2_saved_kg": 78.2,
         "created_at": (datetime.utcnow() - timedelta(days=60)).isoformat(),
         "past_returns": [
             {
@@ -238,7 +238,7 @@ PASSPORTS = [
                 "actor": "user_priya_001",
                 "notes": "Color mismatch — donated to NGO",
                 "location": "Bengaluru, KA",
-                "co2_delta_kg": -8.5,
+                "co2_delta_kg": -18.7,
                 "condition_at_event": "good",
             },
         ],
@@ -270,7 +270,7 @@ RETURNS = [
         "disposal_route": "ngo_donate",
         "grade": "good",
         "green_credits_awarded": 80.0,
-        "co2_saved_kg": 8.5,
+        "co2_saved_kg": 18.7,
         "created_at": (datetime.utcnow() - timedelta(days=25)).isoformat(),
     }
 ]
