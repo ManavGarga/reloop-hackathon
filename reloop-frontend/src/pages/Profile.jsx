@@ -355,7 +355,7 @@ export default function Profile() {
           <div className="bg-[#1e3a8a] text-white p-5 rounded-lg flex flex-col justify-between h-32">
             <div>
               <span className="text-[9px] text-indigo-200 font-bold uppercase tracking-wider block">Amazon Pay Wallet</span>
-              <h3 className="text-2xl font-black mt-1">₹{payWalletBalance.toFixed(2)}</h3>
+              <h3 className="text-2xl font-black mt-1">₹{Math.round(payWalletBalance).toLocaleString('en-IN')}</h3>
             </div>
             <div className="flex justify-between items-center text-[10px] text-indigo-100">
               <span>Verified Wallet</span>
@@ -412,7 +412,7 @@ export default function Profile() {
             {convertError && <p className="text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-lg font-medium">{convertError}</p>}
             {convertAmount && !isNaN(convertAmount) && parseFloat(convertAmount) > 0 && (
               <div className="bg-emerald-50 border border-emerald-100 p-3 rounded text-center text-xs text-emerald-700 font-semibold">
-                🎉 You will receive ₹{parseFloat(convertAmount).toFixed(2)} Amazon Pay Balance
+                🎉 You will receive ₹{Math.round(parseFloat(convertAmount)).toLocaleString('en-IN')} Amazon Pay Balance
               </div>
             )}
             <button
@@ -596,8 +596,8 @@ export default function Profile() {
       </div>
 
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 bg-white border border-[#DDD] text-[#111] px-4 py-3 rounded shadow-xl flex items-center gap-2 z-50">
-          <Sparkles size={15} className="text-amber-500 flex-shrink-0" />
+        <div className="fixed bottom-5 right-5 bg-white border border-[#D1FAE5] text-[#111] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-fade-in">
+          <Sparkles size={15} className="text-[#16A34A] flex-shrink-0 animate-pulse" />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}

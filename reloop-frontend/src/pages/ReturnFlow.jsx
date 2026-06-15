@@ -137,12 +137,12 @@ function OrdersList({ user }) {
     {
       id: "404-3596249-8456512",
       date: "15 March 2026",
-      total: "₹18,999.00",
+      total: "₹18,999",
       shipTo: user?.name || "Priya Sharma",
       status: "Eligible for Return",
       statusDesc: "Delivered on March 18. Return window open until June 18, 2026.",
       productName: "Samsung Galaxy M34 5G (Silver, 128GB)",
-      price: "₹18,999.00",
+      price: "₹18,999",
       productId: "prod_samsung_m34_001",
       img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=200&auto=format&fit=crop",
       carbon_footprint_kg: 70
@@ -150,12 +150,12 @@ function OrdersList({ user }) {
     {
       id: "404-1188199-4825114",
       date: "10 April 2026",
-      total: "₹4,999.00",
+      total: "₹4,999",
       shipTo: user?.name || "Priya Sharma",
       status: "Eligible for Return",
       statusDesc: "Delivered on April 13. Return window open until July 13, 2026.",
       productName: "Levi's Trucker Denim Jacket (Classic Blue, Size M)",
-      price: "₹4,999.00",
+      price: "₹4,999",
       productId: "prod_levis_jacket_001",
       img: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=200&auto=format&fit=crop",
       carbon_footprint_kg: 22
