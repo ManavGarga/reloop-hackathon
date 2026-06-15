@@ -331,7 +331,7 @@ function OrdersList({ user }) {
   }
 
   return (
-    <div style={{ background: '#F7F8FA', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ background: '#F7F8FA', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif', display: 'flex', justifyContent: 'center' }}>
       
       {/* Toast Alert */}
       {toastMessage && (
@@ -340,7 +340,7 @@ function OrdersList({ user }) {
         </div>
       )}
 
-      <div className="w-full max-w-4xl mx-auto px-6 py-8 space-y-6">
+      <div className="w-full max-w-4xl px-6 py-8 space-y-6">
         
         <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px', textAlign: 'left' }}>
           <span>Your Account</span> <ChevronRight size={10} style={{ display: 'inline' }} /> <span style={{ color: '#c7511f' }}>Your Orders</span>
