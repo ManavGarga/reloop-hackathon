@@ -658,11 +658,8 @@ function DemoResetButton() {
   if (location.pathname.startsWith('/renewed')) return null;
 
   const handleReset = () => {
-    const confirmed = window.confirm('Reset demo? This will take you back to the home products page.');
-    if (confirmed) {
-      navigate('/products');
-      fetch('http://localhost:8000/api/demo/reset', { method: 'POST' }).catch(() => {});
-    }
+    navigate('/products');
+    fetch('http://localhost:8000/api/demo/reset', { method: 'POST' }).catch(() => {});
   };
 
   return (
