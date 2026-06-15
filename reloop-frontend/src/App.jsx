@@ -696,6 +696,8 @@ export default function App() {
               <Route path="/passport/:productId" element={<PassportPage />} />
               <Route path="/amazon-renewed" element={<AmazonRenewedPage />} />
               <Route path="/renewed/:productId" element={<AmazonRenewedPage />} />
+              {/* /product/:productId — used by home page cards, map to renewed page */}
+              <Route path="/product/:productId" element={<AmazonRenewedPage />} />
               <Route path="/recommendations" element={<Recommendations />} />
               <Route path="/profile" element={<Profile />} />
             </Routes>
