@@ -88,7 +88,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [creditsData, setCreditsData] = useState(null);
-  const [ledgerOpen, setLedgerOpen] = useState(false);
+  const [ledgerOpen, setLedgerOpen] = useState(true);
   const [redeemModal, setRedeemModal] = useState(null);
   const [redeemStatus, setRedeemStatus] = useState(null);
   const [couponCode, setCouponCode] = useState("");
@@ -125,7 +125,7 @@ export default function Dashboard() {
           recent_returns: dashRes?.recent_returns?.length ? dashRes.recent_returns : [
             { return_id: "RET-20260613-0001", product_id: "prod_samsung_m34_001", product_name: "Samsung Galaxy M34 5G", status: "completed", route: "p2p", grade: "Good", credits_earned: 100.0, co2_saved: 42.0, date: "2026-06-14" },
             { return_id: "RET-20260612-0002", product_id: "prod_samsung_m34_002", product_name: "Samsung Galaxy M34 5G", status: "completed", route: "p2p", grade: "Good", credits_earned: 100.0, co2_saved: 42.0, date: "2026-06-14" },
-            { return_id: "RET-20260530-0005", product_id: "prod_levis_jacket_001", product_name: "Levi's Trucker Denim Jacket", status: "completed", route: "ngo_donate", grade: "Fair", credits_earned: 80.0, co2_saved: 8.5, date: "2026-05-30" },
+            { return_id: "RET-20260530-0005", product_id: "prod_levis_jacket_001", product_name: "Levi's Trucker Denim Jacket", status: "completed", route: "ngo_donate", grade: "Fair", credits_earned: 80.0, co2_saved: 18.7, date: "2026-05-30" },
           ],
           leaderboard_rank: dashRes?.leaderboard_rank ?? 42,
           sustainability_score: dashRes?.sustainability_score ?? 84,
@@ -214,10 +214,34 @@ export default function Dashboard() {
     { month: "Jun", co2: dashboardData.impact.co2_saved_kg },
   ];
 
+  const totalItems = (dashboardData.impact.items_p2p || 0) + (dashboardData.impact.items_donated || 0) + (dashboardData.impact.items_refurbished || 0);
+
+  const p2pCount = dashboardData.impact.items_p2p || 0;
+  const ngoCount = dashboardData.impact.items_donated || 0;
+  const refurbishCount = dashboardData.impact.items_refurbished || 0;
+
+  const p2pPct = totalItems > 0 ? Math.round((p2pCount / totalItems) * 100) : 0;
+  const ngoPct = totalItems > 0 ? Math.round((ngoCount / totalItems) * 100) : 0;
+  const refurbishPct = totalItems > 0 ? 100 - p2pPct - ngoPct : 0;
+
+  let p2pCo2 = 0;
+  let ngoCo2 = 0;
+  let refurbishCo2 = 0;
+
+  if (dashboardData.recent_returns) {
+    dashboardData.recent_returns.forEach(r => {
+      const route = r.route || r.disposal_route;
+      const co2 = parseFloat(r.co2_saved) || 0;
+      if (route === 'p2p') p2pCo2 += co2;
+      else if (route === 'ngo_donate') ngoCo2 += co2;
+      else if (route === 'refurbish') refurbishCo2 += co2;
+    });
+  }
+
   const slices = {
-    p2p: { label: "P2P Resale", pct: 30, val: `${dashboardData.impact.items_p2p} Items`, co2: 126, color: "#2563EB" },
-    ngo: { label: "NGO Donation", pct: 30, val: `${dashboardData.impact.items_donated} Items`, co2: 25, color: "#067D62" },
-    refurbish: { label: "Refurbished", pct: 40, val: `${dashboardData.impact.items_refurbished} Items`, co2: 269, color: "#FF9900" }
+    p2p: { label: "P2P Resale", pct: p2pPct, val: `${p2pCount} Items`, co2: Math.round(p2pCo2), color: "#2563EB" },
+    ngo: { label: "NGO Donation", pct: ngoPct, val: `${ngoCount} Items`, co2: Math.round(ngoCo2), color: "#067D62" },
+    refurbish: { label: "Refurbished", pct: refurbishPct, val: `${refurbishCount} Items`, co2: Math.round(refurbishCo2), color: "#FF9900" }
   };
 
   const routeLabel = { refurbish: "Refurbished", p2p: "P2P Resale", ngo_donate: "Donated", recycle: "Recycled", landfill: "Disposed" };
@@ -491,8 +515,7 @@ export default function Dashboard() {
                         }
                       }}
                     >
-                      {!canAfford && <span className="text-xs mr-1">🔒 Locked</span>}
-                      {canAfford ? "Redeem Reward" : "Locked"}
+                      {canAfford ? "Redeem Reward" : "🔒 Locked"}
                     </Button>
                   </div>
                 </Card>
@@ -573,7 +596,7 @@ export default function Dashboard() {
                 <circle
                   cx="72" cy="72" r="48" stroke="#FF9900" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59" strokeDashoffset="0"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.40) }}
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (refurbishPct / 100)) }}
                   strokeLinecap="round"
                   className="cursor-pointer transition-all hover:stroke-[14px]"
                   onMouseEnter={() => setHoveredSlice(slices.refurbish)}
@@ -582,8 +605,8 @@ export default function Dashboard() {
                 <circle
                   cx="72" cy="72" r="48" stroke="#067D62" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.30) }}
-                  className="origin-center rotate-[144deg] cursor-pointer transition-all hover:stroke-[14px]"
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (ngoPct / 100)), transform: `rotate(${refurbishPct * 3.6}deg)`, transformOrigin: 'center' }}
+                  className="cursor-pointer transition-all hover:stroke-[14px]"
                   strokeLinecap="round"
                   onMouseEnter={() => setHoveredSlice(slices.ngo)}
                   onMouseLeave={() => setHoveredSlice(null)}
@@ -591,8 +614,8 @@ export default function Dashboard() {
                 <circle
                   cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - 0.30) }}
-                  className="origin-center rotate-[252deg] cursor-pointer transition-all hover:stroke-[14px]"
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (p2pPct / 100)), transform: `rotate(${(refurbishPct + ngoPct) * 3.6}deg)`, transformOrigin: 'center' }}
+                  className="cursor-pointer transition-all hover:stroke-[14px]"
                   strokeLinecap="round"
                   onMouseEnter={() => setHoveredSlice(slices.p2p)}
                   onMouseLeave={() => setHoveredSlice(null)}
@@ -608,7 +631,7 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    <span className="text-3xl font-black text-slate-900 leading-none">10</span>
+                    <span className="text-3xl font-black text-slate-900 leading-none">{totalItems}</span>
                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
                   </>
                 )}
@@ -620,23 +643,23 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
-                  <span>🔵 P2P Resale (30%)</span>
+                  <span>🔵 P2P Resale ({p2pPct}%)</span>
                 </div>
-                <span className="font-bold text-slate-800">{dashboardData.impact.items_p2p} items</span>
+                <span className="font-bold text-slate-800">{p2pCount} items</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#067D62]" />
-                  <span>🟢 NGO Donation (30%)</span>
+                  <span>🟢 NGO Donation ({ngoPct}%)</span>
                 </div>
-                <span className="font-bold text-slate-800">{dashboardData.impact.items_donated} items</span>
+                <span className="font-bold text-slate-800">{ngoCount} items</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#FF9900]" />
-                  <span>🟠 Recommerced (40%)</span>
+                  <span>🟠 Recommerced ({refurbishPct}%)</span>
                 </div>
-                <span className="font-bold text-slate-800">{dashboardData.impact.items_refurbished} items</span>
+                <span className="font-bold text-slate-800">{refurbishCount} items</span>
               </div>
             </div>
           </Card>

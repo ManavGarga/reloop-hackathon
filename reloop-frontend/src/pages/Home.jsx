@@ -152,7 +152,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="bg-[#F7F8FA] min-h-screen pb-12 text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+    <div className="bg-[#F7F8FA] min-h-screen pb-32 text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
       <div className="w-full px-6 pt-6 space-y-6">
         {/* ── Hero Banner ──────────────────────────────────────────── */}
         <div className="relative w-full overflow-hidden rounded-2xl shadow-lg animate-fade-in" style={{ minHeight: "260px", background: "#131921", padding: "48px 0" }}>

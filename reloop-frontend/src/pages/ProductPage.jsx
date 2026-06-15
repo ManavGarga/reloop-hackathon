@@ -79,7 +79,7 @@ export default function ProductPage() {
   };
 
   return (
-    <div className="bg-[#F7F8FA] min-h-screen p-4 md:p-6 text-[#111111] font-sans relative">
+    <div className="bg-[#F7F8FA] min-h-screen p-4 md:p-6 pb-28 md:pb-32 text-[#111111] font-sans relative">
       {/* Toast */}
       {toastMessage && (
         <div className="fixed top-20 right-6 bg-[#FF9900] text-[#111111] px-6 py-3 rounded-lg font-bold shadow-lg z-[2000] animate-slide-up">

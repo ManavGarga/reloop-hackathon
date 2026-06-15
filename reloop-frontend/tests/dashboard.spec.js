@@ -9,7 +9,7 @@ test('ReLoop Eco Dashboard Interactivity Test', async ({ page }) => {
   await expect(rankBadge).toBeVisible({ timeout: 15000 });
   await rankBadge.click();
 
-  const leaderboardHeader = page.locator('h3:has-text("National Leaderboard")');
+  const leaderboardHeader = page.locator('h2:has-text("National Leaderboard")');
   await expect(leaderboardHeader).toBeVisible();
 
   console.log('3. Closing Leaderboard Modal...');

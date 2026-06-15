@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 import { useUser } from '../context/UserContext';
-import { getCredits, convertCredits } from '../api/reloop';
+import { getCredits, convertCredits, getUserDashboard } from '../api/reloop';
 
 const IconOrders = () => (
   <svg viewBox="0 0 100 100" className="w-10 h-10 flex-shrink-0">
@@ -176,7 +176,7 @@ export default function Profile() {
   const [profileView, setProfileView] = useState("menu");
 
   const [balance, setBalance] = useState(240);
-  const [co2Saved] = useState(28.4);
+  const [co2Saved, setCo2Saved] = useState(78.2);
   const [payWalletBalance, setPayWalletBalance] = useState(240.0);
   const [toastMessage, setToastMessage] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
@@ -204,6 +204,12 @@ export default function Profile() {
         const savedWallet = localStorage.getItem("amazon_pay_balance");
         setPayWalletBalance(savedWallet ? parseFloat(savedWallet) : res.balance);
         setIsLoaded(true);
+      }
+    });
+    getUserDashboard("user_priya_001").then(res => {
+      if (!active) return;
+      if (res && res.status === "ok" && res.impact) {
+        setCo2Saved(res.impact.co2_saved_kg);
       }
     });
     return () => { active = false; };

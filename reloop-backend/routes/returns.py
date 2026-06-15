@@ -351,7 +351,7 @@ async def complete_return(return_id: str, body: CompleteReturnBody):
     await db.returns.update_one({"return_id": return_id}, {"$set": update_fields})
 
     return {
-        "status":          "ok",
+        "status":          "completed",
         "return_id":       return_id,
         "disposition":     disposition,
         "credits_awarded": credits,

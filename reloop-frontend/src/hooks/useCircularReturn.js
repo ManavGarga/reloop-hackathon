@@ -105,7 +105,7 @@ export function useCircularReturn() {
         co2: co2Saved
       };
       const res = await completeReturn(returnDetails.returnId, payload);
-      if (res && res.status === "completed") {
+      if (res && (res.status === "completed" || res.status === "ok")) {
         updateReturn({
           completeResult: res,
           currentStep: 6
