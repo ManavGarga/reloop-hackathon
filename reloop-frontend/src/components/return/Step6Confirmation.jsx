@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useReturn } from "../../context/ReturnContext";
-import { useUser } from "../../context/UserContext";
-import { completeReturn } from "../../api/reloop";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, ChevronRight, Award, Compass, RefreshCw, AlertCircle, Leaf, Recycle, Search, Tag, History } from "lucide-react";
+import { Recycle, Leaf, Search, Tag, History } from "lucide-react";
+import { useCircularReturn } from "../../hooks/useCircularReturn";
+import { Button, Card, LoadingScreen, ErrorState } from "../ui";
 
 const NGO_MAP = {
   general: { name: "GiveIndia", logo: "🌿" },
@@ -12,12 +11,17 @@ const NGO_MAP = {
 };
 
 export default function Step6Confirmation() {
-  const { returnDetails, updateReturn, resetReturn } = useReturn();
-  const { user } = useUser();
   const navigate = useNavigate();
+  const {
+    returnDetails,
+    loading,
+    error,
+    completeReturnFlow,
+    resetReturn
+  } = useCircularReturn();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [localLoading, setLocalLoading] = useState(true);
+  const [localError, setLocalError] = useState("");
   const [completeData, setCompleteData] = useState(null);
 
   const isSamsung = returnDetails.productId === "B09X7KQMGN" || returnDetails.productId === "prod_samsung_m34_001";
@@ -43,88 +47,53 @@ export default function Step6Confirmation() {
   useEffect(() => {
     let active = true;
 
-    const finalizeReturn = async () => {
+    const finalize = async () => {
       try {
-        const res = await completeReturn(returnDetails.returnId, {
-          notes: "Customer confirmed return flow through wizard.",
-        });
-        if (active) {
-          if (res && res.status === "ok") {
-            setCompleteData(res);
-            updateReturn({ completeResult: res });
-          } else {
-            throw new Error(res.detail || "Completion failed");
-          }
+        const res = await completeReturnFlow(
+          returnDetails.productId,
+          data.refund,
+          data.credits,
+          data.co2
+        );
+        if (active && res) {
+          setCompleteData(res);
         }
       } catch (err) {
-        console.error(err);
-        if (active) {
-          setError("Failed to finalize return. Please verify backend connection.");
-        }
+        setLocalError(err.message || "Failed to finalize return.");
       } finally {
         if (active) {
-          setLoading(false);
+          setLocalLoading(false);
         }
       }
     };
 
     if (returnDetails.returnId) {
-      finalizeReturn();
+      finalize();
     } else {
-      setLoading(false);
+      setLocalLoading(false);
     }
 
     return () => { active = false; };
-  }, [returnDetails.returnId, updateReturn]);
+  }, [returnDetails.returnId, returnDetails.productId, completeReturnFlow]);
 
   const handleFinish = () => {
     resetReturn();
     navigate("/dashboard");
   };
 
-  // Progression flow chart statuses
-  const flowStages = [
-    { label: "Initiated", done: true },
-    { label: "Graded", done: true },
-    { label: "Disposed", done: true },
-    { label: "Completed", done: !loading && !error }
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4 max-w-sm mx-auto text-center animate-fade-in">
-        <RefreshCw className="animate-spin text-[#FF9900]" size={36} />
-        <h3 className="text-sm font-bold text-slate-800">Completing circular return...</h3>
-        <p className="text-[10px] text-slate-500 leading-normal font-medium">
-          Writing transactions to the green credits ledger and generating your product passport.
-        </p>
-      </div>
-    );
+  if (localLoading || loading) {
+    return <LoadingScreen message="Completing circular return..." />;
   }
 
-  if (error) {
+  if (localError || error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4 max-w-sm mx-auto text-center animate-fade-in">
-        <AlertCircle className="text-[#D13212]" size={36} />
-        <h3 className="text-sm font-bold text-slate-800">Something went wrong</h3>
-        <p className="text-xs text-slate-500 leading-normal bg-red-50 border border-red-200 px-4 py-3 rounded-xl">{error}</p>
-        <button onClick={handleFinish} className="px-6 h-[44px] bg-[#FF9900] hover:bg-[#F08804] text-[#111111] rounded-lg text-sm font-bold transition-all active:scale-[0.98] cursor-pointer border border-transparent flex items-center justify-center shadow-sm">
-          Go to Dashboard
-        </button>
-      </div>
+      <ErrorState
+        title="Something went wrong"
+        message={localError || error}
+        onRetry={handleFinish}
+      />
     );
   }
-
-  const creditsAwarded = completeData?.credits_awarded || returnDetails.disposeResult?.green_credits_awarded || 30;
-  const disposition = completeData?.disposition || returnDetails.disposeResult?.disposition || "recycle";
-  const isNGODonation = disposition === "ngo_donate";
-  const isP2P = disposition === "p2p";
-
-  // Determine NGO for donation
-  const productCategory = returnDetails.disposeResult?.category || "general";
-  const ngo = NGO_MAP[productCategory] || NGO_MAP.general;
-  const donationDate = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
-  const certId = `RLP-CERT-${Date.now().toString(36).toUpperCase().slice(-8)}`;
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto py-4 animate-fade-in text-left">
@@ -140,7 +109,7 @@ export default function Step6Confirmation() {
       {/* 2. Three Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Refund Card */}
-        <div className="bg-white border border-[#E7E7E7] p-5 rounded-lg flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+        <Card className="flex flex-col items-center justify-between space-y-3 text-center p-5 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-extrabold shadow-sm">
             ₹
           </div>
@@ -148,10 +117,10 @@ export default function Step6Confirmation() {
             <span className="text-2xl font-black text-slate-900 block">{data.refund}</span>
             <p className="text-xs text-[#565959] font-semibold">{data.refund_label}</p>
           </div>
-        </div>
+        </Card>
 
         {/* Green Credits Card */}
-        <div className="bg-white border border-[#E7E7E7] p-5 rounded-lg flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+        <Card className="flex flex-col items-center justify-between space-y-3 text-center p-5 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-[#067D62]/10 text-[#067D62] flex items-center justify-center shadow-sm">
             <Leaf size={20} className="text-[#067D62]" />
           </div>
@@ -159,10 +128,10 @@ export default function Step6Confirmation() {
             <span className="text-2xl font-black text-[#067D62] block">{data.credits}</span>
             <p className="text-xs text-[#565959] font-semibold">{data.credits_label}</p>
           </div>
-        </div>
+        </Card>
 
         {/* CO2 Saved Card */}
-        <div className="bg-white border border-[#E7E7E7] p-5 rounded-lg flex flex-col items-center justify-between space-y-3 shadow-sm text-center">
+        <Card className="flex flex-col items-center justify-between space-y-3 text-center p-5 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-[#067D62]/10 text-[#067D62] flex items-center justify-center shadow-sm">
             <Recycle size={20} className="text-[#067D62]" />
           </div>
@@ -170,21 +139,21 @@ export default function Step6Confirmation() {
             <span className="text-2xl font-black text-[#067D62] block">{data.co2}</span>
             <p className="text-xs text-[#565959] font-semibold">{data.co2_label}</p>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* 3. Passport Link */}
       <div className="text-center">
-        <button
+        <Button
+          variant="link"
           onClick={() => navigate(`/passport/${data.productId}`)}
-          className="text-[14px] font-semibold text-[#007185] hover:text-[#C7511F] hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
         >
-          <span>View your item's Lifecycle Passport →</span>
-        </button>
+          View your item's Lifecycle Passport →
+        </Button>
       </div>
 
       {/* 4. Ecosystem Flow Diagram */}
-      <div className="bg-white border border-[#E7E7E7] rounded-lg p-6 shadow-sm space-y-5">
+      <Card className="p-6 shadow-sm space-y-5">
         <span className="text-[11px] font-bold text-[#565959] uppercase tracking-wider block text-left">
           What happens next
         </span>
@@ -195,7 +164,7 @@ export default function Step6Confirmation() {
               <Search size={20} className="text-[#067D62]" />
             </div>
             <span className="text-xs font-bold text-slate-800">Your item graded</span>
-            <span className="text-[11px] text-slate-505 font-semibold">AI vision inspection within 24 hrs</span>
+            <span className="text-[11px] text-slate-500 font-semibold">AI vision inspection within 24 hrs</span>
           </div>
 
           {/* Arrow 1 */}
@@ -207,7 +176,7 @@ export default function Step6Confirmation() {
               <Tag size={20} className="text-[#FF9900]" />
             </div>
             <span className="text-xs font-bold text-slate-800">Listed on Amazon Renewed</span>
-            <span className="text-[11px] text-slate-550 font-semibold">Certified listing goes live</span>
+            <span className="text-[11px] text-slate-500 font-semibold">Certified listing goes live</span>
           </div>
 
           {/* Arrow 2 */}
@@ -226,22 +195,24 @@ export default function Step6Confirmation() {
         <p className="text-[10px] text-[#565959] font-semibold italic text-center leading-normal pt-4 border-t border-slate-100">
           ReLoop integrates with Amazon Renewed via SP-API — your item's passport travels with it to the next owner.
         </p>
-      </div>
+      </Card>
 
       {/* 5. Two CTA buttons */}
       <div className="flex gap-4 justify-center">
-        <button
+        <Button
           onClick={handleFinish}
-          className="flex-1 max-w-xs h-[44px] bg-white border border-[#D5D9D9] text-[#111111] hover:bg-gray-50 font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer shadow-sm"
+          variant="secondary"
+          className="flex-1 max-w-xs"
         >
-          <span>Go to Dashboard</span>
-        </button>
-        <button
+          Go to Dashboard
+        </Button>
+        <Button
           onClick={() => navigate(`/passport/${data.productId}`)}
-          className="flex-1 max-w-xs h-[44px] bg-[#FF9900] hover:bg-[#F08804] text-[#111111] font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer border border-transparent shadow-sm"
+          variant="primary"
+          className="flex-1 max-w-xs"
         >
-          <span>View Passport</span>
-        </button>
+          View Passport
+        </Button>
       </div>
     </div>
   );

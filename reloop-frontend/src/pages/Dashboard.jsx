@@ -5,16 +5,17 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip,
 } from "recharts";
 import {
-  Leaf, Award, Recycle, Gift, ChevronRight,
-  CheckCircle, Sparkles, X, CreditCard, Zap,
-  ShieldCheck, Star, Trophy, Users, TrendingUp, TreePine, Shield, Package, AlertCircle
+  Leaf, Recycle, Gift, ChevronRight,
+  CheckCircle, X, CreditCard, Zap,
+  ShieldCheck, Trophy, TrendingUp, TreePine, Shield, AlertCircle
 } from "lucide-react";
+import { Button, Card, Badge, Spinner, LoadingScreen, Modal } from "../components/ui";
+import { getUserDashboard, getCredits, redeemCredits } from "../api/reloop";
 
 // ── Date Formatter ────────────────────────────────────────────────────────────
 function formatDate(raw) {
   if (!raw) return "—";
   try {
-    // Handle both "2026-06-14" and "2026-06-14T10:00:00" formats
     const d = new Date(raw.includes("T") ? raw : raw + "T00:00:00");
     if (isNaN(d.getTime())) return raw;
     return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
@@ -31,7 +32,6 @@ function gradeStyle(grade) {
   if (g === "damaged")  return "bg-red-100 text-red-800";
   return "bg-slate-100 text-slate-700";
 }
-import { getUserDashboard, getCredits, redeemCredits } from "../api/reloop";
 
 // ── Reward Catalogue ──────────────────────────────────────────────────────────
 const REWARDS = [
@@ -72,7 +72,7 @@ function CustomTooltip({ active, payload, label }) {
     const km = Math.round(co2 * 4.05);
     return (
       <div className="bg-white border border-slate-200/80 rounded-xl shadow-lg px-4 py-3 text-left space-y-1">
-        <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wide">{label} 2026</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{label} 2026</p>
         <p className="text-sm font-black text-[#16A34A]">{co2} kg CO₂ Saved</p>
         <p className="text-[11px] text-slate-500 font-semibold border-t border-slate-100 pt-1 flex items-center gap-1">
           <span>🚗</span> Equivalent to {km} km not driven
@@ -197,17 +197,7 @@ export default function Dashboard() {
   };
 
   if (loading || !dashboardData) {
-    return (
-      <div className="min-h-screen bg-[#F7F8FA] flex items-center justify-center font-sans">
-        <div className="flex flex-col items-center gap-4 text-slate-500">
-          <div className="relative">
-            <div className="w-12 h-12 border-4 border-slate-200 border-t-[#FF9900] rounded-full animate-spin"></div>
-            <Leaf className="absolute inset-0 m-auto text-[#067D62]" size={20} />
-          </div>
-          <span className="text-sm font-medium text-slate-600">Loading your Eco Dashboard...</span>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Loading your Eco Dashboard..." />;
   }
 
   const balance = creditsData?.balance ?? dashboardData.green_credits.balance;
@@ -274,7 +264,7 @@ export default function Dashboard() {
         {/* SECTION 1 — Hero (Tier + Credits) */}
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
           {/* Tier Card */}
-          <div className="flex-1 bg-white rounded-2xl border border-[#E7E7E7] p-6 flex flex-col justify-between shadow-sm">
+          <Card className="flex-1 p-6 flex flex-col justify-between">
             <div className="flex items-start gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-[#E7E7E7] flex items-center justify-center text-3xl flex-shrink-0 shadow-xs">
                 {tier.icon}
@@ -341,13 +331,14 @@ export default function Dashboard() {
               </div>
               <div className="h-6" /> {/* spacer for labels below */}
             </div>
-          </div>
+          </Card>
 
           {/* Credits Balance Card Widget */}
-          <div
+          <Card
             id="credits-balance-card"
             onClick={handleCreditsClick}
-            className="w-full lg:w-72 flex-shrink-0 bg-white border border-[#E7E7E7] border-l-4 border-l-[#FF9900] rounded-2xl p-5 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md hover:border-[#FF9900] active:scale-[0.99] transition-all group text-left"
+            className="w-full lg:w-72 flex-shrink-0 border-l-4 border-l-[#FF9900] p-5 flex flex-col justify-between cursor-pointer"
+            hover
             title="Click to view transaction ledger"
           >
             <div className="flex justify-between items-center w-full">
@@ -382,15 +373,16 @@ export default function Dashboard() {
                 <TrendingUp size={12} className="text-[#067D62]" />
                 <span>Total earned: <strong>{dashboardData.green_credits.total_earned.toLocaleString()}</strong></span>
               </p>
-              <button
+              <Button
+                variant="secondary"
                 onClick={(e) => { e.stopPropagation(); navigate("/profile"); }}
-                className="w-full h-[44px] bg-white border border-[#D5D9D9] text-[#111111] font-semibold text-sm rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                className="w-full"
+                icon={<ChevronRight size={14} />}
               >
                 Convert to Amazon Pay
-                <ChevronRight size={14} />
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Divider 1 */}
@@ -404,10 +396,10 @@ export default function Dashboard() {
             { label: "Items Reused", value: `${dashboardData.impact.items_refurbished + dashboardData.impact.items_donated + dashboardData.impact.items_p2p}`, unit: "", icon: <Recycle size={20} />, bg: "bg-blue-50", text: "text-blue-600" },
             { label: "Returns Saved", value: `${dashboardData.impact.returns_avoided}`, unit: "", icon: <Shield size={20} />, bg: "bg-amber-50", text: "text-amber-605" },
           ].map((stat, idx) => (
-            <div
+            <Card
               key={idx}
               id={idx === 0 ? "co2-saved-card" : undefined}
-              className="bg-white border border-[#E7E7E7] rounded-xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] relative overflow-hidden flex flex-col justify-between h-[120px] text-left"
+              className="relative overflow-hidden flex flex-col justify-between h-[120px] text-left p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-[12px] font-medium text-[#565959] uppercase tracking-wider">{stat.label}</span>
@@ -417,7 +409,7 @@ export default function Dashboard() {
                 {stat.value}
                 {stat.unit && <span className="text-xs font-semibold text-slate-500 ml-1">{stat.unit}</span>}
               </h3>
-            </div>
+            </Card>
           ))}
         </div>
 
@@ -425,7 +417,7 @@ export default function Dashboard() {
         <hr className="border-slate-200" />
 
         {/* SECTION 3 — Redeem Credits */}
-        <div className="bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6">
+        <Card className="p-6 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-2.5 text-left">
               <Gift className="text-[#FF9900]" size={20} />
@@ -443,13 +435,12 @@ export default function Dashboard() {
             {REWARDS.map((reward) => {
               const canAfford = balance >= reward.credits;
               return (
-                <div
+                <Card
                   key={reward.reward_id}
                   id={`redeem-reward-${reward.reward_id}`}
                   onClick={() => canAfford && (setRedeemModal(reward), setRedeemStatus(null), setCouponCode(""), setRedeemError(""))}
-                  className={`relative rounded-xl border p-[20px] flex flex-col justify-between bg-white border-[#E7E7E7] shadow-xs ${
-                    canAfford ? "hover:border-[#FF9900] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-200 cursor-pointer" : "opacity-70"
-                  }`}
+                  hover={canAfford}
+                  className={`relative flex flex-col justify-between p-[20px] ${!canAfford ? "opacity-70" : ""}`}
                 >
                   {/* Top right badge if available */}
                   {canAfford && (
@@ -459,7 +450,7 @@ export default function Dashboard() {
                   )}
                   
                   {/* Icon in grey circle */}
-                  <div className="w-10 h-10 rounded-full bg-gray-105 flex items-center justify-center text-lg mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg mb-3">
                     {reward.icon}
                   </div>
 
@@ -485,7 +476,10 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    <button
+                    <Button
+                      variant={canAfford ? "primary" : "secondary"}
+                      disabled={!canAfford}
+                      fullWidth
                       onClick={(e) => {
                         if (canAfford) {
                           setRedeemModal(reward);
@@ -496,30 +490,24 @@ export default function Dashboard() {
                           e.stopPropagation();
                         }
                       }}
-                      className={`w-full h-[44px] flex items-center justify-center gap-1.5 text-sm font-bold rounded-lg transition-all active:scale-[0.98] cursor-pointer ${
-                        canAfford 
-                          ? "bg-[#FF9900] hover:bg-[#F08804] text-[#111111] shadow-sm" 
-                          : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-                      }`}
-                      disabled={!canAfford}
                     >
-                      {!canAfford && <span className="text-xs">🔒 Locked</span>}
+                      {!canAfford && <span className="text-xs mr-1">🔒 Locked</span>}
                       {canAfford ? "Redeem Reward" : "Locked"}
-                    </button>
+                    </Button>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
-        </div>
+        </Card>
 
         {/* Divider 3 */}
         <hr className="border-slate-200" />
 
-        {/* SECTION 4 — Charts Row (Left 65% CO2 savings trend, Right 35% Recirculation Breakdown) */}
+        {/* SECTION 4 — Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* CO2 Savings Trend line plot (col span 8) */}
-          <div className="lg:col-span-8 bg-white border border-[#E7E7E7] rounded-2xl p-6 shadow-sm relative text-left">
+          {/* CO2 Savings Trend line plot */}
+          <Card className="lg:col-span-8 p-6 relative text-left">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-slate-900">CO₂ Savings Trend</h3>
@@ -531,7 +519,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Annotation Tooltip flag for June dip */}
+            {/* Annotation Tooltip flag */}
             <div className="absolute bottom-20 right-16 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-xs z-10">
               <AlertCircle size={10} className="text-amber-500" />
               <span>Fewer returns this month</span>
@@ -540,7 +528,6 @@ export default function Dashboard() {
 
             {/* Chart Area */}
             <div className="h-60 w-full mt-4 flex items-stretch">
-              {/* Y-Axis Label */}
               <div className="flex items-center justify-center w-6 text-slate-400 select-none">
                 <span className="rotate-270 text-[10px] font-bold whitespace-nowrap tracking-wider">CO₂ OFFSET (KG)</span>
               </div>
@@ -570,10 +557,10 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               </div>
             </div>
-          </div>
+          </Card>
 
-          {/* Recirculation breakdown donut plot (col span 4) */}
-          <div className="lg:col-span-4 bg-white border border-[#E7E7E7] rounded-2xl p-6 shadow-sm flex flex-col justify-between text-left min-h-[360px]">
+          {/* Recirculation breakdown donut plot */}
+          <Card className="lg:col-span-4 p-6 flex flex-col justify-between text-left min-h-[360px]">
             <div>
               <h3 className="text-base font-bold text-slate-900">Recirculation Breakdown</h3>
               <p className="text-xs text-slate-500 mt-0.5">How your returned items were reused</p>
@@ -582,10 +569,7 @@ export default function Dashboard() {
             {/* SVG Donut Ring */}
             <div className="flex items-center justify-center py-6 relative">
               <svg className="w-36 h-36 transform -rotate-90">
-                {/* Circumference = 2 * pi * 48 = 301.59 */}
-                {/* Base circle */}
                 <circle cx="72" cy="72" r="48" stroke="#f1f5f9" strokeWidth="12" fill="transparent" />
-                {/* Refurbished segment (40% - orange) */}
                 <circle
                   cx="72" cy="72" r="48" stroke="#FF9900" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59" strokeDashoffset="0"
@@ -595,7 +579,6 @@ export default function Dashboard() {
                   onMouseEnter={() => setHoveredSlice(slices.refurbish)}
                   onMouseLeave={() => setHoveredSlice(null)}
                 />
-                {/* Donated segment (30% - green) */}
                 <circle
                   cx="72" cy="72" r="48" stroke="#067D62" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
@@ -605,7 +588,6 @@ export default function Dashboard() {
                   onMouseEnter={() => setHoveredSlice(slices.ngo)}
                   onMouseLeave={() => setHoveredSlice(null)}
                 />
-                {/* P2P segment (30% - blue) */}
                 <circle
                   cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
@@ -627,7 +609,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     <span className="text-3xl font-black text-slate-900 leading-none">10</span>
-                    <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
                   </>
                 )}
               </div>
@@ -657,7 +639,7 @@ export default function Dashboard() {
                 <span className="font-bold text-slate-800">{dashboardData.impact.items_refurbished} items</span>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Divider 4 */}
@@ -696,8 +678,8 @@ export default function Dashboard() {
                           {(item.route === 'refurbish' || item.route === 'p2p') && (
                             <span
                               onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/renewed/${item.product_id}`);
+                                  e.stopPropagation();
+                                  navigate(`/renewed/${item.product_id}`);
                               }}
                               className="text-xs text-[#007185] hover:text-[#C7511F] font-bold hover:underline block mt-0.5 cursor-pointer"
                             >
@@ -760,19 +742,13 @@ export default function Dashboard() {
 
       {/* ── Redeem Modal ── */}
       {redeemModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in text-left">
-
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Confirm Redemption</span>
-                <h3 className="text-lg font-bold text-gray-900 mt-1">{redeemModal.title}</h3>
-              </div>
-              <button onClick={() => setRedeemModal(null)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer">
-                <X size={18} />
-              </button>
-            </div>
-
+        <Modal
+          open={!!redeemModal}
+          onClose={() => setRedeemModal(null)}
+          title="Confirm Redemption"
+          maxWidth="450px"
+        >
+          <div className="space-y-5">
             <div className="flex items-center gap-4 bg-gray-50 border border-[#E7E7E7] p-5 rounded-xl">
               <span className="text-4xl">{redeemModal.icon}</span>
               <div>
@@ -796,12 +772,12 @@ export default function Dashboard() {
                   <p className="text-xs text-gray-500 mb-1.5">Your coupon code (tap to copy):</p>
                   <p className="text-lg font-bold text-[#067D62] font-mono tracking-widest group-hover:scale-105 transition-transform">{couponCode}</p>
                 </div>
-                <button onClick={() => setRedeemModal(null)} className="w-full h-[44px] bg-[#FF9900] hover:bg-[#F08804] text-[#111111] font-bold rounded-lg text-sm transition-all active:scale-[0.98] shadow-sm cursor-pointer flex items-center justify-center">Done</button>
+                <Button variant="primary" fullWidth onClick={() => setRedeemModal(null)}>Done</Button>
               </div>
             ) : redeemStatus === "error" ? (
               <div className="space-y-4">
                 <p className="text-sm text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl font-medium">{redeemError || "An error occurred."}</p>
-                <button onClick={() => setRedeemModal(null)} className="w-full h-[44px] bg-white border border-[#D5D9D9] hover:bg-gray-50 text-[#111111] font-bold rounded-lg text-sm transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center">Dismiss</button>
+                <Button variant="secondary" fullWidth onClick={() => setRedeemModal(null)}>Dismiss</Button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -810,45 +786,24 @@ export default function Dashboard() {
                 </p>
                 {redeemError && <p className="text-sm text-rose-700 bg-rose-50 border border-rose-200 p-3 rounded-xl font-medium">{redeemError}</p>}
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => setRedeemModal(null)}
-                    className="flex-1 h-[44px] bg-white border border-[#D5D9D9] hover:bg-gray-50 text-[#111111] font-bold rounded-lg text-sm transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleRedeem}
-                    disabled={redeemStatus === "loading"}
-                    className="flex-1 h-[44px] bg-[#FF9900] hover:bg-[#F08804] text-[#111111] font-bold rounded-lg text-sm transition-all active:scale-[0.98] shadow-sm disabled:opacity-60 cursor-pointer flex items-center justify-center"
-                  >
-                    {redeemStatus === "loading" ? "Processing..." : "Confirm Redeem"}
-                  </button>
+                  <Button variant="secondary" fullWidth onClick={() => setRedeemModal(null)}>Cancel</Button>
+                  <Button variant="primary" fullWidth loading={redeemStatus === "loading"} onClick={handleRedeem}>Confirm Redeem</Button>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* ── Leaderboard Modal ── */}
       {leaderboardOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-7 max-w-md w-full space-y-5 shadow-2xl animate-fade-in text-left">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <Trophy className="text-amber-500" size={22} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">National Leaderboard</h3>
-                  <p className="text-xs text-gray-500">Green shoppers across India</p>
-                </div>
-              </div>
-              <button onClick={() => setLeaderboardOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer">
-                <X size={18} />
-              </button>
-            </div>
-
+        <Modal
+          open={leaderboardOpen}
+          onClose={() => setLeaderboardOpen(false)}
+          title="National Leaderboard"
+          maxWidth="450px"
+        >
+          <div className="space-y-5">
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {LEADERBOARD_DATA.map((entry) => (
                 <div
@@ -883,14 +838,9 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <button
-              onClick={() => setLeaderboardOpen(false)}
-              className="w-full h-[44px] bg-white border border-[#D5D9D9] hover:bg-gray-50 text-[#111111] font-bold rounded-lg text-sm transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center"
-            >
-              Close
-            </button>
+            <Button variant="secondary" fullWidth onClick={() => setLeaderboardOpen(false)}>Close</Button>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* ── Toast Message ── */}
