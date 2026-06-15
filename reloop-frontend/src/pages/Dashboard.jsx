@@ -623,7 +623,7 @@ export default function Dashboard() {
                   onMouseLeave={() => setHoveredSlice(null)}
                 />
               </svg>
-              <div className="absolute flex flex-col items-center text-center px-4 select-none pointer-events-none">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none pointer-events-none">
                 {hoveredSlice ? (
                   <>
                     <span className="text-xl font-black text-slate-800 leading-none">{hoveredSlice.val}</span>
