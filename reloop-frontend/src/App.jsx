@@ -121,13 +121,13 @@ function Navbar() {
     <>
       <header style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex', flexDirection: 'column' }}>
         {/* Top Main Nav Belt */}
-        <div className="h-14 flex items-center px-4 gap-4 text-white" style={{ background: '#14532D' }}>
+        <div className="h-14 flex items-center px-4 gap-4 text-white" style={{ background: '#131921' }}>
           {/* Left: Logo and Address */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <NavLink to="/" className="flex items-center gap-1" style={{ textDecoration: 'none' }}>
               <span style={{ fontSize: '20px', lineHeight: 1 }}>♻</span>
               <span style={{ fontWeight: 900, fontSize: 20, color: 'white', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
-                Re<span style={{ color: '#86efac' }}>Loop</span>
+                Re<span style={{ color: '#FF9900' }}>Loop</span>
               </span>
             </NavLink>
 
@@ -219,9 +219,9 @@ function Navbar() {
                 left: 0,
                 right: 0,
                 background: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                border: '1px solid #E7E7E7',
+                borderRadius: '0 0 8px 8px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                 zIndex: 1000,
                 color: '#111',
                 maxHeight: '320px',
@@ -254,18 +254,19 @@ function Navbar() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: '10px 16px',
+                    height: '44px',
+                    padding: '0 16px',
                     cursor: 'pointer',
                     fontSize: '14px',
                     borderBottom: '1px solid #f5f5f5'
                   }}
-                  onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'}
+                  onMouseOver={e => e.currentTarget.style.background = '#F7F8FA'}
                   onMouseOut={e => e.currentTarget.style.background = 'white'}
                 >
-                  <Search size={14} style={{ color: '#888' }} />
-                  <div>
+                  <Search size={14} style={{ color: '#565959' }} />
+                  <div style={{ color: '#111111' }}>
                     <strong>{item.primary}</strong>
-                    <span style={{ color: '#555' }}>{item.secondary}</span>
+                    <span>{item.secondary}</span>
                   </div>
                 </div>
               ))}
@@ -298,9 +299,9 @@ function Navbar() {
                   right: '-60px',
                   width: '320px',
                   background: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  border: '1px solid #E7E7E7',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                   padding: '16px',
                   zIndex: 500,
                   color: '#111'
@@ -309,28 +310,31 @@ function Navbar() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
                   <button
                     onClick={() => setIsLoggedIn(!isLoggedIn)}
-                    className="w-full bg-[#16A34A] text-white font-bold py-2 rounded mb-3 text-sm cursor-pointer hover:bg-[#15803D] transition-colors"
+                    className="w-full bg-[#FF9900] text-[#111111] font-bold py-2 rounded-lg mb-3 text-sm cursor-pointer transition-all active:scale-[0.98]"
+                    style={{ height: '40px', border: 'none' }}
+                    onMouseOver={e => e.currentTarget.style.filter = 'brightness(0.92)'}
+                    onMouseOut={e => e.currentTarget.style.filter = 'none'}
                   >
                     {isLoggedIn ? "Sign Out" : "Sign In"}
                   </button>
-                  <span className="text-xs text-center text-slate-500 border-b border-slate-200 pb-3 mb-3 w-full">New customer? <strong style={{ color: '#16A34A', cursor: 'pointer' }} className="hover:underline">Start here.</strong></span>
+                  <span className="text-xs text-center text-slate-500 border-b border-slate-200 pb-3 mb-3 w-full">New customer? <strong style={{ color: '#FF9900', cursor: 'pointer' }} className="hover:underline" onClick={() => navigate('/profile')}>Start here.</strong></span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '12px', textAlign: 'left' }}>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Your Lists</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#64748b' }}>
-                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Create Wishlist</span>
-                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Any Website</span>
-                      <span className="hover:text-[#16A34A] hover:underline cursor-pointer">Baby Wishlist</span>
+                    <h4 style={{ fontSize: '11px', fontWeight: 'bold', color: '#565959', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Your Lists</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline cursor-pointer transition-colors block py-0.5">Create Wishlist</span>
+                      <span className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline cursor-pointer transition-colors block py-0.5">Any Website</span>
+                      <span className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline cursor-pointer transition-colors block py-0.5">Baby Wishlist</span>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Your Account</h4>
+                    <h4 style={{ fontSize: '11px', fontWeight: 'bold', color: '#565959', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Your Account</h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <NavLink to="/profile" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Account</NavLink>
-                      <NavLink to="/returns" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Orders</NavLink>
-                      <NavLink to="/dashboard" className="text-sm text-slate-700 hover:text-[#16A34A] hover:underline block leading-7">Eco Dashboard</NavLink>
+                      <NavLink to="/profile" className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline transition-colors block py-0.5" style={{ textDecoration: 'none' }}>Account</NavLink>
+                      <NavLink to="/returns" className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline transition-colors block py-0.5" style={{ textDecoration: 'none' }}>Orders</NavLink>
+                      <NavLink to="/dashboard" className="text-[14px] text-[#111111] hover:text-[#C7511F] hover:underline transition-colors block py-0.5" style={{ textDecoration: 'none' }}>Eco Dashboard</NavLink>
                     </div>
                   </div>
                 </div>
@@ -400,13 +404,13 @@ function Navbar() {
                 key={to} to={to} end={to === '/'}
                 style={({ isActive }) => ({
                   textDecoration: 'none',
-                  color: isActive ? '#ffffff' : '#d1fae5',
+                  color: isActive ? '#FF9900' : '#ffffff',
                   fontWeight: isActive ? '700' : '500',
                   fontSize: '13px',
                   padding: '6px 11px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  borderBottom: isActive ? '2px solid #86efac' : '2px solid transparent',
+                  borderBottom: isActive ? '2px solid #FF9900' : '2px solid transparent',
                   transition: 'color 0.15s, border-color 0.15s',
                   whiteSpace: 'nowrap',
                 })}
@@ -452,54 +456,57 @@ function Navbar() {
           <div
             style={{
               width: '100%',
-              maxWidth: '450px',
+              maxWidth: '400px',
               height: '100%',
-              background: '#0f172a',
-              borderLeft: '1px solid rgba(255,255,255,0.1)',
+              background: '#FFFFFF',
+              borderLeft: '1px solid #E7E7E7',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
-              padding: '24px'
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.1)',
+              padding: '24px',
+              position: 'relative'
             }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '16px', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShoppingCart size={22} style={{ color: '#febd69' }} /> Shopping Cart
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E7E7E7', paddingBottom: '16px', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111111', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShoppingCart size={22} style={{ color: '#FF9900' }} /> Shopping Cart
               </h2>
               <button
                 onClick={() => setCartOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#565959', cursor: 'pointer', borderRadius: '8px' }}
+                onMouseOver={e => { e.currentTarget.style.background = '#F7F8FA'; e.currentTarget.style.color = '#111111'; }}
+                onMouseOut={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#565959'; }}
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Cart Items */}
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {cartItems.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
-                  <ShoppingCart size={48} style={{ color: '#1e293b', marginBottom: '16px', marginInline: 'auto' }} />
-                  <p style={{ fontSize: '15px', fontWeight: '600' }}>Your Cart is empty</p>
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#565959' }}>
+                  <ShoppingCart size={48} style={{ color: '#D5D9D9', marginBottom: '16px', marginInline: 'auto' }} />
+                  <p style={{ fontSize: '16px', fontWeight: '600', color: '#565959' }}>Your Cart is empty</p>
                   <p style={{ fontSize: '13px', marginTop: '4px' }}>Add items from Marketplace or Amazon Renewed!</p>
                 </div>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.product_id} style={{ display: 'flex', gap: '14px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px' }}>
-                    <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div key={item.product_id} style={{ display: 'flex', gap: '14px', background: '#FFFFFF', border: '1px solid #E7E7E7', padding: '12px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                    <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', border: '1px solid #E7E7E7' }}>
                       <img src={item.image_url} alt={item.name} style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifySelf: 'stretch', justifyContent: 'space-between' }}>
                       <div>
-                        <h4 style={{ fontSize: '14px', fontWeight: '700', color: 'white', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.name}</h4>
-                        <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>Qty: {item.quantity}</p>
+                        <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#111111', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.name}</h4>
+                        <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Qty: {item.quantity}</p>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                        <span style={{ fontSize: '15px', fontWeight: '800', color: '#4ade80' }}>₹{item.price_new.toLocaleString()}</span>
+                      <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span style={{ fontSize: '15px', fontWeight: '800', color: '#B12704' }}>₹{item.price_new.toLocaleString('en-IN')}</span>
                         <button
                           onClick={() => removeFromCart(item.product_id)}
-                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600' }}
+                          style={{ background: 'none', border: 'none', color: '#D13212', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600' }}
                         >
                           <Trash2 size={14} /> Remove
                         </button>
@@ -512,30 +519,17 @@ function Navbar() {
 
             {/* Footer */}
             {cartItems.length > 0 && (
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', marginTop: '20px', spaceY: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '500' }}>Subtotal ({totalItems} items):</span>
-                  <span style={{ fontSize: '20px', fontWeight: '800', color: 'white' }}>
-                    ₹{cartItems.reduce((acc, item) => acc + (item.price_new * item.quantity), 0).toLocaleString()}
+              <div style={{ borderTop: '1px solid #E7E7E7', paddingTop: '20px', marginTop: '20px', spaceY: '16px' }}>
+                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '14px', color: '#565959', fontWeight: '500' }}>Subtotal ({totalItems} items):</span>
+                  <span style={{ fontSize: '20px', fontWeight: '800', color: '#B12704' }}>
+                    ₹{cartItems.reduce((acc, item) => acc + (item.price_new * item.quantity), 0).toLocaleString('en-IN')}
                   </span>
                 </div>
                 <button
                   onClick={handleProceedToBuy}
-                  style={{
-                    width: '100%',
-                    padding: '14px',
-                    background: 'linear-gradient(180deg, #fad961 0%, #f76b1c 100%)',
-                    border: 'none',
-                    borderRadius: '10px',
-                    color: '#0f172a',
-                    fontWeight: '800',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(247, 107, 28, 0.2)',
-                    transition: 'transform 0.1s'
-                  }}
-                  onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
-                  onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                  className="btn-primary btn-full"
+                  style={{ height: '44px' }}
                 >
                   Proceed to Buy
                 </button>

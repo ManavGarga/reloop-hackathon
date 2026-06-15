@@ -27,16 +27,16 @@ function EcoProductCard({ name, emoji, price, co2, credits, condition, link, del
   }, [])
 
   const conditionColor = {
-    'Like New': 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    'Good':     'bg-blue-100 text-blue-800 border-blue-200',
-    'Fair':     'bg-amber-100 text-amber-800 border-amber-200',
+    'Like New': 'bg-emerald-100 text-emerald-800 border-emerald-250/70',
+    'Good':     'bg-blue-100 text-blue-800 border-blue-250/70',
+    'Fair':     'bg-amber-100 text-amber-800 border-amber-250/70',
   }[condition] || 'bg-gray-100 text-gray-700'
 
   return (
     <div
       ref={ref}
       onClick={() => navigate(link)}
-      className={`relative flex flex-col bg-white border border-[#D1FAE5] rounded-xl p-5 cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group ${visible ? 'animate-card-reveal opacity-100' : 'opacity-0'}`}
+      className={`relative flex flex-col bg-white border border-[#E7E7E7] rounded-xl p-4 cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group ${visible ? 'animate-card-reveal opacity-100' : 'opacity-0'}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Condition Ribbon Overlay */}
@@ -47,21 +47,21 @@ function EcoProductCard({ name, emoji, price, co2, credits, condition, link, del
       </div>
 
       {/* Product image placeholder */}
-      <div className="flex items-center justify-center h-28 text-6xl mb-4 bg-[#F0FDF4] rounded-xl group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
-        {emoji}
+      <div className="flex items-center justify-center h-[200px] text-6xl mb-4 bg-[#F7F8FA] rounded-xl group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+        <span className="object-cover">{emoji}</span>
         {/* Certification badge watermark */}
-        <span className="absolute bottom-1 left-2 text-[9px] font-bold text-emerald-700 bg-white/95 px-1.5 py-0.5 rounded shadow-sm border border-emerald-100 flex items-center gap-0.5">
+        <span className="absolute bottom-1 left-2 text-[9px] font-bold text-[#067D62] bg-white/95 px-1.5 py-0.5 rounded shadow-sm border border-slate-100 flex items-center gap-0.5">
           <ShieldCheck size={9} /> ReLoop Graded
         </span>
       </div>
 
       {/* Name & price */}
-      <h3 className="text-sm font-semibold text-slate-800 leading-snug mb-1 line-clamp-2 group-hover:text-[#16A34A] transition-colors">{name}</h3>
-      <p className="text-lg font-bold text-[#16A34A] mb-3">{price}</p>
+      <h3 className="text-sm font-semibold text-slate-800 leading-snug mb-1 line-clamp-2 group-hover:text-[#FF9900] transition-colors">{name}</h3>
+      <p className="text-[18px] font-bold text-[#B12704] mb-3">{price}</p>
 
       {/* Eco stats */}
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-        <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+        <span className="flex items-center gap-1 text-[11px] text-[#067D62] font-semibold">
           <Leaf size={11} /> −{co2} kg CO₂
         </span>
         <span className="flex items-center gap-1 text-[11px] text-amber-600 font-semibold">
@@ -158,24 +158,17 @@ export default function Home() {
   ]
 
   return (
-    <div className="bg-[#F0FDF4] min-h-screen pb-12 text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+    <div className="bg-[#F7F8FA] min-h-screen pb-12 text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
       <div className="w-full px-6 pt-6 space-y-6">
 
         {/* ── Hero Banner ──────────────────────────────────────────── */}
-        <div className="relative w-full overflow-hidden rounded-2xl shadow-lg" style={{ minHeight: '260px', background: 'linear-gradient(135deg, #14532D 0%, #16A34A 55%, #065F46 100%)' }}>
-
-          {/* Leaf particles */}
-          <LeafParticle style={{ bottom: '20px', left: '8%',  animationDuration: '5s',  animationDelay: '0s'   }} />
-          <LeafParticle style={{ bottom: '10px', left: '22%', animationDuration: '6s',  animationDelay: '1.2s' }} />
-          <LeafParticle style={{ bottom: '30px', left: '55%', animationDuration: '4.5s',animationDelay: '0.5s' }} />
-          <LeafParticle style={{ bottom: '15px', right: '12%',animationDuration: '5.5s',animationDelay: '2s'   }} />
-          <LeafParticle style={{ bottom: '25px', right: '28%',animationDuration: '7s',  animationDelay: '0.8s' }} />
+        <div className="relative w-full overflow-hidden rounded-2xl shadow-lg" style={{ minHeight: '260px', background: '#131921', padding: '48px 0' }}>
 
           {/* Subtle radial glow */}
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 70%)' }} />
 
           {/* Hero content */}
-          <div className={`relative z-10 px-10 py-12 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className={`relative z-10 px-10 py-4 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex items-center gap-2 mb-3">
               <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm border border-white/25 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">
                 <Recycle size={12} /> Circular Commerce Platform
@@ -183,7 +176,7 @@ export default function Home() {
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-2" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.25)' }}>
               Shop Circular.{' '}
-              <span style={{ borderBottom: '3px solid #86efac', paddingBottom: '2px' }}>Live Greener.</span>
+              <span style={{ borderBottom: '3px solid #FF9900', paddingBottom: '2px' }}>Live Greener.</span>
             </h1>
             <p className="text-white/85 text-base mt-3 mb-6 max-w-md leading-relaxed font-medium">
               Return, refurbish, and recommerce — every purchase earns Green Credits and saves real CO₂.
@@ -191,13 +184,14 @@ export default function Home() {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => navigate('/amazon-renewed')}
-                className="flex items-center justify-center gap-2 bg-white text-[#14532D] hover:bg-[#F0FDF4] font-bold h-12 px-6 rounded-xl text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+                className="flex items-center justify-center gap-2 bg-[#FF9900] text-[#111111] font-bold h-11 px-6 rounded-lg text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+                style={{ border: 'none' }}
               >
                 Explore Renewed Deals <ArrowRight size={15} />
               </button>
               <button
                 onClick={() => navigate('/returns')}
-                className="flex items-center justify-center gap-2 bg-transparent hover:bg-white/10 border-2 border-white/60 text-white font-bold h-12 px-6 rounded-xl text-sm transition-all duration-200"
+                className="flex items-center justify-center gap-2 bg-white text-[#111111] border-[1.5px] border-[#D5D9D9] font-bold h-11 px-6 rounded-lg text-sm transition-all duration-200 hover:scale-[1.02] cursor-pointer"
               >
                 <Recycle size={15} /> Start a Return
               </button>
@@ -208,17 +202,17 @@ export default function Home() {
           <div className="absolute top-5 right-6 bg-white/15 backdrop-blur-sm border border-white/25 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-3 shadow-md">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#067D62]"></span>
             </span>
             <div className="flex flex-col items-center">
-              <span className="text-lg font-black text-[#86efac] tracking-wide tabular-nums">{co2Saved.toFixed(3)} kg</span>
+              <span className="text-lg font-black text-[#FF9900] tracking-wide tabular-nums">{co2Saved.toFixed(3)} kg</span>
               <span className="text-[10px] text-white/70">CO₂ saved today</span>
             </div>
           </div>
         </div>
 
         {/* ── Category Grid ─────────────────────────────────────────── */}
-        <div className="bg-white border border-[#D1FAE5] rounded-xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <div className="bg-white border border-[#E7E7E7] rounded-xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {categories.map((cat, i) => (
               <div key={i} className="bg-white border border-slate-100 rounded-xl p-4 flex flex-col h-full hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
@@ -226,14 +220,14 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-2 flex-1">
                   {cat.items.map((item, idx) => (
                     <div key={idx} onClick={() => navigate('/products')} className="cursor-pointer flex flex-col gap-1 group">
-                      <div className="aspect-[4/3] bg-[#F0FDF4] rounded-xl overflow-hidden flex items-center justify-center p-2 border border-green-50 group-hover:scale-[1.03] transition-transform duration-200">
-                        <img src={item.img} alt={item.name} className="max-h-full max-w-full object-contain" />
+                      <div className="aspect-[4/3] bg-[#F7F8FA] rounded-xl overflow-hidden flex items-center justify-center p-2 border border-slate-100">
+                        <img src={item.img} alt={item.name} className="max-h-full max-w-full object-contain rounded-lg transition-transform duration-250 group-hover:scale-[1.02]" />
                       </div>
-                      <span className="text-[11px] text-slate-500 mt-0.5 text-center truncate group-hover:text-[#16A34A] transition-colors">{item.name}</span>
+                      <span className="text-[11px] text-slate-500 mt-0.5 text-center truncate group-hover:text-[#FF9900] transition-colors">{item.name}</span>
                     </div>
                   ))}
                 </div>
-                <span onClick={() => navigate('/products')} className="mt-3 pt-3 border-t border-slate-100 text-sm text-[#16A34A] hover:text-[#14532D] hover:underline font-semibold cursor-pointer block">
+                <span onClick={() => navigate('/products')} className="mt-3 pt-3 border-t border-slate-100 text-sm text-[#067D62] hover:text-[#044e3d] hover:underline font-semibold cursor-pointer block">
                   See more →
                 </span>
               </div>
@@ -246,12 +240,12 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <ShieldCheck size={20} className="text-[#16A34A]" />
+                <ShieldCheck size={20} className="text-[#067D62]" />
                 ReLoop Certified Deals
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">AI-graded, verified, and carbon-tracked</p>
             </div>
-            <button onClick={() => navigate('/amazon-renewed')} className="text-sm text-[#16A34A] font-semibold hover:underline flex items-center gap-1">
+            <button onClick={() => navigate('/amazon-renewed')} className="text-sm text-[#067D62] font-semibold hover:underline flex items-center gap-1 cursor-pointer" style={{ border: 'none', background: 'none' }}>
               View all <ArrowRight size={14} />
             </button>
           </div>
@@ -270,14 +264,14 @@ export default function Home() {
         </div>
 
         {/* ── Impact Banner ─────────────────────────────────────────── */}
-        <div className="rounded-xl overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.08)] border border-[#D1FAE5]" style={{ background: 'linear-gradient(135deg, #14532D, #065F46)' }}>
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/20">
+        <div className="rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-[#E7E7E7] bg-[#232F3E]">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {[
               { icon: '🌍', val: '420.25 kg', label: 'CO₂ Saved This Month' },
               { icon: '♻️', val: '1,200+', label: 'Items Recirculated' },
               { icon: '🌳', val: '38',     label: 'Trees Equivalent Saved' },
             ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center py-6 px-4 text-white text-center">
+              <div key={i} className="flex flex-col items-center py-6 px-4 text-white text-center justify-center">
                 <span className="text-3xl mb-2">{stat.icon}</span>
                 <span className="text-2xl font-black">{stat.val}</span>
                 <span className="text-xs text-white/70 mt-0.5 font-medium">{stat.label}</span>

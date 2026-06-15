@@ -13,12 +13,12 @@
   --amz-nav:           #232F3E;
 
   /* === ReLoop Brand (keep alongside Amazon tokens) === */
-  --rl-green:          #16A34A;
-  --rl-green-dark:     #14532D;
-  --rl-green-mid:      #15803D;
-  --rl-green-light:    #22c55e;
-  --rl-green-tint:     #F0FDF4;
-  --rl-border:         #D1FAE5;
+  --rl-green:          #067D62;
+  --rl-green-dark:     #044e3d;
+  --rl-green-mid:      #05644e;
+  --rl-green-light:    #067D62;
+  --rl-green-tint:     #F0FFF4;
+  --rl-border:         #E7E7E7;
 
   /* === Surfaces === */
   --bg:                #F7F8FA;
@@ -56,8 +56,8 @@
   --primary-dark:      var(--rl-green-dark);
   --accent:            var(--rl-teal);
   --surface:           var(--rl-surface);
-  --surface-2:         #DCFCE7;
-  --surface-3:         #BBF7D0;
+  --surface-2:         #FFFFFF;
+  --surface-3:         #FFFFFF;
   --text:              var(--rl-text);
   --text-muted:        var(--rl-text-muted);
   --danger:            var(--rl-red);
@@ -132,12 +132,12 @@ html, body, #root {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .rl-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
 .rl-card-eco {
@@ -175,21 +175,22 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: var(--amz-orange);
-  color: var(--text-primary);
+  background: #FF9900;
+  color: #111111;
   font-weight: 600;
   font-size: 14px;
-  height: 40px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 12px 24px;
   border-radius: 8px;
-  border: 1px solid var(--amz-orange);
+  border: 1px solid #FF9900;
   cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s, filter 0.15s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 .btn-primary:hover, .btn-orange:hover {
-  background: var(--amz-orange-hover);
-  border-color: var(--amz-orange-hover);
+  filter: brightness(0.92);
+  background: #FF9900;
+  border-color: #FF9900;
   box-shadow: 0 2px 8px rgba(255,153,0,0.30);
 }
 .btn-primary:active, .btn-orange:active { transform: scale(0.98); }
@@ -202,65 +203,69 @@ html, body, #root {
   justify-content: center;
   gap: 6px;
   background: white;
-  color: var(--text-primary);
+  color: #111111;
   font-weight: 600;
   font-size: 14px;
-  height: 40px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 12px 24px;
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1.5px solid #D5D9D9;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s, filter 0.15s;
 }
-.btn-secondary:hover { background: var(--bg); border-color: #A5A5A5; }
+.btn-secondary:hover {
+  filter: brightness(0.92);
+  background: white;
+  border-color: #A5A5A5;
+}
 .btn-secondary:active { transform: scale(0.98); }
 .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Green (brand action) */
+/* Green (brand action) - Overridden to keep brand styling clean and never green */
 .btn-green {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: var(--rl-green);
-  color: #fff;
-  font-weight: 700;
+  background: #FF9900;
+  color: #111111;
+  font-weight: 600;
   font-size: 14px;
-  height: 40px;
-  padding: 0 20px;
+  min-height: 44px;
+  padding: 12px 24px;
   border-radius: 8px;
-  border: 1px solid var(--rl-green);
+  border: 1px solid #FF9900;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s, filter 0.15s;
 }
 .btn-green:hover {
-  background: var(--rl-green-mid);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.30);
+  filter: brightness(0.92);
+  background: #FF9900;
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.30);
 }
 .btn-green:active { transform: scale(0.98); }
 .btn-green:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Outline Green */
+/* Outline Green - Overridden to subtle style */
 .btn-outline-green {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   background: #fff;
-  color: var(--rl-green);
+  color: #067D62;
   font-weight: 600;
   font-size: 14px;
-  height: 40px;
-  padding: 0 20px;
+  min-height: 44px;
+  padding: 12px 24px;
   border-radius: 8px;
-  border: 1.5px solid var(--rl-green);
+  border: 1.5px solid #067D62;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: background 0.15s, transform 0.1s, filter 0.15s;
 }
 .btn-outline-green:hover {
-  background: var(--rl-green-tint);
-  transform: translateY(-1px);
+  filter: brightness(0.92);
+  background: #fff;
 }
 
 /* Danger */
@@ -269,23 +274,26 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: var(--error);
+  background: #D13212;
   color: white;
   font-weight: 600;
   font-size: 14px;
-  height: 40px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 12px 24px;
   border-radius: 8px;
-  border: 1px solid var(--error);
+  border: 1px solid #D13212;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: background 0.15s, transform 0.1s, filter 0.15s;
 }
-.btn-danger:hover { background: #B82B10; }
+.btn-danger:hover {
+  filter: brightness(0.92);
+  background: #D13212;
+}
 .btn-danger:active { transform: scale(0.98); }
 
 /* Large / Small size modifiers */
-.btn-lg { height: 48px; padding: 0 24px; font-size: 14px; }
-.btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+.btn-lg { min-height: 48px; padding: 12px 24px; font-size: 14px; }
+.btn-sm { min-height: 44px; padding: 12px 24px; font-size: 14px; }
 .btn-full { width: 100%; }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

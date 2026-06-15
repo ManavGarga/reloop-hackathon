@@ -85,25 +85,27 @@ const AccountCard = ({ icon, iconBg, title, desc, badge, onClick, id }) => (
   <div
     id={id}
     onClick={onClick}
-    className="bg-white border border-slate-200 rounded-xl p-5 flex items-center justify-between gap-4 hover:shadow-md hover:border-[#16A34A]/30 transition-all cursor-pointer group"
+    className="bg-white border border-[#E7E7E7] rounded-lg h-[64px] px-4 flex items-center justify-between gap-3 hover:shadow-sm hover:border-[#FF9900]/30 transition-all cursor-pointer group"
   >
-    <div className="flex items-start gap-3 min-w-0">
-      <div className={`w-14 h-14 flex-shrink-0 rounded-lg flex items-center justify-center ${iconBg}`}>
+    <div className="flex items-center gap-3 min-w-0 flex-1">
+      <div className="w-[20px] h-[20px] flex-shrink-0 flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5 [&_svg]:flex-shrink-0">
         {icon}
       </div>
-      <div className="space-y-1 min-w-0">
-        {badge && (
-          <span className="inline-block bg-[#16A34A] text-white text-xs font-bold px-2 py-0.5 rounded mb-1.5 whitespace-nowrap">
-            {badge}
-          </span>
-        )}
-        <h4 className="text-[14px] font-bold text-[#0F1111] group-hover:text-[#16A34A] leading-snug transition-colors">
-          {title}
-        </h4>
-        <p className="text-[11px] text-[#565959] leading-relaxed">{desc}</p>
+      <div className="flex flex-col min-w-0 text-left">
+        <div className="flex items-center gap-1.5">
+          <h4 className="text-[15px] font-bold text-[#111111] group-hover:text-[#FF9900] leading-none transition-colors">
+            {title}
+          </h4>
+          {badge && (
+            <span className="bg-[#FF9900] text-[#111111] text-[10px] font-bold px-1.5 py-0.5 rounded-[4px] whitespace-nowrap">
+              {badge}
+            </span>
+          )}
+        </div>
+        <p className="text-[13px] text-[#565959] truncate mt-0.5">{desc}</p>
       </div>
     </div>
-    <ChevronRight size={16} className="text-slate-400 group-hover:text-[#16A34A] transition-colors flex-shrink-0" />
+    <ChevronRight size={16} className="text-slate-400 group-hover:text-[#FF9900] transition-colors flex-shrink-0" />
   </div>
 );
 
@@ -119,10 +121,10 @@ const EditRow = ({ label, value, hint, hintColor = "#565959", fieldKey, isEditin
             type={inputType}
             value={editValue}
             onChange={e => onChange(e.target.value)}
-            className="border border-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#16A34A] focus:ring-2 focus:ring-[#16A34A]/20 font-semibold text-[#111] min-w-[200px] transition-all"
+            className="border border-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#FF9900] focus:ring-2 focus:ring-[#FF9900]/20 font-semibold text-[#111] min-w-[200px] transition-all"
           />
-          <button id={`save-${fieldKey}-btn`} onClick={onSave} className="px-4 py-1.5 bg-[#16A34A] hover:bg-[#14532D] text-white font-semibold text-xs rounded-lg transition-all shadow-sm cursor-pointer border border-transparent">Save</button>
-          <button onClick={onCancel} className="px-4 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-lg transition-all shadow-sm cursor-pointer">Cancel</button>
+          <button id={`save-${fieldKey}-btn`} onClick={onSave} className="btn-primary text-xs h-9 px-4 py-1.5">Save</button>
+          <button onClick={onCancel} className="btn-secondary text-xs h-9 px-4 py-1.5">Cancel</button>
         </div>
       ) : (
         <>
@@ -132,7 +134,7 @@ const EditRow = ({ label, value, hint, hintColor = "#565959", fieldKey, isEditin
       )}
     </div>
     {!isEditing && (
-      <button id={`edit-${fieldKey}-trigger`} onClick={onStart} className="px-4 py-1.5 bg-white hover:bg-[#F0FDF4] border border-[#16A34A] text-[#16A34A] text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer">
+      <button id={`edit-${fieldKey}-trigger`} onClick={onStart} className="btn-secondary text-xs h-9 px-4 py-1.5">
         Edit
       </button>
     )}
@@ -142,13 +144,13 @@ const EditRow = ({ label, value, hint, hintColor = "#565959", fieldKey, isEditin
 
 // Subpage shell - defined outside Profile to avoid re-mount on state changes
 const SubpageShell = ({ title, breadcrumb, children, onBack, toastMessage }) => (
-  <div className="bg-[#F0FDF4] min-h-screen px-6 py-8" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
-    <div className="w-full bg-white border border-slate-200 rounded-xl shadow-sm">
+  <div className="bg-[#F7F8FA] min-h-screen px-6 py-8" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+    <div className="w-full bg-white border border-[#E7E7E7] rounded-xl shadow-sm">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1 text-[11px] text-[#565959] px-6 pt-5 pb-0">
-        <span className="hover:text-[#16A34A] cursor-pointer hover:underline" onClick={onBack}>Your Account</span>
+        <span className="hover:text-[#C7511F] cursor-pointer hover:underline" onClick={onBack}>Your Account</span>
         <ChevronRight size={10} />
-        <span className="text-[#16A34A] font-medium">{breadcrumb}</span>
+        <span className="text-[#007185] font-medium">{breadcrumb}</span>
       </div>
       {/* Header */}
       <div className="flex items-center gap-3 px-6 pt-4 pb-5 border-b border-slate-100">
@@ -160,8 +162,8 @@ const SubpageShell = ({ title, breadcrumb, children, onBack, toastMessage }) => 
       <div className="p-6 space-y-6">{children}</div>
     </div>
     {toastMessage && (
-      <div className="fixed bottom-5 right-5 bg-white border border-slate-200 text-[#111] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-fade-in">
-        <Sparkles size={15} className="text-[#16A34A] flex-shrink-0 animate-pulse" />
+      <div className="fixed bottom-5 right-5 bg-white border border-[#E7E7E7] text-[#111] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-fade-in">
+        <Sparkles size={15} className="text-[#FF9900] flex-shrink-0 animate-pulse" />
         <span className="text-xs font-semibold">{toastMessage}</span>
       </div>
     )}
@@ -267,21 +269,21 @@ export default function Profile() {
         <div className="border border-[#DDD] rounded divide-y divide-[#EEE]">
           <EditRow label="Name" value={user.name} fieldKey="name" isEditing={isEditingName} editValue={editName} onStart={() => startEdit("name")} onChange={setEditName} onSave={() => saveEdit("name")} onCancel={() => cancelEdit("name")} />
           <EditRow label="Primary mobile number" value={user.phone} hint="Quickly sign in, recover password, and receive notifications." fieldKey="phone" isEditing={isEditingPhone} editValue={editPhone} onStart={() => startEdit("phone")} onChange={setEditPhone} onSave={() => saveEdit("phone")} onCancel={() => cancelEdit("phone")} inputType="tel" />
-          <EditRow label="E-mail" value={user.email} hint="⚠️ Add email verification to increase account protection." hintColor="#D97706" fieldKey="email" isEditing={isEditingEmail} editValue={editEmail} onStart={() => startEdit("email")} onChange={setEditEmail} onSave={() => saveEdit("email")} onCancel={() => cancelEdit("email")} inputType="email" />
+          <EditRow label="E-mail" value={user.email} hint="⚠️ Add email verification to increase account protection." hintColor="#D13212" fieldKey="email" isEditing={isEditingEmail} editValue={editEmail} onStart={() => startEdit("email")} onChange={setEditEmail} onSave={() => saveEdit("email")} onCancel={() => cancelEdit("email")} inputType="email" />
           <EditRow label="Primary delivery city" value={user.city || "Bengaluru"} hint="Used for local NGO donations and peer-to-peer recommendation sorting." fieldKey="city" isEditing={isEditingCity} editValue={editCity} onStart={() => startEdit("city")} onChange={setEditCity} onSave={() => saveEdit("city")} onCancel={() => cancelEdit("city")} />
           <div className="flex justify-between items-center py-5 px-6">
             <div>
               <span className="text-xs font-bold text-[#0F1111] block">Passkey</span>
               <p className="text-[11px] text-[#565959] mt-1">Sign in with face, fingerprint, or PIN.</p>
             </div>
-            <button className="px-4 py-1.5 bg-white hover:bg-[#F0FDF4] border border-[#16A34A] text-[#16A34A] text-xs font-semibold rounded-lg shadow-xs transition-all cursor-pointer">Set up</button>
+            <button className="btn-secondary text-xs h-9 px-4 py-1.5">Set up</button>
           </div>
           <div className="flex justify-between items-center py-5 px-6">
             <div>
               <span className="text-xs font-bold text-[#0F1111] block">Password</span>
               <p className="text-sm text-[#333] mt-1 tracking-widest">••••••••</p>
             </div>
-            <button className="px-4 py-1.5 bg-white hover:bg-[#F0FDF4] border border-[#16A34A] text-[#16A34A] text-xs font-semibold rounded-lg shadow-xs transition-all cursor-pointer">Edit</button>
+            <button className="btn-secondary text-xs h-9 px-4 py-1.5">Edit</button>
           </div>
         </div>
       </SubpageShell>
@@ -298,11 +300,11 @@ export default function Profile() {
           <div className="prime-shimmer absolute inset-0 pointer-events-none z-0" />
           <div className="relative z-10 flex justify-between items-start mb-4">
             <div>
-              <span className="text-[9px] bg-[#00A8E1]/20 text-[#00A8E1] border border-[#00A8E1]/30 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">
+              <span className="text-[9px] bg-[#FF9900] text-[#111111] rounded-[4px] px-2 py-0.5 font-bold uppercase tracking-wider">
                 CIRCULAR PRIME PASS
               </span>
               <h2 className="text-base font-black tracking-tight mt-2">
-                amazon<span className="text-[#4ade80]">reloop</span> prime
+                amazon<span className="text-[#FF9900]">reloop</span> prime
               </h2>
             </div>
             <span className="text-2xl">👑</span>
@@ -314,7 +316,7 @@ export default function Profile() {
           <div className="flex justify-between items-center pt-3 border-t border-slate-700/50">
             <div>
               <p className="text-[9px] text-slate-400 uppercase font-bold">Status</p>
-              <p className="text-xs text-[#4ade80] font-black mt-0.5">ACTIVE MEMBER ✓</p>
+              <p className="text-xs text-[#067D62] font-black mt-0.5">ACTIVE MEMBER ✓</p>
             </div>
             <div className="text-right">
               <p className="text-[9px] text-slate-400 uppercase font-bold">Valid Until</p>
@@ -387,7 +389,7 @@ export default function Profile() {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-[#565959] uppercase font-bold">Convertible Credits</p>
-              <p id="profile-green-credits-bal" data-loaded={isLoaded} className="text-xl font-black text-emerald-600">{balance} pts</p>
+              <p id="profile-green-credits-bal" data-loaded={isLoaded} className="text-xl font-black text-[#067D62]">{balance} pts</p>
             </div>
           </div>
           <div className="space-y-4">
@@ -404,14 +406,14 @@ export default function Profile() {
                     const v = e.target.value;
                     if (v === "" || /^[0-9]+$/.test(v)) { setConvertAmount(v); setConvertError(""); }
                   }}
-                  className="border border-slate-300 text-xs rounded-lg px-3.5 py-2.5 w-full focus:outline-none focus:border-[#16A34A] focus:ring-2 focus:ring-[#16A34A]/20 font-semibold text-slate-800 transition-all"
+                  className="border border-slate-300 text-xs rounded-lg px-3.5 py-2.5 w-full focus:outline-none focus:border-[#FF9900] focus:ring-2 focus:ring-[#FF9900]/20 font-semibold text-slate-800 transition-all"
                 />
-                <button id="convert-max-btn" onClick={() => setConvertAmount(balance.toString())} className="px-5 bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#16A34A] text-slate-700 hover:text-[#16A34A] font-semibold text-xs rounded-lg transition-all whitespace-nowrap shadow-xs cursor-pointer">Max</button>
+                <button id="convert-max-btn" onClick={() => setConvertAmount(balance.toString())} className="btn-secondary text-xs h-9 px-4 py-1.5">Max</button>
               </div>
             </div>
             {convertError && <p className="text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-lg font-medium">{convertError}</p>}
             {convertAmount && !isNaN(convertAmount) && parseFloat(convertAmount) > 0 && (
-              <div className="bg-emerald-50 border border-emerald-100 p-3 rounded text-center text-xs text-emerald-700 font-semibold">
+              <div style={{ background: '#FFF8F0', border: '1.5px solid #FF9900', color: '#111111' }} className="p-3 rounded-lg text-center text-xs font-semibold">
                 🎉 You will receive ₹{Math.round(parseFloat(convertAmount)).toLocaleString('en-IN')} Amazon Pay Balance
               </div>
             )}
@@ -419,7 +421,7 @@ export default function Profile() {
               id="execute-convert-btn"
               onClick={handleConvert}
               disabled={isConverting || !convertAmount || isNaN(convertAmount) || parseFloat(convertAmount) <= 0}
-              className="w-full py-3 bg-[#16A34A] hover:bg-[#14532D] disabled:bg-slate-250 disabled:text-slate-400 disabled:border-slate-300 border border-transparent text-white font-bold rounded-lg text-sm shadow-xs transition-all cursor-pointer"
+              className="btn-primary w-full py-3 text-sm font-bold"
             >
               {isConverting ? "Converting..." : "Convert to Wallet Balance"}
             </button>
@@ -434,9 +436,9 @@ export default function Profile() {
     return (
       <SubpageShell title="Contact Customer Support" breadcrumb="Contact Us" onBack={goBackToMenu} toastMessage={toastMessage}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div onClick={() => navigate('/recommendations')} className="p-6 bg-white border border-slate-200 rounded-xl text-center cursor-pointer hover:border-[#16A34A] hover:shadow-md transition-all group">
+          <div onClick={() => navigate('/recommendations')} className="p-6 bg-white border border-slate-200 rounded-xl text-center cursor-pointer hover:border-[#FF9900] hover:shadow-md transition-all group">
             <span className="text-3xl block mb-3">💬</span>
-            <h3 className="text-sm font-bold text-slate-800 group-hover:text-[#16A34A] transition-colors">Chat with ReLoop AI</h3>
+            <h3 className="text-sm font-bold text-slate-800 group-hover:text-[#FF9900] transition-colors">Chat with ReLoop AI</h3>
             <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">Talk instantly to our sustainability advisor chatbot to ask about credits, returns, or checkups.</p>
           </div>
           <div className="p-6 bg-white border border-[#DDD] rounded text-center">
@@ -451,93 +453,90 @@ export default function Profile() {
 
   // ── Main Menu ───────────────────────────────────────────────────────────────
   return (
-    <div className="bg-[#F0FDF4] min-h-screen px-6 py-8" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
+    <div className="bg-[#F7F8FA] min-h-screen px-6 py-8" style={{ fontFamily: "'Plus Jakarta Sans', Inter, sans-serif" }}>
       <div className="w-full space-y-6">
 
         {/* Page header */}
-        <div className="flex items-center justify-between pb-4 border-b border-green-200">
+        <div className="flex items-center justify-between pb-4 border-b border-[#E7E7E7]">
           <h1 className="text-2xl font-black text-slate-800">Your Account</h1>
           <span className="text-xs text-slate-400 font-medium">{user?.name || 'Priya Sharma'}</span>
         </div>
 
-        {/* Hero Stat Rings */}
-        <div className="bg-white border border-green-100 rounded-2xl p-6 shadow-md shadow-green-950/[0.02]">
-          <div className="grid grid-cols-3 gap-4 divide-x divide-slate-100">
-            {[
-              {
-                id: 'profile-green-credits-bal',
-                label: 'Green Credits',
-                value: balance,
-                unit: 'pts',
-                max: 2000,
-                color: '#16A34A',
-                track: '#D1FAE5',
-                icon: '🌿',
-                loaded: isLoaded
-              },
-              {
-                label: 'CO₂ Saved',
-                value: co2Saved,
-                unit: 'kg',
-                max: 100,
-                color: '#16A34A',
-                track: '#D1FAE5',
-                icon: '🌍'
-              },
-              {
-                label: 'Amazon Pay',
-                value: payWalletBalance.toFixed(0),
-                unit: '₹',
-                max: 2000,
-                color: '#D97706',
-                track: '#FEF3C7',
-                icon: '💰'
-              }
-            ].map((stat, i) => {
-              const size = 80, sw = 8, r = (size - sw) / 2
-              const circ = 2 * Math.PI * r
-              const pct = Math.min(100, (parseFloat(stat.value) / stat.max) * 100)
-              const offset = circ * (1 - pct / 100)
-              return (
-                <div key={i} className="flex flex-col items-center gap-3 px-6 py-2">
-                  <div className="relative" style={{ width: size, height: size }}>
-                    <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-                      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={stat.track} strokeWidth={sw} />
-                      <circle
-                        cx={size/2} cy={size/2} r={r}
-                        fill="none" stroke={stat.color} strokeWidth={sw}
-                        strokeLinecap="round"
-                        strokeDasharray={circ}
-                        strokeDashoffset={offset}
-                        style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)' }}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-xl">{stat.icon}</span>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <p
-                      id={stat.id}
-                      data-loaded={stat.loaded}
-                      className="text-3xl md:text-[40px] font-black leading-none"
-                      style={{ color: stat.color }}
-                    >
-                      {stat.unit === '₹' ? '₹' : ''}{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}{stat.unit !== '₹' ? ` ${stat.unit}` : ''}
-                    </p>
-                    <p className="text-xs text-slate-500 font-semibold mt-1.5">{stat.label}</p>
+        {/* Hero Stat Rings (Separate cards in a grid) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              id: 'profile-green-credits-bal',
+              label: 'Green Credits',
+              value: balance,
+              unit: 'pts',
+              max: 2000,
+              color: '#FF9900',
+              track: '#F5F5F5',
+              icon: '🌿',
+              loaded: isLoaded
+            },
+            {
+              label: 'CO₂ Saved',
+              value: co2Saved,
+              unit: 'kg',
+              max: 100,
+              color: '#FF9900',
+              track: '#F5F5F5',
+              icon: '🌍'
+            },
+            {
+              label: 'Amazon Pay',
+              value: payWalletBalance.toFixed(0),
+              unit: '₹',
+              max: 2000,
+              color: '#D97706',
+              track: '#FEF3C7',
+              icon: '💰'
+            }
+          ].map((stat, i) => {
+            const size = 80, sw = 8, r = (size - sw) / 2
+            const circ = 2 * Math.PI * r
+            const pct = Math.min(100, (parseFloat(stat.value) / stat.max) * 100)
+            const offset = circ * (1 - pct / 100)
+            return (
+              <div key={i} className="bg-white border border-[#E7E7E7] rounded-xl p-5 shadow-sm flex items-center justify-between gap-4">
+                <div className="text-left">
+                  <p className="text-xs text-[#565959] font-bold uppercase tracking-wider">{stat.label}</p>
+                  <p
+                    id={stat.id}
+                    data-loaded={stat.loaded}
+                    className="text-2xl font-black mt-2 text-[#111111]"
+                  >
+                    {stat.unit === '₹' ? '₹' : ''}{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}{stat.unit !== '₹' ? ` ${stat.unit}` : ''}
+                  </p>
+                </div>
+                <div className="relative" style={{ width: size, height: size }}>
+                  <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={stat.track} strokeWidth={sw} />
+                    <circle
+                      cx={size/2} cy={size/2} r={r}
+                      fill="none" stroke={stat.color} strokeWidth={sw}
+                      strokeLinecap="round"
+                      strokeDasharray={circ}
+                      strokeDashoffset={offset}
+                      style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xl">{stat.icon}</span>
                   </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* Card grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {!isLoaded ? (
             [1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-              <div key={n} className="bg-white border border-slate-200 rounded-xl p-5 flex gap-4 h-24 items-center animate-pulse shadow-xs">
+              <div key={n} className="bg-white border border-[#E7E7E7] rounded-xl p-5 flex gap-4 h-24 items-center animate-pulse shadow-xs">
                 <div className="w-14 h-14 bg-slate-100 rounded-lg flex-shrink-0" />
                 <div className="space-y-2 flex-1">
                   <div className="h-4 bg-slate-100 rounded w-2/3" />
@@ -547,10 +546,10 @@ export default function Profile() {
             ))
           ) : (
             <>
-              <AccountCard icon={<IconOrders />} iconBg="bg-[#F0FDF4]" title="Your Orders" desc="Track, return, or buy circular items again." onClick={() => navigate('/returns')} />
+              <AccountCard icon={<IconOrders />} iconBg="bg-[#F7F8FA]" title="Your Orders" desc="Track, return, or buy circular items again." onClick={() => navigate('/returns')} />
               <AccountCard id="login-security-card" icon={<IconSecurity />} iconBg="bg-[#F3F4F6]" title="Login & Security" desc="Edit login, name, city, and mobile settings." onClick={() => setProfileView("login-security")} />
               <AccountCard id="prime-card" icon={<IconPrime />} iconBg="bg-[#E0F2FE]" title="Prime" desc="View circular prime benefits and membership." badge="CIRCULAR PRIME" onClick={() => setProfileView("prime")} />
-              <AccountCard icon={<IconAddresses />} iconBg="bg-[#F0FDF4]" title="Your Addresses" desc="Edit shipping locations for doorstep returns." onClick={() => setProfileView("login-security")} />
+              <AccountCard icon={<IconAddresses />} iconBg="bg-[#F7F8FA]" title="Your Addresses" desc="Edit shipping locations for doorstep returns." onClick={() => setProfileView("login-security")} />
               <AccountCard icon={<IconBusiness />} iconBg="bg-[#F3F4F6]" title="Your Business Account" desc="Save up to 18% with GST invoice and bulk discounts." onClick={() => setToastMessage("Amazon Business ReLoop benefits activated!")} />
               <AccountCard id="payment-options-card" icon={<IconPayment />} iconBg="bg-[#F0FDFA]" title="Payment Options" desc="Convert credits to Pay balance and view cards." onClick={() => setProfileView("payment")} />
               <AccountCard icon={<IconAmazonPay />} iconBg="bg-[#FFFBEB]" title="Amazon Pay Balance" desc="Add money or convert green credits to balance." onClick={() => setProfileView("payment")} />
@@ -562,7 +561,7 @@ export default function Profile() {
         <hr className="border-[#DDD]" />
 
         {/* Footer links */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+        <div className="bg-white border border-[#E7E7E7] rounded-xl p-6 md:p-8 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -579,11 +578,11 @@ export default function Profile() {
               },
             ].map((col) => (
               <div key={col.title} className="space-y-2">
-                <h3 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide border-b border-slate-200 pb-2">{col.title}</h3>
+                <h3 style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 'bold', color: '#565959', padding: '16px 0 8px' }} className="border-b border-[#E7E7E7] mb-3">{col.title}</h3>
                 <ul className="space-y-1">
                   {col.links.map(link => (
                     <li key={link}>
-                      <span className="text-[13px] text-[#16A34A] hover:text-[#14532D] hover:underline mb-1.5 block cursor-pointer transition-colors duration-150">
+                      <span className="text-[13px] text-[#007185] hover:text-[#C7511F] hover:underline mb-1.5 block cursor-pointer transition-colors duration-150">
                         {link}
                       </span>
                     </li>
@@ -596,8 +595,8 @@ export default function Profile() {
       </div>
 
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 bg-white border border-[#D1FAE5] text-[#111] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-fade-in">
-          <Sparkles size={15} className="text-[#16A34A] flex-shrink-0 animate-pulse" />
+        <div className="fixed bottom-5 right-5 bg-white border border-[#E7E7E7] text-[#111] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-fade-in">
+          <Sparkles size={15} className="text-[#FF9900] flex-shrink-0 animate-pulse" />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}

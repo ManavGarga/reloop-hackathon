@@ -67,23 +67,23 @@ function ReturnFlowContainer() {
 
   if (isMismatched && !initialized) {
     return (
-      <div style={{ background: '#090d16', minHeight: '100vh', padding: '32px 24px', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', borderRadius: '12px' }}>
+      <div style={{ background: '#F7F8FA', minHeight: '100vh', padding: '32px 24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
         <div className="min-h-screen flex flex-col items-center justify-center max-w-5xl mx-auto space-y-6">
-          <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-slate-400">Initializing return wizard...</p>
+          <div className="w-8 h-8 border-4 border-[#FF9900] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-slate-500">Initializing return wizard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#F9FAFB] min-h-screen">
+    <div className="bg-[#F7F8FA] min-h-screen">
       <div className="w-full px-6 py-8">
         
         {/* Return to Orders */}
         <button 
           onClick={() => navigate('/returns')}
-          className="text-sm text-[#16A34A] hover:text-[#14532D] flex items-center gap-1 mb-6 cursor-pointer font-semibold"
+          className="text-sm text-[#007185] hover:text-[#C7511F] flex items-center gap-1 mb-6 cursor-pointer font-semibold bg-transparent border-0"
         >
           <ArrowLeft size={16} /> Back to Your Orders
         </button>
@@ -91,18 +91,18 @@ function ReturnFlowContainer() {
         {/* Wizard Header Title */}
         <div className="text-center space-y-2 mb-6">
           <h1 className="text-2xl font-bold text-slate-900 flex items-center justify-center gap-2">
-            <Sparkles size={24} className="text-[#16A34A]" />
-            amazon<span className="text-[#16A34A]">reloop</span> <span className="font-light text-slate-500">AI Return Hub</span>
+            <Sparkles size={24} className="text-[#FF9900]" />
+            amazon<span className="text-[#067D62]">reloop</span> <span className="font-light text-slate-500">AI Return Hub</span>
           </h1>
-          <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs text-[#565959] max-w-lg mx-auto leading-relaxed">
             Reduce carbon waste, earn green credits, and circularize returns via automated computer vision grading.
           </p>
         </div>
 
         {/* CO2 Savings Pill */}
         <div className="flex justify-center mb-6">
-          <span className="inline-flex items-center gap-1.5 bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC] text-[13px] font-bold px-5 py-2.5 rounded-full shadow-sm">
-            <Leaf size={16} className="text-[#16A34A]" />
+          <span className="inline-flex items-center gap-1.5 bg-[#067D62]/10 text-[#067D62] border border-[#067D62]/20 text-[13px] font-bold px-5 py-2.5 rounded-full shadow-sm">
+            <Leaf size={16} className="text-[#067D62]" />
             Circular returns save 59.5 kg CO₂ and earn 150 Green Credits
           </span>
         </div>
@@ -110,14 +110,24 @@ function ReturnFlowContainer() {
         {/* Progress Bar */}
         <ProgressBar currentStep={currentStep} />
 
-        {/* Step Container Card with left border */}
-        <div className="w-full bg-white rounded-xl shadow-sm border-l-4 border-l-[#16A34A] border-y border-r border-[#D1FAE5] p-6 md:p-8 animate-slide-up mt-6">
+        {/* Step Container Card */}
+        <div className="w-full bg-white rounded-xl shadow-sm border border-[#E7E7E7] p-6 md:p-8 animate-slide-up mt-6">
           {renderActiveStep()}
         </div>
       </div>
     </div>
   );
 }
+const formatCurrency = (amount) => {
+  if (!amount) return "";
+  const numericAmount = typeof amount === "string" ? parseFloat(amount.replace(/[₹,]/g, "")) : amount;
+  if (isNaN(numericAmount)) return amount;
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(numericAmount);
+};
 
 function OrdersList({ user }) {
   const navigate = useNavigate();
@@ -177,7 +187,6 @@ function OrdersList({ user }) {
   };
 
   const handleBuyAgain = (order) => {
-    // Map order item back to a cart item structure
     const cartProduct = {
       product_id: order.productId,
       name: order.productName,
@@ -218,100 +227,99 @@ function OrdersList({ user }) {
 
   if (activeTab === "refund-status" && selectedOrder) {
     return (
-      <div className="bg-[#F0FDF4] min-h-screen w-full" style={{ color: '#0F172A', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif" }}>
-        <div className="w-full bg-white min-h-screen px-6 py-8">
+      <div className="bg-[#F7F8FA] min-h-screen w-full" style={{ color: '#111111', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif" }}>
+        <div className="w-full max-w-4xl mx-auto px-6 py-8">
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
-            <h2 style={{ fontSize: '22px', fontWeight: '500' }}>Return/Refund Status</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E7E7E7', paddingBottom: '16px', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: '600' }}>Return/Refund Status</h2>
             <button 
               onClick={() => setActiveTab("orders")}
               style={{ background: 'none', border: 'none', color: '#007185', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' }}
+              className="hover:text-[#C7511F] hover:underline"
             >
               Back to Your Orders
             </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
-            <div style={{ background: '#fcfcfc', border: '1px solid #e7e7e7', borderRadius: '8px', padding: '20px' }}>
-              <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', marginBottom: '20px' }}>
-                <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '4px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center' }}>
+            <div style={{ background: 'white', border: '1px solid #E7E7E7', borderRadius: '8px', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #E7E7E7', paddingBottom: '16px', marginBottom: '20px' }}>
+                <div style={{ width: '80px', height: '80px', background: 'white', borderRadius: '4px', border: '1px solid #E7E7E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={selectedOrder.img} alt={selectedOrder.productName} style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain' }} />
                 </div>
-                <div>
+                <div style={{ textAlign: 'left' }}>
                   <h4 style={{ fontSize: '14px', fontWeight: '700' }}>{selectedOrder.productName}</h4>
-                  <span style={{ fontSize: '14px', fontWeight: '800', color: '#B12704', marginTop: '6px', display: 'block' }}>{selectedOrder.price}</span>
+                  <span style={{ fontSize: '14px', fontWeight: '800', color: '#B12704', marginTop: '6px', display: 'block' }}>{formatCurrency(selectedOrder.price)}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '24px' }}>
-                <span style={{ color: '#137333' }}><CheckCircle2 size={20} /></span>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '24px', textAlign: 'left' }}>
+                <span style={{ color: '#067D62', marginTop: '2px' }}><CheckCircle2 size={20} /></span>
                 <div>
-                  <h5 style={{ fontSize: '14px', fontWeight: '700', color: '#137333' }}>Refund status: Processed</h5>
-                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '2px' }}>Your circular return was processed and credits/cash refund has been issued.</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h5 style={{ fontSize: '14px', fontWeight: '700' }}>Refund status:</h5>
+                    <span className="badge" style={{ background: '#067D62', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>Processed</span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '6px' }}>Your circular return was processed and credits/cash refund has been issued.</p>
                 </div>
               </div>
 
               <div style={{ position: 'relative', paddingLeft: '32px' }}>
-                <div style={{ position: 'absolute', left: '11px', top: '12px', bottom: '12px', width: '4px', background: '#ff9900' }} />
+                <div style={{ position: 'absolute', left: '11px', top: '12px', bottom: '12px', width: '2px', background: '#D5D9D9' }} />
                 {[
                   { label: "Return initiated (ReLoop AI scan verified)", date: "Today" },
                   { label: "Package dropped off / collected", date: "Pending" },
                   { label: "Item received at sorting hub", date: "Pending" },
                   { label: "Refund credited & Green Credits awarded", date: "Processed ✓" }
-                ].map((step, idx) => (
-                  <div key={idx} style={{ position: 'relative', marginBottom: '24px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '13px' }}>
-                    <span style={{
-                      position: 'absolute',
-                      left: '-26px',
-                      top: '2px',
-                      width: '14px',
-                      height: '14px',
-                      background: '#ff9900',
-                      borderRadius: '50%',
-                      border: '3px solid white',
-                      boxShadow: '0 0 0 1px #ff9900'
-                    }} />
-                    <span style={{ fontWeight: '700', color: '#111' }}>{step.label}</span>
-                    <span style={{ color: '#565959' }}>{step.date}</span>
-                  </div>
-                ))}
+                ].map((step, idx) => {
+                  const isCompleted = step.date !== "Pending";
+                  return (
+                    <div key={idx} style={{ position: 'relative', marginBottom: '24px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '13px', textAlign: 'left' }}>
+                      <span style={{
+                        position: 'absolute',
+                        left: '-28px',
+                        top: '2px',
+                        width: '16px',
+                        height: '16px',
+                        background: isCompleted ? '#067D62' : '#D5D9D9',
+                        borderRadius: '50%',
+                        border: '3px solid white',
+                        boxShadow: `0 0 0 1px ${isCompleted ? '#067D62' : '#D5D9D9'}`
+                      }} />
+                      <span style={{ fontWeight: isCompleted ? '700' : '500', color: isCompleted ? '#111' : '#565959' }}>{step.label}</span>
+                      <span style={{ color: isCompleted ? '#067D62' : '#565959', fontWeight: 'bold' }}>{step.date}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '20px' }}>
-                <h4 style={{ fontWeight: '750', fontSize: '16px', marginBottom: '14px' }}>Refund summary</h4>
+              <div style={{ background: 'white', border: '1px solid #E7E7E7', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <h4 style={{ fontWeight: '700', fontSize: '16px', marginBottom: '14px', textAlign: 'left' }}>Refund summary</h4>
                 <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '13px', paddingBottom: '8px' }}>
                   <span>Refund subtotal</span>
-                  <span>{selectedOrder.price}</span>
+                  <span>{formatCurrency(selectedOrder.price)}</span>
                 </div>
-                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold', borderTop: '1px dashed #eee', paddingTop: '8px' }}>
+                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold', borderTop: '1px dashed #E7E7E7', paddingTop: '8px' }}>
                   <span>Total expected refund</span>
-                  <span>{selectedOrder.price}</span>
+                  <span style={{ color: '#B12704' }}>{formatCurrency(selectedOrder.price)}</span>
                 </div>
               </div>
 
-              <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                <div style={{ background: '#f0f2f2', padding: '10px 16px', fontSize: '13px', fontWeight: '700', borderBottom: '1px solid #ddd' }}>
+              <div style={{ background: 'white', border: '1px solid #E7E7E7', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ background: '#F7F8FA', padding: '10px 16px', fontSize: '13px', fontWeight: '700', borderBottom: '1px solid #E7E7E7', textAlign: 'left' }}>
                   Manage your return
                 </div>
-                <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#007185' }}>
-                  <span style={{ cursor: 'pointer' }} onClick={() => setSelectedInvoice(selectedOrder)}>View invoice receipt</span>
-                  <span style={{ cursor: 'pointer' }} onClick={() => setReviewingOrder(selectedOrder)}>Write a product review</span>
+                <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#007185', textAlign: 'left' }}>
+                  <span style={{ cursor: 'pointer' }} className="hover:text-[#C7511F]" onClick={() => setSelectedInvoice(selectedOrder)}>View invoice receipt</span>
+                  <span style={{ cursor: 'pointer' }} className="hover:text-[#C7511F]" onClick={() => setReviewingOrder(selectedOrder)}>Write a product review</span>
                 </div>
               </div>
 
               <button 
                 onClick={() => navigate('/')}
-                style={{
-                  padding: '12px',
-                  background: '#ffd814',
-                  border: '1px solid #fcd200',
-                  borderRadius: '100px',
-                  fontWeight: '700',
-                  fontSize: '13px',
-                  cursor: 'pointer'
-                }}
+                className="btn-primary w-full text-base font-bold"
               >
                 Continue shopping
               </button>
@@ -323,24 +331,24 @@ function OrdersList({ user }) {
   }
 
   return (
-    <div style={{ background: '#eaeded', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ background: '#F7F8FA', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif' }}>
       
       {/* Toast Alert */}
       {toastMessage && (
-        <div style={{ position: "fixed", top: "80px", right: "24px", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: "4px", fontWeight: "bold", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 2000 }}>
+        <div style={{ position: "fixed", top: "80px", right: "24px", background: "#067D62", color: "white", padding: "12px 24px", borderRadius: "8px", fontWeight: "bold", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 2000 }}>
           {toastMessage}
         </div>
       )}
 
-      <div className="w-full px-6 py-8 space-y-6">
+      <div className="w-full max-w-4xl mx-auto px-6 py-8 space-y-6">
         
-        <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px' }}>
+        <div style={{ fontSize: '12px', color: '#565959', marginBottom: '16px', textAlign: 'left' }}>
           <span>Your Account</span> <ChevronRight size={10} style={{ display: 'inline' }} /> <span style={{ color: '#c7511f' }}>Your Orders</span>
         </div>
 
-        <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px' }}>Your Orders</h1>
+        <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '20px', textAlign: 'left' }}>Your Orders</h1>
 
-        <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px', marginBottom: '20px', fontSize: '14px' }}>
+        <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #E7E7E7', paddingBottom: '10px', marginBottom: '20px', fontSize: '14px' }}>
           <span style={{ fontWeight: 'bold', borderBottom: '2px solid #e77600', paddingBottom: '10px', cursor: 'pointer' }}>Orders</span>
           <span style={{ color: '#565959', cursor: 'pointer' }}>Buy Again</span>
           <span style={{ color: '#565959', cursor: 'pointer' }}>Not Yet Shipped</span>
@@ -348,10 +356,10 @@ function OrdersList({ user }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {orders.map((order) => (
-            <div key={order.id} style={{ background: 'white', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+            <div key={order.id} style={{ background: 'white', border: '1px solid #E7E7E7', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               
               {/* Card Metadata Top belt */}
-              <div style={{ background: '#f0f2f2', padding: '12px 20px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '12px', color: '#565959' }}>
+              <div style={{ background: '#F7F8FA', borderBottom: '1px solid #E7E7E7', padding: '12px 20px', display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', fontSize: '12px', color: '#565959' }}>
                 <div style={{ display: 'flex', gap: '32px' }}>
                   <div>
                     <span>ORDER PLACED</span>
@@ -359,7 +367,7 @@ function OrdersList({ user }) {
                   </div>
                   <div>
                     <span>TOTAL</span>
-                    <p style={{ color: '#111', fontWeight: '500', marginTop: '2px' }}>{order.total}</p>
+                    <p style={{ color: '#B12704', fontWeight: 'bold', marginTop: '2px' }}>{formatCurrency(order.total)}</p>
                   </div>
                   <div>
                     <span>SHIP TO</span>
@@ -369,40 +377,40 @@ function OrdersList({ user }) {
                 <div style={{ textAlign: 'right' }}>
                   <span>ORDER # {order.id}</span>
                   <p style={{ color: '#007185', marginTop: '2px', cursor: 'pointer' }}>
-                    <span onClick={() => setSelectedInvoice(order)}>Invoice</span>
+                    <span onClick={() => setSelectedInvoice(order)} className="hover:text-[#C7511F] hover:underline">Invoice</span>
                   </p>
                 </div>
               </div>
 
               {/* Card Item body */}
-              <div className="flex items-start gap-6 px-6 py-5">
-                <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center bg-[#F0FDF4] border border-green-100 rounded-xl p-2">
+              <div className="flex flex-col md:flex-row items-start gap-6 px-6 py-5">
+                <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center bg-white border border-[#E7E7E7] rounded-xl p-2 mx-auto md:mx-0">
                   <img src={order.img} alt={order.productName} className="max-h-full max-w-full object-contain" />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 text-left">
                   <div className="mb-1.5 flex items-center gap-2 flex-wrap">
-                    <span className="inline-flex items-center text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-0.5 rounded-full">
+                    <span className="inline-flex items-center text-[11px] font-bold text-[#067D62] bg-[#067D62]/10 border border-[#067D62]/20 px-2.5 py-0.5 rounded-full">
                       {order.status}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500 mb-1.5">{order.statusDesc}</p>
+                  <p className="text-xs text-[#565959] mb-1.5">{order.statusDesc}</p>
                   <span 
                     onClick={() => navigate(order.productId === 'JACKET_001' ? '/passport/JACKET_001' : '/product/B09X7KQMGN')} 
-                    className="text-sm text-teal-600 hover:underline cursor-pointer font-semibold block leading-tight mb-2"
+                    className="text-[15px] text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer font-bold block leading-tight mb-2"
                   >
                     {order.productName}
                   </span>
 
                   {/* CO2 Impact Line */}
-                  <div className="inline-flex items-center gap-1.5 bg-[#F0FDF4] border border-green-200 rounded-lg px-3 py-1.5 mb-3">
+                  <div className="inline-flex items-center gap-1.5 bg-[#067D62]/10 border border-[#067D62]/20 rounded-lg px-3 py-1.5 mb-3">
                     <span className="text-sm">♻️</span>
-                    <span className="text-xs font-semibold text-[#1A6B3C]">
+                    <span className="text-xs font-semibold text-[#067D62]">
                       Returning this saves <strong>{order.carbon_footprint_kg ? (order.carbon_footprint_kg * 0.85).toFixed(1) : '59.5'} kg CO₂</strong> from manufacturing
                     </span>
                   </div>
 
                   {/* Journey Timeline */}
-                  <div className="flex items-center gap-0 mt-1">
+                  <div className="flex items-center gap-0 mt-1 flex-wrap">
                     {[
                       { label: 'Return Initiated', icon: '📦' },
                       { label: 'AI Graded',        icon: '🔍' },
@@ -412,11 +420,11 @@ function OrdersList({ user }) {
                       <div key={idx} className="flex items-center">
                         <div className="flex flex-col items-center">
                           <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm border-2 ${
-                            idx === 0 ? 'bg-[#1A6B3C] border-[#1A6B3C] text-white' : 'bg-white border-slate-200 text-slate-400'
+                            idx === 0 ? 'bg-[#067D62] border-[#067D62] text-white' : 'bg-white border-slate-200 text-slate-400'
                           }`}>
                             {step.icon}
                           </div>
-                          <span className="text-[9px] text-slate-400 mt-0.5 text-center leading-tight w-14">{step.label}</span>
+                          <span className="text-[9px] text-[#565959] mt-0.5 text-center leading-tight w-14">{step.label}</span>
                         </div>
                         {idx < 3 && <div className="w-8 h-0.5 bg-slate-200 mb-3 flex-shrink-0" />}
                       </div>
@@ -424,30 +432,29 @@ function OrdersList({ user }) {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 w-48 flex-shrink-0">
-                  {/* Primary green CTA */}
+                <div className="flex flex-col gap-2 w-full md:w-48 flex-shrink-0 mt-4 md:mt-0">
+                  {/* Return via ReLoop button */}
                   <button 
                     onClick={() => navigate(`/return/${order.productId}`)}
-                    className="w-full text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg shadow-md"
-                    style={{ background: 'linear-gradient(135deg, #1A6B3C, #0D9488)' }}
+                    className="btn-secondary w-full text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span className="text-base">♻</span> Return via ReLoop
                   </button>
                   <button 
                     onClick={() => handleBuyAgain(order)}
-                    className="bg-[#F59E0B] hover:bg-[#D97706] text-white text-sm font-semibold py-2.5 rounded-xl text-center cursor-pointer transition-all"
+                    className="w-full text-[#111111] text-sm font-semibold h-[44px] rounded-lg bg-[#FFD814] hover:bg-[#F0C14B] border border-[#FCD200] flex items-center justify-center cursor-pointer transition-all active:scale-[0.98] shadow-sm"
                   >
                     Buy it again
                   </button>
                   <button 
                     onClick={() => handleViewStatus(order)}
-                    className="bg-white border border-slate-200 text-slate-700 text-sm py-2 rounded-xl text-center hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="btn-secondary w-full text-sm font-semibold flex items-center justify-center cursor-pointer"
                   >
                     View Refund Status
                   </button>
                   <button 
                     onClick={() => setReviewingOrder(order)}
-                    className="bg-white border border-slate-200 text-slate-700 text-sm py-2 rounded-xl text-center hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="btn-secondary w-full text-sm font-semibold flex items-center justify-center cursor-pointer"
                   >
                     Write product review
                   </button>
@@ -465,7 +472,7 @@ function OrdersList({ user }) {
             
             <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: '2px solid #ddd', paddingBottom: '10px', marginBottom: '20px' }}>
               <div>
-                <h2 style={{ fontSize: '22px', fontWeight: 'bold' }}>amazon<span style={{ color: '#16a34a' }}>reloop</span></h2>
+                <h2 style={{ fontSize: '22px', fontWeight: 'bold' }}>amazon<span style={{ color: '#FF9900' }}>reloop</span></h2>
                 <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Verified Circular Order Invoice</p>
               </div>
               <button onClick={() => setSelectedInvoice(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={20} /></button>
@@ -491,19 +498,19 @@ function OrdersList({ user }) {
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', padding: '10px', borderBottom: '1px solid #eee' }}>
                 <span style={{ fontWeight: '500' }}>{selectedInvoice.productName}</span>
                 <span>1</span>
-                <span style={{ textAlign: 'right' }}>{selectedInvoice.price}</span>
+                <span style={{ textAlign: 'right', fontWeight: 'bold', color: '#B12704' }}>{formatCurrency(selectedInvoice.price)}</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', padding: '10px', fontWeight: 'bold' }}>
                 <span>Total Amount</span>
                 <span></span>
-                <span style={{ textAlign: 'right' }}>{selectedInvoice.price}</span>
+                <span style={{ textAlign: 'right', fontWeight: 'bold', color: '#B12704' }}>{formatCurrency(selectedInvoice.price)}</span>
               </div>
             </div>
 
             {/* ReLoop Eco Certification Section */}
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '24px', fontSize: '12px' }}>
-              <span style={{ fontWeight: 'bold', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>🌱 CIRCULAR ECO-CERTIFICATE</span>
-              <p style={{ color: '#166534', marginTop: '6px', lineHeight: '1.4' }}>
+            <div style={{ background: 'rgba(6, 125, 98, 0.1)', border: '1px solid rgba(6, 125, 98, 0.2)', borderRadius: '8px', padding: '16px', marginBottom: '24px', fontSize: '12px', textAlign: 'left' }}>
+              <span style={{ fontWeight: 'bold', color: '#067D62', display: 'flex', alignItems: 'center', gap: '6px' }}>🌱 CIRCULAR ECO-CERTIFICATE</span>
+              <p style={{ color: '#067D62', marginTop: '6px', lineHeight: '1.4' }}>
                 This purchase was fulfilled utilizing verified circular logistics. E-waste/Garment manufacturing offset is estimated at approximately <strong>{selectedInvoice.carbon_footprint_kg || 40} kg of CO₂e emissions</strong> compared to virgin material processing loops.
               </p>
             </div>
@@ -513,13 +520,13 @@ function OrdersList({ user }) {
                 onClick={() => {
                   window.print();
                 }} 
-                style={{ flex: 1, padding: '10px', background: '#ffd814', border: '1px solid #fcd200', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                className="flex-1 text-[#111111] text-xs font-semibold h-[44px] rounded-lg bg-[#FFD814] hover:bg-[#F0C14B] border border-[#FCD200] flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-[0.98] shadow-sm"
               >
                 <Printer size={16} /> Print Receipt
               </button>
               <button 
                 onClick={() => setSelectedInvoice(null)} 
-                style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                className="btn-secondary flex-1 text-xs"
               >
                 Close Invoice
               </button>
@@ -534,25 +541,25 @@ function OrdersList({ user }) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', color: '#111' }}>
           <div style={{ background: 'white', padding: '24px', borderRadius: '8px', width: '450px', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
             
-            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: '1px solid #E7E7E7', paddingBottom: '10px', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Create verified review</h3>
               <button onClick={() => setReviewingOrder(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={18} /></button>
             </div>
 
             {reviewSubmitted ? (
               <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-                <span style={{ fontSize: '48px', color: '#16a34a' }}>✓</span>
-                <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '12px', color: '#15803d' }}>Review Submitted!</h4>
+                <span style={{ fontSize: '48px', color: '#067D62' }}>✓</span>
+                <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '12px', color: '#067D62' }}>Review Submitted!</h4>
                 <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>Earning +15 green credits for verified review activity.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <img src={reviewingOrder.img} alt="" style={{ width: '50px', height: '50px', objectFit: 'contain', border: '1px solid #eee', borderRadius: '4px' }} />
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{reviewingOrder.productName}</span>
+                  <img src={reviewingOrder.img} alt="" style={{ width: '50px', height: '50px', objectFit: 'contain', border: '1px solid #E7E7E7', borderRadius: '4px' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textAlign: 'left' }}>{reviewingOrder.productName}</span>
                 </div>
 
-                <div>
+                <div style={{ textAlign: 'left' }}>
                   <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>Overall rating</label>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -568,13 +575,13 @@ function OrdersList({ user }) {
                   </div>
                 </div>
 
-                <div>
+                <div style={{ textAlign: 'left' }}>
                   <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <label style={{ fontSize: '11px', fontWeight: 'bold' }}>Add a written review</label>
                     <button 
                       type="button" 
                       onClick={suggestAIReview} 
-                      style={{ background: 'none', border: 'none', color: '#16A34A', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}
+                      style={{ background: 'none', border: 'none', color: '#007185', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}
                     >
                       ✨ Auto-Draft Eco Review
                     </button>
@@ -583,7 +590,7 @@ function OrdersList({ user }) {
                     value={reviewComment}
                     onChange={e => setReviewComment(e.target.value)}
                     placeholder="What did you like or dislike? How does ReLoop carbon saving verification feel?"
-                    style={{ width: '100%', height: '100px', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px', outline: 'none' }}
+                    style={{ width: '100%', height: '100px', padding: '10px', border: '1px solid #D5D9D9', borderRadius: '4px', fontSize: '12px', outline: 'none' }}
                     required
                   />
                 </div>
@@ -592,13 +599,13 @@ function OrdersList({ user }) {
                   <button 
                     type="button"
                     onClick={() => setReviewingOrder(null)} 
-                    style={{ flex: 1, padding: '10px', background: '#eee', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                    className="btn-secondary flex-1 text-xs"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit" 
-                    style={{ flex: 1, padding: '10px', background: '#16A34A', border: 'none', color: '#ffffff', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}
+                    className="btn-primary flex-1 text-xs"
                   >
                     Submit Review
                   </button>
