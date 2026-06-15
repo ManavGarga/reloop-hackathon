@@ -1,3 +1,4 @@
+from mangum import Mangum
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -53,3 +54,6 @@ app.include_router(demo.router,            prefix="/api/demo",            tags=[
 @app.get("/api/health", tags=["health"])
 async def health_check():
     return {"status": "ok", "project": "ReLoop"}
+
+# AWS Lambda Handler
+handler = Mangum(app)
