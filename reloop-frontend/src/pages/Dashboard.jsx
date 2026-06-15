@@ -605,7 +605,8 @@ export default function Dashboard() {
                 <circle
                   cx="72" cy="72" r="48" stroke="#067D62" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (ngoPct / 100)), transform: `rotate(${refurbishPct * 3.6}deg)`, transformOrigin: 'center' }}
+                  transform={`rotate(${refurbishPct * 3.6} 72 72)`}
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (ngoPct / 100)) }}
                   className="cursor-pointer transition-all hover:stroke-[14px]"
                   strokeLinecap="round"
                   onMouseEnter={() => setHoveredSlice(slices.ngo)}
@@ -614,7 +615,8 @@ export default function Dashboard() {
                 <circle
                   cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
                   strokeDasharray="301.59"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (p2pPct / 100)), transform: `rotate(${(refurbishPct + ngoPct) * 3.6}deg)`, transformOrigin: 'center' }}
+                  transform={`rotate(${(refurbishPct + ngoPct) * 3.6} 72 72)`}
+                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (p2pPct / 100)) }}
                   className="cursor-pointer transition-all hover:stroke-[14px]"
                   strokeLinecap="round"
                   onMouseEnter={() => setHoveredSlice(slices.p2p)}
@@ -643,21 +645,21 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
-                  <span>🔵 P2P Resale ({p2pPct}%)</span>
+                  <span>P2P Resale ({p2pPct}%)</span>
                 </div>
                 <span className="font-bold text-slate-800">{p2pCount} items</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#067D62]" />
-                  <span>🟢 NGO Donation ({ngoPct}%)</span>
+                  <span>NGO Donation ({ngoPct}%)</span>
                 </div>
                 <span className="font-bold text-slate-800">{ngoCount} items</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-semibold text-slate-600">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#FF9900]" />
-                  <span>🟠 Recommerced ({refurbishPct}%)</span>
+                  <span>Recommerced ({refurbishPct}%)</span>
                 </div>
                 <span className="font-bold text-slate-800">{refurbishCount} items</span>
               </div>
