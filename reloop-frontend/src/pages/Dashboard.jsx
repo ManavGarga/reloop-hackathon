@@ -9,6 +9,28 @@ import {
   CheckCircle, Sparkles, X, CreditCard, Zap,
   ShieldCheck, Star, Trophy, Users, TrendingUp, TreePine, Shield, Package, AlertCircle
 } from "lucide-react";
+
+// ── Date Formatter ────────────────────────────────────────────────────────────
+function formatDate(raw) {
+  if (!raw) return "—";
+  try {
+    // Handle both "2026-06-14" and "2026-06-14T10:00:00" formats
+    const d = new Date(raw.includes("T") ? raw : raw + "T00:00:00");
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  } catch { return raw; }
+}
+
+// ── Grade Color Config ────────────────────────────────────────────────────────
+function gradeStyle(grade) {
+  const g = (grade || "").toLowerCase();
+  if (g === "excellent" || g === "like new") return "bg-emerald-100 text-emerald-800";
+  if (g === "good")     return "bg-green-100 text-green-800";
+  if (g === "fair")     return "bg-amber-100 text-amber-800";
+  if (g === "poor")     return "bg-orange-100 text-orange-800";
+  if (g === "damaged")  return "bg-red-100 text-red-800";
+  return "bg-slate-100 text-slate-700";
+}
 import { getUserDashboard, getCredits, redeemCredits } from "../api/reloop";
 
 // ── Reward Catalogue ──────────────────────────────────────────────────────────
@@ -234,7 +256,7 @@ export default function Dashboard() {
             </h1>
             <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
               <p className="text-xs text-slate-500">
-                Welcome back, <span className="font-semibold text-slate-700">{dashboardData.user.name}</span> · Member since {dashboardData.user.member_since}
+                Welcome back, <span className="font-semibold text-slate-700">{dashboardData.user.name}</span> · Member since {formatDate(dashboardData.user.member_since)}
               </p>
               <span className="text-slate-300">|</span>
               <button
@@ -684,7 +706,7 @@ export default function Dashboard() {
                         </div>
                       </td>
                       <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 uppercase tracking-wide">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${gradeStyle(item.grade)}`}>
                           {item.grade || "—"}
                         </span>
                       </td>
@@ -695,7 +717,7 @@ export default function Dashboard() {
                       </td>
                       <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 font-extrabold text-[#16A34A]">+{item.co2_saved || 0} kg</td>
                       <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 font-extrabold text-[#16A34A]">+{item.credits_earned || 0} pts</td>
-                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 text-slate-500 font-semibold">{item.date}</td>
+                      <td className="px-5 py-4 text-sm text-slate-700 border-b border-slate-100 text-slate-500 font-semibold">{formatDate(item.date)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -721,7 +743,7 @@ export default function Dashboard() {
                   <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-100 p-4 rounded-xl text-left">
                     <div>
                       <p className="text-sm font-semibold text-slate-800">{t.notes}</p>
-                      <p className="text-xs text-slate-400 mt-0.5 font-semibold">{(t.timestamp || "").slice(0, 10)}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 font-semibold">{formatDate(t.timestamp)}</p>
                     </div>
                     <span className={`font-bold text-base ${t.amount > 0 ? "text-[#16A34A]" : "text-rose-500"}`}>
                       {t.amount > 0 ? "+" : ""}{t.amount} pts

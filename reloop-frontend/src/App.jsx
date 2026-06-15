@@ -658,11 +658,8 @@ function DemoResetButton() {
   if (location.pathname.startsWith('/renewed')) return null;
 
   const handleReset = () => {
-    const confirmed = window.confirm('Reset demo? This will return you to the product page.');
-    if (confirmed) {
-      navigate('/product/B09X7KQMGN');
-      fetch('http://localhost:8000/api/demo/reset', { method: 'POST' }).catch(() => {});
-    }
+    navigate('/products');
+    fetch('http://localhost:8000/api/demo/reset', { method: 'POST' }).catch(() => {});
   };
 
   return (
