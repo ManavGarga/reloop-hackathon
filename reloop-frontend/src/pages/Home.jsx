@@ -66,18 +66,18 @@ function EcoProductCard({ name, emoji, price, co2, credits, condition, link, del
       </div>
 
       {/* Name & price */}
-      <h3 className="text-sm font-semibold text-slate-800 leading-snug mb-1 line-clamp-2 group-hover:text-[#FF9900] transition-colors">
+      <h3 className="text-sm font-semibold text-slate-800 leading-snug mb-1 line-clamp-2 group-hover:text-[#067D62] transition-colors">
         {name}
       </h3>
-      <p className="text-[18px] font-bold text-[#B12704] mb-3">{price}</p>
+      <p className="text-[18px] font-black text-[#B12704] mb-3">{price}</p>
 
       {/* Eco stats */}
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-        <span className="flex items-center gap-1 text-[11px] text-[#067D62] font-semibold">
+        <span className="flex items-center gap-1 text-[11px] text-[#067D62] font-bold">
           <Leaf size={11} /> −{co2} kg CO₂
         </span>
-        <span className="flex items-center gap-1 text-[11px] text-amber-600 font-semibold">
-          <Zap size={11} /> +{credits} Credits
+        <span className="flex items-center gap-1 text-[11px] text-[#92400E] font-bold bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200">
+          <Zap size={11} className="text-amber-600" /> +{credits} Credits
         </span>
       </div>
     </Card>
