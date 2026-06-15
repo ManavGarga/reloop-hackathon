@@ -326,9 +326,93 @@ function OrdersList({ user }) {
             </div>
           </div>
         </div>
+
+        {/* Invoice Modal */}
+        {selectedInvoice && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111' }}>
+            <div style={{ background: 'white', padding: '30px', borderRadius: '8px', width: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', border: '1px solid #ccc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #ddd', paddingBottom: '10px', marginBottom: '20px' }}>
+                <div>
+                  <h2 style={{ fontSize: '22px', fontWeight: 'bold' }}>amazon<span style={{ color: '#FF9900' }}>reloop</span></h2>
+                  <p style={{ fontSize: '11px', color: '#565959', marginTop: '2px' }}>Verified Circular Order Invoice</p>
+                </div>
+                <button onClick={() => setSelectedInvoice(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={20} /></button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '12px', marginBottom: '20px' }}>
+                <div><strong>Sold By:</strong><p style={{ color: '#565959', marginTop: '4px', lineHeight: '1.4' }}>Amazon Retail India<br />Plot 14, ReLoop Hub Sector 5<br />Bengaluru, KA 560001</p></div>
+                <div><strong>Shipping Address:</strong><p style={{ color: '#565959', marginTop: '4px', lineHeight: '1.4' }}>{selectedInvoice.shipTo}<br />M.G. Road Residency<br />{user?.city || 'Bengaluru'}, India</p></div>
+              </div>
+              <div style={{ border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px', fontSize: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', background: '#f0f2f2', padding: '10px', fontWeight: 'bold', borderBottom: '1px solid #ddd' }}>
+                  <span>Item</span><span>Qty</span><span style={{ textAlign: 'right' }}>Price</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', padding: '10px' }}>
+                  <span style={{ fontWeight: '500' }}>{selectedInvoice.productName}</span>
+                  <span>1</span>
+                  <span style={{ textAlign: 'right', fontWeight: 'bold', color: '#B12704' }}>{formatCurrency(selectedInvoice.price)}</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => window.print()} className="flex-1 text-[#111111] text-xs font-semibold h-[44px] rounded-lg bg-[#FFD814] hover:bg-[#F0C14B] border border-[#FCD200] flex items-center justify-center gap-1.5 cursor-pointer">
+                  <Printer size={16} /> Print Receipt
+                </button>
+                <button onClick={() => setSelectedInvoice(null)} className="btn-secondary flex-1 text-xs">Close Invoice</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Review Modal */}
+        {reviewingOrder && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111' }}>
+            <div style={{ background: 'white', padding: '24px', borderRadius: '8px', width: '450px', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #E7E7E7', paddingBottom: '10px', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Create verified review</h3>
+                <button onClick={() => setReviewingOrder(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}><X size={18} /></button>
+              </div>
+              {reviewSubmitted ? (
+                <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+                  <span style={{ fontSize: '48px', color: '#067D62' }}>✓</span>
+                  <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '12px', color: '#067D62' }}>Review Submitted!</h4>
+                  <p style={{ fontSize: '12px', color: '#565959', marginTop: '4px' }}>Earning +15 green credits for verified review activity.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <img src={reviewingOrder.img} alt="" style={{ width: '50px', height: '50px', objectFit: 'contain', border: '1px solid #E7E7E7', borderRadius: '4px' }} />
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', textAlign: 'left' }}>{reviewingOrder.productName}</span>
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>Overall rating</label>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {[1,2,3,4,5].map((star) => (
+                        <Star key={star} size={22} onClick={() => setReviewRating(star)} fill={star <= reviewRating ? '#ff9900' : 'none'} stroke={star <= reviewRating ? '#ff9900' : '#ccc'} style={{ cursor: 'pointer' }} />
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 'bold' }}>Add a written review</label>
+                      <button type="button" onClick={suggestAIReview} style={{ background: 'none', border: 'none', color: '#007185', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold' }}>✨ Auto-Draft Eco Review</button>
+                    </div>
+                    <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)}
+                      placeholder="What did you like or dislike?"
+                      style={{ width: '100%', height: '100px', padding: '10px', border: '1px solid #D5D9D9', borderRadius: '4px', fontSize: '12px', outline: 'none' }} required />
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                    <button type="button" onClick={() => setReviewingOrder(null)} className="btn-secondary flex-1 text-xs">Cancel</button>
+                    <button type="submit" className="btn-primary flex-1 text-xs">Submit Review</button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
+
 
   return (
     <div style={{ background: '#F7F8FA', minHeight: '100vh', padding: '24px', color: '#111111', fontFamily: 'Arial, sans-serif', display: 'flex', justifyContent: 'center' }}>
