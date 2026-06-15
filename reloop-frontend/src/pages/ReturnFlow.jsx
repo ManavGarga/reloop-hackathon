@@ -77,8 +77,8 @@ function ReturnFlowContainer() {
   }
 
   return (
-    <div className="bg-[#F7F8FA] min-h-screen">
-      <div className="w-full px-6 py-8">
+    <div className="bg-[#F7F8FA] min-h-screen w-full flex flex-col items-center">
+      <div className="w-full max-w-4xl px-6 py-8">
         
         {/* Return to Orders */}
         <button 

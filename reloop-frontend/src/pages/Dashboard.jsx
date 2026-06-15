@@ -590,53 +590,55 @@ export default function Dashboard() {
             </div>
 
             {/* SVG Donut Ring */}
-            <div className="flex items-center justify-center py-6 relative">
-              <svg className="w-36 h-36 transform -rotate-90">
-                <circle cx="72" cy="72" r="48" stroke="#f1f5f9" strokeWidth="12" fill="transparent" />
-                <circle
-                  cx="72" cy="72" r="48" stroke="#FF9900" strokeWidth="12" fill="transparent"
-                  strokeDasharray="301.59" strokeDashoffset="0"
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (refurbishPct / 100)) }}
-                  strokeLinecap="round"
-                  className="cursor-pointer transition-all hover:stroke-[14px]"
-                  onMouseEnter={() => setHoveredSlice(slices.refurbish)}
-                  onMouseLeave={() => setHoveredSlice(null)}
-                />
-                <circle
-                  cx="72" cy="72" r="48" stroke="#067D62" strokeWidth="12" fill="transparent"
-                  strokeDasharray="301.59"
-                  transform={`rotate(${refurbishPct * 3.6} 72 72)`}
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (ngoPct / 100)) }}
-                  className="cursor-pointer transition-all hover:stroke-[14px]"
-                  strokeLinecap="round"
-                  onMouseEnter={() => setHoveredSlice(slices.ngo)}
-                  onMouseLeave={() => setHoveredSlice(null)}
-                />
-                <circle
-                  cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
-                  strokeDasharray="301.59"
-                  transform={`rotate(${(refurbishPct + ngoPct) * 3.6} 72 72)`}
-                  style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (p2pPct / 100)) }}
-                  className="cursor-pointer transition-all hover:stroke-[14px]"
-                  strokeLinecap="round"
-                  onMouseEnter={() => setHoveredSlice(slices.p2p)}
-                  onMouseLeave={() => setHoveredSlice(null)}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none pointer-events-none">
-                {hoveredSlice ? (
-                  <>
-                    <span className="text-xl font-black text-slate-800 leading-none">{hoveredSlice.val}</span>
-                    <span className="text-[10px] font-extrabold uppercase mt-1" style={{ color: hoveredSlice.color }}>
-                      {hoveredSlice.pct}% ({hoveredSlice.co2}kg Saved)
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-3xl font-black text-slate-900 leading-none">{totalItems}</span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
-                  </>
-                )}
+            <div className="flex items-center justify-center py-6">
+              <div className="relative w-36 h-36">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="72" cy="72" r="48" stroke="#f1f5f9" strokeWidth="12" fill="transparent" />
+                  <circle
+                    cx="72" cy="72" r="48" stroke="#FF9900" strokeWidth="12" fill="transparent"
+                    strokeDasharray="301.59" strokeDashoffset="0"
+                    style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (refurbishPct / 100)) }}
+                    strokeLinecap="round"
+                    className="cursor-pointer transition-all hover:stroke-[14px]"
+                    onMouseEnter={() => setHoveredSlice(slices.refurbish)}
+                    onMouseLeave={() => setHoveredSlice(null)}
+                  />
+                  <circle
+                    cx="72" cy="72" r="48" stroke="#067D62" strokeWidth="12" fill="transparent"
+                    strokeDasharray="301.59"
+                    transform={`rotate(${refurbishPct * 3.6} 72 72)`}
+                    style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (ngoPct / 100)) }}
+                    className="cursor-pointer transition-all hover:stroke-[14px]"
+                    strokeLinecap="round"
+                    onMouseEnter={() => setHoveredSlice(slices.ngo)}
+                    onMouseLeave={() => setHoveredSlice(null)}
+                  />
+                  <circle
+                    cx="72" cy="72" r="48" stroke="#2563EB" strokeWidth="12" fill="transparent"
+                    strokeDasharray="301.59"
+                    transform={`rotate(${(refurbishPct + ngoPct) * 3.6} 72 72)`}
+                    style={{ strokeDasharray: "301.59", strokeDashoffset: 301.59 * (1 - (p2pPct / 100)) }}
+                    className="cursor-pointer transition-all hover:stroke-[14px]"
+                    strokeLinecap="round"
+                    onMouseEnter={() => setHoveredSlice(slices.p2p)}
+                    onMouseLeave={() => setHoveredSlice(null)}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none pointer-events-none">
+                  {hoveredSlice ? (
+                    <>
+                      <span className="text-xl font-black text-slate-800 leading-none">{hoveredSlice.val}</span>
+                      <span className="text-[10px] font-extrabold uppercase mt-1" style={{ color: hoveredSlice.color }}>
+                        {hoveredSlice.pct}% ({hoveredSlice.co2}kg Saved)
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-black text-slate-900 leading-none">{totalItems}</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Items Total</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 

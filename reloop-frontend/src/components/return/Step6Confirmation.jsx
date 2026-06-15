@@ -96,7 +96,7 @@ export default function Step6Confirmation() {
   }
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto py-4 animate-fade-in text-left">
+    <div className="space-y-8 max-w-2xl mx-auto py-4 animate-fade-in text-left flex flex-col items-center w-full">
       {/* 1. Big green checkmark & Heading */}
       <div className="text-center space-y-3">
         <div className="w-16 h-16 bg-[#067D62]/10 border border-[#067D62]/20 rounded-full flex items-center justify-center text-[#067D62] text-3xl mx-auto shadow-sm animate-scale-up">
@@ -107,7 +107,7 @@ export default function Step6Confirmation() {
       </div>
 
       {/* 2. Three Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {/* Refund Card */}
         <Card className="flex flex-col items-center justify-between space-y-3 text-center p-5 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-extrabold shadow-sm">
@@ -153,7 +153,7 @@ export default function Step6Confirmation() {
       </div>
 
       {/* 4. Ecosystem Flow Diagram */}
-      <Card className="p-6 shadow-sm space-y-5">
+      <Card className="p-6 shadow-sm space-y-5 w-full">
         <span className="text-[11px] font-bold text-[#565959] uppercase tracking-wider block text-left">
           What happens next
         </span>
@@ -198,7 +198,7 @@ export default function Step6Confirmation() {
       </Card>
 
       {/* 5. Two CTA buttons */}
-      <div className="flex gap-4 justify-center">
+      <div className="flex gap-4 justify-center w-full">
         <Button
           onClick={handleFinish}
           variant="secondary"

@@ -89,7 +89,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
   }
 
   return (
-    <div className="space-y-6 text-[#111111]">
+    <div className="space-y-6 text-[#111111] flex flex-col items-center w-full">
       {route === "p2p" || route === "refurbish" ? (
         <>
           <div className="text-center max-w-xl mx-auto space-y-2">
@@ -99,7 +99,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
             <p className="text-xs text-[#565959]">Review the instant P2P purchase request matched for your product.</p>
           </div>
 
-          <div className="max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
+          <div className="w-full max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
             {/* P2P Offer details card */}
             <div className="bg-gray-50 border border-[#E7E7E7] border-t-4 border-t-[#FF9900] p-5 rounded-lg text-center space-y-4 relative overflow-hidden">
               <span className="text-[10px] font-bold text-[#565959] uppercase tracking-widest block">Live Match Signal</span>
@@ -148,7 +148,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
             <p className="text-xs text-[#565959]">Donate this item to help families in need and earn double Green Credits.</p>
           </div>
 
-          <div className="max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
+          <div className="w-full max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
             {/* NGO Donation Card */}
             <div className="bg-gray-50 border border-[#E7E7E7] border-t-4 border-t-[#067D62] p-5 rounded-lg text-center space-y-4 relative overflow-hidden">
               <span className="text-[10px] font-bold text-[#565959] uppercase tracking-widest block">Live Route Match</span>
@@ -197,7 +197,7 @@ export default function Step5ReLoopOptions({ onNext, onBack }) {
             <p className="text-xs text-[#565959]">Recycle this item responsibly to recover valuable materials.</p>
           </div>
 
-          <div className="max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
+          <div className="w-full max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-xl p-6 shadow-sm space-y-6 text-left">
             {/* Recycling Card */}
             <div className="bg-gray-50 border border-[#E7E7E7] border-t-4 border-t-[#565959] p-5 rounded-lg text-center space-y-4 relative overflow-hidden">
               <span className="text-[10px] font-bold text-[#565959] uppercase tracking-widest block">Recycling Route</span>

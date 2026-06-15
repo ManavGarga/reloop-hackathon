@@ -263,7 +263,7 @@ export default function Home() {
         </div>
 
         {/* ── Impact Banner ─────────────────────────────────────────── */}
-        <Card padding="none" className="overflow-hidden bg-[#232F3E]">
+        <Card padding="none" className="overflow-hidden bg-[#232F3E] border-transparent">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {[
               { icon: "🌍", val: "420.25 kg", label: "CO₂ Saved This Month" },

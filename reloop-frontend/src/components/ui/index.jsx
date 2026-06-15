@@ -64,15 +64,16 @@ export function Button({
   );
 }
 
-/* ─── Card ────────────────────────────────────────────────────────────────── */
 export function Card({ children, className = '', hover = false, onClick, padding = 'default', ...rest }) {
   const paddings = { default: 'p-5', sm: 'p-3', lg: 'p-7', none: '' };
   const hoverClass = hover ? 'hover:-translate-y-0.5 hover:shadow-md cursor-pointer' : '';
   const clickable = onClick ? 'cursor-pointer' : '';
+  const hasCustomBg = /(?:^|\s)bg-/.test(className);
+  const bgClass = hasCustomBg ? '' : 'bg-white';
   return (
     <div
       onClick={onClick}
-      className={`bg-white border border-[#E7E7E7] rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.07)] transition-all duration-150 ${hoverClass} ${clickable} ${paddings[padding]} ${className}`}
+      className={`${bgClass} border border-[#E7E7E7] rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.07)] transition-all duration-150 ${hoverClass} ${clickable} ${paddings[padding]} ${className}`}
       {...rest}
     >
       {children}
